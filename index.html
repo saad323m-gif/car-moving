@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>نظام إدارة وتسجيل حركة السيارات المتكامل - V2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="autocomplete" content="off" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="logo.png" type="image/png" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- الهيدر -->
+    <header class="app-header">
+      <!-- يسار: اسم المستخدم داخل شارة + خروج تحتها -->
+      <div class="header-left">
+        <div id="current-user-badge" class="user-badge hidden">
+          <span id="current-user-name" class="user-badge-name"></span>
+          <span id="current-user-role" class="user-badge-role"></span>
+        </div>
+        <button id="logout-btn" class="logout-btn hidden">تسجيل الخروج</button>
+      </div>
+
+      <!-- المنتصف: شعار المسعود كبير -->
+      <div class="header-center">
+        <img src="logo.png" alt="AL MASAOOD" class="app-logo" />
+      </div>
+
+      <!-- يمين: عنوان النظام أعلى + التاريخ والوقت وأسفلها زر التحديث -->
+      <div class="header-right">
+        <h1 class="app-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
+        <div class="header-right-bottom">
+          <div id="header-datetime" class="header-datetime"></div>
+          <button id="manual-refresh-btn" class="icon-btn" title="تحديث البيانات يدويًا">
+            🔄
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- شريط البحث الثابت -->
+    <section id="global-search-bar" class="global-search-bar hidden">
+      <div class="global-search-inner">
+        <input
+          id="global-search-input"
+          type="text"
+          placeholder="بحث سريع في الحركات، العهدة، الأسطول، الأعضاء..."
+        />
+        <button id="global-search-btn" class="btn btn-secondary">بحث</button>
+      </div>
+    </section>
+
+    <!-- لوحة الملخصات -->
+    <section id="dashboard-summary" class="dashboard-summary hidden">
+      <div class="summary-card">
+        <div class="summary-label">عدد السيارات في الأسطول</div>
+        <div id="summary-fleet-count" class="summary-value">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">حركات اليوم</div>
+        <div id="summary-movements-today" class="summary-value">0</div>
+      </div>
+      <div class="summary-card summary-card-warning">
+        <div class="summary-label">سيارات تحتاج تنبيه</div>
+        <div id="summary-alerts-count" class="summary-value">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">عدد الأعضاء</div>
+        <div id="summary-users-count" class="summary-value">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">عدد العهد</div>
+        <div id="summary-assignments-count" class="summary-value">0</div>
+      </div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="app-main">
+      <!-- تسجيل الدخول -->
+      <section id="login-section" class="card">
+        <h2 class="section-title">تسجيل الدخول</h2>
+        <form id="login-form" autocomplete="off" novalidate>
+          <div class="form-group">
+            <label for="login-username">اسم المستخدم</label>
+            <input
+              id="login-username"
+              type="text"
+              minlength="4"
+              required
+              autocomplete="new-username"
+              placeholder="ادخل اسم المستخدم"
+            />
+          </div>
+          <div class="form-group">
+            <label for="login-password">كلمة المرور</label>
+            <input
+              id="login-password"
+              type="password"
+              minlength="6"
+              required
+              autocomplete="new-password"
+              placeholder="ادخل كلمة المرور"
+            />
+          </div>
+          <div id="login-error" class="form-error"></div>
+          <button type="submit" class="btn btn-primary btn-block">دخول</button>
+        </form>
+      </section>
+
+      <!-- إجبار المدير على تغيير البيانات -->
+      <section id="admin-force-change-section" class="card hidden">
+        <h2 class="section-title">تحديث بيانات المدير</h2>
+        <p class="section-note">
+          يجب تغيير بيانات الدخول الافترية (admin / admin123) قبل المتابعة.
+        </p>
+        <form id="admin-change-form" autocomplete="off" novalidate>
+          <div class="form-group">
+            <label for="new-admin-username">اسم مستخدم جديد (مدير)</label>
+            <input
+              id="new-admin-username"
+              type="text"
+              minlength="4"
+              required
+              placeholder="ادخل اسم مستخدم جديد"
+            />
+          </div>
+          <div class="form-group">
+            <label for="new-admin-password">كلمة مرور جديدة</label>
+            <input
+              id="new-admin-password"
+              type="password"
+              minlength="6"
+              required
+              placeholder="ادخل كلمة مرور جديدة"
+            />
+          </div>
+          <div class="form-group">
+            <label for="new-admin-phone">رقم الجوال (10 أرقام)</label>
+            <input
+              id="new-admin-phone"
+              type="tel"
+              inputmode="numeric"
+              placeholder="مثال: 0501234567"
+              required
+            />
+          </div>
+          <div id="admin-change-error" class="form-error"></div>
+          <button type="submit" class="btn btn-primary btn-block">
+            حفظ ومتابعة
+          </button>
+        </form>
+      </section>
+
+      <!-- التطبيق بعد تسجيل الدخول -->
+      <section id="app-section" class="hidden">
+        <!-- التبويبات -->
+        <nav class="tabs-nav">
+          <button class="tab-btn active" data-tab="tab-movements">التحركات</button>
+          <button class="tab-btn" data-tab="tab-assignments">العهدة</button>
+          <button class="tab-btn" data-tab="tab-fleet">الأسطول</button>
+          <button class="tab-btn" data-tab="tab-users">الأعضاء</button>
+          <button class="tab-btn" data-tab="tab-search">نتائج البحث</button>
+        </nav>
+
+        <!-- التحركات -->
+        <div id="tab-movements" class="tab-content active">
+          <h2 class="section-title">حركات السيارات</h2>
+
+          <form id="movement-form" class="card">
+            <h3 class="section-subtitle">إضافة حركة</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>رقم السيارة</label>
+                <input id="mov-car-number" type="text" required />
+              </div>
+              <div class="form-group">
+                <label>كود اللوحة</label>
+                <input id="mov-plate-code" type="text" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم العضو (السائق)</label>
+                <select id="mov-user-select" required></select>
+              </div>
+              <div class="form-group">
+                <label>الحركة</label>
+                <select id="mov-action" required>
+                  <option value="">اختر</option>
+                  <option value="استلام">استلام</option>
+                  <option value="تسليم">تسليم</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>ملاحظات</label>
+              <textarea id="mov-notes" rows="2"></textarea>
+            </div>
+
+            <div id="movements-form-error" class="form-error"></div>
+
+            <button type="submit" class="btn btn-primary btn-block">حفظ الحركة</button>
+          </form>
+
+          <div class="card">
+            <h3 class="section-subtitle">تقرير التحركات</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>المدة</label>
+                <select id="mov-report-range">
+                  <option value="day">اليوم</option>
+                  <option value="week">أسبوع</option>
+                  <option value="month">شهر</option>
+                  <option value="year">سنة</option>
+                  <option value="all">الكل</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>&nbsp;</label>
+                <button id="mov-print-report" class="btn btn-secondary btn-block">
+                  طباعة تقرير التحركات
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="movements-list" class="card movements-list"></div>
+        </div>
+
+        <!-- العهدة -->
+        <div id="tab-assignments" class="tab-content">
+          <h2 class="section-title">العهدة</h2>
+
+          <form id="assignment-form" class="card">
+            <h3 class="section-subtitle">إضافة عهدة</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>رقم السيارة</label>
+                <input id="ass-car-number" type="text" required />
+              </div>
+              <div class="form-group">
+                <label>كود اللوحة</label>
+                <input id="ass-plate-code" type="text" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم المستخدم</label>
+                <select id="ass-user-select" required></select>
+              </div>
+              <div class="form-group">
+                <label>المالك</label>
+                <input id="ass-owner" type="text" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>ملاحظات</label>
+              <textarea id="ass-notes" rows="2"></textarea>
+            </div>
+            <div id="assignments-form-error" class="form-error"></div>
+            <button type="submit" class="btn btn-primary btn-block">حفظ العهدة</button>
+          </form>
+
+          <div id="assignments-list" class="card accordion-list"></div>
+        </div>
+
+        <!-- الأسطول -->
+        <div id="tab-fleet" class="tab-content">
+          <h2 class="section-title">إدارة الأسطول</h2>
+
+          <div class="card">
+            <h3 class="section-subtitle">تصفية الأسطول</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>فلتر</label>
+                <select id="fleet-filter">
+                  <option value="all">كل السيارات</option>
+                  <option value="alert">سيارات تحتاج تنبيه</option>
+                  <option value="expired">سيارات منتهية</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <form id="fleet-form" class="card">
+            <h3 class="section-subtitle">إضافة سيارة</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>رقم السيارة</label>
+                <input id="fleet-car-number" type="text" required />
+              </div>
+              <div class="form-group">
+                <label>كود اللوحة</label>
+                <input id="fleet-plate-code" type="text" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>المالك</label>
+                <input id="fleet-owner" type="text" required />
+              </div>
+              <div class="form-group">
+                <label>نهاية الترخيص</label>
+                <input id="fleet-license-end" type="date" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>نهاية التأمين</label>
+                <input id="fleet-insurance-end" type="date" required />
+              </div>
+              <div class="form-group">
+                <label>ملاحظات</label>
+                <input id="fleet-notes" type="text" />
+              </div>
+            </div>
+            <div id="fleet-form-error" class="form-error"></div>
+            <button type="submit" class="btn btn-primary btn-block">حفظ السيارة</button>
+          </form>
+
+          <div id="fleet-list" class="card accordion-list"></div>
+        </div>
+
+        <!-- الأعضاء -->
+        <div id="tab-users" class="tab-content">
+          <h2 class="section-title">إدارة الأعضاء</h2>
+
+          <form id="user-form" class="card">
+            <h3 class="section-subtitle">إضافة / تعديل عضو</h3>
+            <input id="user-id" type="hidden" />
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم المستخدم</label>
+                <input id="user-username" type="text" minlength="4" required />
+              </div>
+              <div class="form-group">
+                <label>كلمة المرور</label>
+                <input id="user-password" type="password" minlength="6" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>الدور</label>
+                <select id="user-role" required>
+                  <option value="member">عضو</option>
+                  <option value="supervisor">مشرف</option>
+                  <option value="admin">مدير</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>رقم الجوال (10 أرقام)</label>
+                <input
+                  id="user-phone"
+                  type="tel"
+                  inputmode="numeric"
+                  placeholder="مثال: 0501234567"
+                  required
+                />
+              </div>
+            </div>
+            <div id="users-form-error" class="form-error"></div>
+            <button type="submit" class="btn btn-primary btn-block">
+              حفظ العضو
+            </button>
+          </form>
+
+          <div id="users-list" class="card accordion-list"></div>
+        </div>
+
+        <!-- نتائج البحث (تستخدم مع شريط البحث العلوي) -->
+        <div id="tab-search" class="tab-content">
+          <h2 class="section-title">نتائج البحث</h2>
+          <div id="search-results" class="search-results"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="app-footer">
+      <div>جميع الحقوق محفوظة © <span id="footer-year"></span></div>
+      <div>تمت البرمجة والتطوير بواسطة ( MIOHAMED SAAD )</div>
+    </footer>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
