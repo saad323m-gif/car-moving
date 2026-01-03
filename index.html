@@ -5,215 +5,145 @@
     <title>نظام إدارة وتسجيل حركة السيارات المتكامل</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Manifest لـ PWA -->
     <link rel="manifest" href="manifest.json">
-
-    <!-- أيقونة التطبيق (يمكن لاحقًا استبدالها) -->
     <link rel="icon" href="logo.png" type="image/png">
-
-    <!-- ملف التنسيقات -->
     <link rel="stylesheet" href="styles.css">
 
-    <!-- منع تلميح اسم المستخدم أو كلمة المرور -->
     <meta name="autocomplete" content="off">
 </head>
 <body>
-    <!-- غلاف التطبيق -->
-    <div class="app-container">
 
-        <!-- الهيدر -->
-        <header class="app-header">
-            <div class="header-left">
-                <img src="logo.png" alt="AL MASAOOD Logo" class="app-logo">
+<div class="app-container">
+
+    <!-- الهيدر الجديد -->
+    <header class="app-header">
+
+        <!-- يسار: اسم المستخدم + تسجيل الخروج -->
+        <div class="header-left">
+            <div id="current-user-info" class="current-user-info"></div>
+            <button id="logout-btn" class="logout-btn hidden">تسجيل الخروج</button>
+        </div>
+
+        <!-- المنتصف: الشعار + العنوان -->
+        <div class="header-center">
+            <img src="logo.png" alt="Logo" class="app-logo">
+            <h1 class="app-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
+        </div>
+
+        <!-- يمين: التاريخ والوقت -->
+        <div class="header-right">
+            <div id="header-datetime" class="header-datetime"></div>
+        </div>
+
+    </header>
+
+    <!-- المحتوى -->
+    <main class="app-main">
+
+        <!-- تسجيل الدخول -->
+        <section id="login-section" class="card login-section">
+            <h2 class="section-title">تسجيل الدخول</h2>
+            <form id="login-form" autocomplete="off" novalidate>
+                <div class="form-group">
+                    <label for="login-username">اسم المستخدم</label>
+                    <input id="login-username" type="text" minlength="4" required autocomplete="new-username">
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">كلمة المرور</label>
+                    <input id="login-password" type="password" minlength="6" required autocomplete="new-password">
+                </div>
+
+                <div id="login-error" class="form-error"></div>
+
+                <button type="submit" class="btn btn-primary btn-block">دخول</button>
+            </form>
+        </section>
+
+        <!-- إجبار المدير على تغيير البيانات -->
+        <section id="admin-force-change-section" class="card hidden">
+            <h2 class="section-title">تحديث بيانات المدير</h2>
+            <p class="section-note">يجب تغيير بيانات الدخول الافتراضية قبل المتابعة.</p>
+
+            <form id="admin-change-form" autocomplete="off" novalidate>
+                <div class="form-group">
+                    <label>اسم مستخدم جديد</label>
+                    <input id="new-admin-username" type="text" minlength="4" required>
+                </div>
+
+                <div class="form-group">
+                    <label>كلمة مرور جديدة</label>
+                    <input id="new-admin-password" type="password" minlength="6" required>
+                </div>
+
+                <div class="form-group">
+                    <label>رقم الجوال (10 أرقام)</label>
+                    <input id="new-admin-phone" type="tel" pattern="\\d{10}" required>
+                </div>
+
+                <div id="admin-change-error" class="form-error"></div>
+
+                <button type="submit" class="btn btn-primary btn-block">حفظ ومتابعة</button>
+            </form>
+        </section>
+
+        <!-- التطبيق بعد تسجيل الدخول -->
+        <section id="app-section" class="hidden">
+
+            <!-- التبويبات -->
+            <nav class="tabs-nav">
+                <button class="tab-btn active" data-tab="tab-movements">التحركات</button>
+                <button class="tab-btn" data-tab="tab-assignments">العهدة</button>
+                <button class="tab-btn" data-tab="tab-fleet">الأسطول</button>
+                <button class="tab-btn" data-tab="tab-users">الأعضاء</button>
+                <button class="tab-btn" data-tab="tab-search">البحث</button>
+            </nav>
+
+            <!-- التحركات -->
+            <div id="tab-movements" class="tab-content active">
+                <h2 class="section-title">حركات السيارات</h2>
+                <p class="section-note">سيتم تفعيل هذا القسم في الخطوة القادمة.</p>
+                <div class="placeholder-card">واجهة التحركات قيد البناء…</div>
             </div>
-            <div class="header-center">
-                <h1 class="app-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
+
+            <!-- العهدة -->
+            <div id="tab-assignments" class="tab-content">
+                <h2 class="section-title">العهدة</h2>
+                <div class="placeholder-card">واجهة العهدة قيد البناء…</div>
             </div>
-            <div class="header-right">
-                <div id="header-datetime" class="header-datetime">
-                    <!-- اليوم والتاريخ والوقت (يتم تحديثها من JavaScript) -->
-                </div>
-                <div id="current-user-info" class="current-user-info">
-                    <!-- يظهر اسم المستخدم/الدور بعد تسجيل الدخول -->
-                </div>
+
+            <!-- الأسطول -->
+            <div id="tab-fleet" class="tab-content">
+                <h2 class="section-title">الأسطول</h2>
+                <div class="placeholder-card">واجهة الأسطول قيد البناء…</div>
             </div>
-        </header>
 
-        <!-- محتوى رئيسي -->
-        <main class="app-main">
-
-            <!-- صفحة تسجيل الدخول -->
-            <section id="login-section" class="card login-section">
-                <h2 class="section-title">تسجيل الدخول</h2>
-                <form id="login-form" autocomplete="off" novalidate>
-                    <div class="form-group">
-                        <label for="login-username">اسم المستخدم</label>
-                        <input
-                            id="login-username"
-                            name="login-username"
-                            type="text"
-                            inputmode="text"
-                            autocomplete="new-username"
-                            minlength="4"
-                            required
-                            placeholder="ادخل اسم المستخدم"
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="login-password">كلمة المرور</label>
-                        <input
-                            id="login-password"
-                            name="login-password"
-                            type="password"
-                            autocomplete="new-password"
-                            minlength="6"
-                            required
-                            placeholder="ادخل كلمة المرور"
-                        >
-                    </div>
-                    <div id="login-error" class="form-error"></div>
-                    <button type="submit" class="btn btn-primary btn-block">
-                        دخول
-                    </button>
-                </form>
-            </section>
-
-            <!-- إجبار المدير على تغيير بيانات الدخول بعد أول دخول ناجح -->
-            <section id="admin-force-change-section" class="card hidden">
-                <h2 class="section-title">تحديث بيانات المدير الافتراضي</h2>
-                <p class="section-note">
-                    يجب تغيير اسم المستخدم وكلمة المرور الافتراضية قبل المتابعة.
-                </p>
-                <form id="admin-change-form" autocomplete="off" novalidate>
-                    <div class="form-group">
-                        <label for="new-admin-username">اسم مستخدم جديد (المدير)</label>
-                        <input
-                            id="new-admin-username"
-                            name="new-admin-username"
-                            type="text"
-                            minlength="4"
-                            required
-                            placeholder="ادخل اسم مستخدم جديد"
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="new-admin-password">كلمة مرور جديدة</label>
-                        <input
-                            id="new-admin-password"
-                            name="new-admin-password"
-                            type="password"
-                            minlength="6"
-                            required
-                            placeholder="ادخل كلمة مرور جديدة"
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="new-admin-phone">رقم الجوال (10 أرقام)</label>
-                        <input
-                            id="new-admin-phone"
-                            name="new-admin-phone"
-                            type="tel"
-                            inputmode="numeric"
-                            pattern="\\d{10}"
-                            placeholder="مثال: 0501234567"
-                            required
-                        >
-                    </div>
-                    <div id="admin-change-error" class="form-error"></div>
-                    <button type="submit" class="btn btn-primary btn-block">
-                        حفظ ومتابعة
-                    </button>
-                </form>
-            </section>
-
-            <!-- واجهة التطبيق بعد تسجيل الدخول -->
-            <section id="app-section" class="hidden">
-
-                <!-- شريط التبويبات -->
-                <nav class="tabs-nav">
-                    <button class="tab-btn active" data-tab="tab-movements">التحركات</button>
-                    <button class="tab-btn" data-tab="tab-assignments">العهدة</button>
-                    <button class="tab-btn" data-tab="tab-fleet">الأسطول</button>
-                    <button class="tab-btn" data-tab="tab-users">الأعضاء</button>
-                    <button class="tab-btn" data-tab="tab-search">البحث</button>
-                </nav>
-
-                <!-- تبويب التحركات (تصميم مبدئي) -->
-                <div id="tab-movements" class="tab-content active">
-                    <h2 class="section-title">حركات السيارات</h2>
-                    <p class="section-note">
-                        سيتم لاحقًا تفعيل إضافة الحركات، الأكورديون، الصلاحيات، والطباعة حسب المدة.
-                    </p>
-                    <div class="placeholder-card">
-                        واجهة التحركات قيد البناء في الخطوة التالية.
-                    </div>
-                </div>
-
-                <!-- تبويب العهدة -->
-                <div id="tab-assignments" class="tab-content">
-                    <h2 class="section-title">العهدة</h2>
-                    <p class="section-note">
-                        سيتم لاحقًا ربط السيارات بالأعضاء، وعرض العهدة لكل مستخدم حسب صلاحياته.
-                    </p>
-                    <div class="placeholder-card">
-                        واجهة العهدة قيد البناء في الخطوات القادمة.
-                    </div>
-                </div>
-
-                <!-- تبويب الأسطول -->
-                <div id="tab-fleet" class="tab-content">
-                    <h2 class="section-title">إدارة الأسطول</h2>
-                    <p class="section-note">
-                        سيتم لاحقًا إضافة بيانات السيارات (الترخيص، التأمين، التنبيهات قبل 15 يوم).
-                    </p>
-                    <div class="placeholder-card">
-                        واجهة الأسطول قيد البناء في الخطوات القادمة.
-                    </div>
-                </div>
-
-                <!-- تبويب الأعضاء -->
-                <div id="tab-users" class="tab-content">
-                    <h2 class="section-title">إدارة الأعضاء</h2>
-                    <p class="section-note">
-                        سيتم لاحقًا تفعيل إضافة وتعديل وحذف الأعضاء مع الصلاحيات الكاملة.
-                    </p>
-                    <div class="placeholder-card">
-                        واجهة إدارة الأعضاء قيد البناء في الخطوات القادمة.
-                    </div>
-                </div>
-
-                <!-- تبويب البحث -->
-                <div id="tab-search" class="tab-content">
-                    <h2 class="section-title">البحث في النظام</h2>
-                    <p class="section-note">
-                        سيتم لاحقًا تفعيل محرك بحث موحد يشمل التحركات، العهدة، الأسطول، والأعضاء مع احترام الصلاحيات.
-                    </p>
-                    <div class="placeholder-card">
-                        واجهة البحث قيد البناء في الخطوات القادمة.
-                    </div>
-                </div>
-
-            </section>
-        </main>
-
-        <!-- الفوتر -->
-        <footer class="app-footer">
-            <div>
-                جميع الحقوق محفوظة &copy;
-                <span id="footer-year"></span>
+            <!-- الأعضاء -->
+            <div id="tab-users" class="tab-content">
+                <h2 class="section-title">الأعضاء</h2>
+                <div class="placeholder-card">واجهة الأعضاء قيد البناء…</div>
             </div>
-            <div>
-                تمت البرمجة والتطوير بواسطة ( MIOHAMED SAAD )
+
+            <!-- البحث -->
+            <div id="tab-search" class="tab-content">
+                <h2 class="section-title">البحث</h2>
+                <div class="placeholder-card">واجهة البحث قيد البناء…</div>
             </div>
-        </footer>
 
-        <!-- زر تسجيل الخروج -->
-        <button id="logout-btn" class="logout-btn hidden">
-            تسجيل الخروج
-        </button>
-    </div>
+        </section>
 
-    <!-- ملف جافاسكربت الرئيسي -->
-    <script type="module" src="app.js"></script>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="app-footer">
+        <div>جميع الحقوق محفوظة © <span id="footer-year"></span></div>
+        <div>تمت البرمجة والتطوير بواسطة ( MIOHAMED SAAD )</div>
+    </footer>
+
+</div>
+
+<script type="module" src="app.js"></script>
+
 </body>
 </html>
+
