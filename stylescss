@@ -1,0 +1,169 @@
+/* إعدادات عامة */
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: #f4f6f9;
+    direction: rtl;
+}
+
+/* الحاوية */
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* الهيدر الجديد */
+.app-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 10px;
+    background-color: #0b2c6a;
+    color: #fff;
+}
+
+/* يسار */
+.header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+}
+
+.current-user-info {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* زر تسجيل الخروج */
+.logout-btn {
+    background-color: #c62828;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    width: fit-content;
+}
+
+/* المنتصف */
+.header-center {
+    text-align: center;
+}
+
+.app-logo {
+    height: 64px;
+    margin: 0 auto 6px auto;
+    display: block;
+}
+
+.app-title {
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* يمين */
+.header-right {
+    text-align: right;
+}
+
+.header-datetime {
+    font-size: 0.8rem;
+}
+
+/* المحتوى */
+.app-main {
+    flex: 1;
+    padding: 12px;
+    max-width: 900px;
+    margin: auto;
+}
+
+/* الكروت */
+.card {
+    background: #fff;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px #0001;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    margin: 0 0 12px;
+}
+
+.section-note {
+    color: #555;
+    margin-bottom: 12px;
+}
+
+/* النماذج */
+.form-group { margin-bottom: 12px; }
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* الأزرار */
+.btn {
+    padding: 10px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #0b2c6a;
+    color: #fff;
+}
+
+.btn-block { width: 100%; }
+
+/* التبويبات */
+.tabs-nav {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 999px;
+    border: none;
+    background: #e0e3eb;
+}
+
+.tab-btn.active {
+    background: #0b2c6a;
+    color: #fff;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* placeholder */
+.placeholder-card {
+    padding: 20px;
+    background: #f1f3fa;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* الفوتر */
+.app-footer {
+    background: #0b2c6a;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+/* إخفاء */
+.hidden { display: none !important; }
