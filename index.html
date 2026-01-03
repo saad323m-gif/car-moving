@@ -13,31 +13,33 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- START NEW HEADER -->
-<header class="main-header">
-  <div class="header-logo">
-    <img src="assets/logo.png" alt="Al Masoud Logo" class="logo-large">
-  </div>
-
-  <div class="header-content">
-    <div class="header-left">
-      <h1 class="system-title">نظام إدارة حركة السيارات</h1>
-    </div>
-
-    <div class="header-right">
-      <span id="usernameBadge" class="user-badge">اسم المستخدم</span>
-      <button id="logoutBtn" class="logout-btn">تسجيل خروج</button>
-
-      <div class="date-time">
-        <span id="currentDate"></span>
-        <span id="currentTime"></span>
+    <!-- الهيدر -->
+    <header class="app-header">
+      <!-- يسار: اسم المستخدم داخل شارة + خروج تحتها -->
+      <div class="header-left">
+        <div id="current-user-badge" class="user-badge hidden">
+          <span id="current-user-name" class="user-badge-name"></span>
+          <span id="current-user-role" class="user-badge-role"></span>
+        </div>
+        <button id="logout-btn" class="logout-btn hidden">تسجيل الخروج</button>
       </div>
 
-      <button id="refreshBtn" class="refresh-btn">تحديث</button>
-    </div>
-  </div>
-</header>
-<!-- END NEW HEADER -->
+      <!-- المنتصف: شعار المسعود كبير -->
+      <div class="header-center">
+        <img src="logo.png" alt="AL MASAOOD" class="app-logo" />
+      </div>
+
+      <!-- يمين: عنوان النظام أعلى + التاريخ والوقت وأسفلها زر التحديث -->
+      <div class="header-right">
+        <h1 class="app-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
+        <div class="header-right-bottom">
+          <div id="header-datetime" class="header-datetime"></div>
+          <button id="manual-refresh-btn" class="icon-btn" title="تحديث البيانات يدويًا">
+            🔄
+          </button>
+        </div>
+      </div>
+    </header>
 
     <!-- شريط البحث الثابت -->
     <section id="global-search-bar" class="global-search-bar hidden">
@@ -176,17 +178,7 @@
               </div>
               <div class="form-group">
                 <label>كود اللوحة</label>
-                <input id="mov-plate-code" type="text"
-
-              <div class="form-group">
-                <label>نوع السيارة</label>
-                <input id="mov-car-type" type="text" placeholder="مثال: نيسان صني" required />
-              </div>
-              <div class="form-group">
-                <label>عداد الكيلومتر</label>
-                <input id="mov-odometer" type="number" placeholder="القراءة الحالية" required />
-              </div>
- required />
+                <input id="mov-plate-code" type="text" required />
               </div>
             </div>
 
