@@ -1,54 +1,6 @@
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010import {
+// استيراد Firebase من CDNimport { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+query,
+ import {
   getFirestore,
   collection,
   doc,
@@ -62,64 +14,15 @@ Notice: syntax highlight function is only for small text
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // إعدادات Firebase
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010const firebaseConfig = {
+rebaseapp.com",
+  projecconst firebaseConfig = {
   apiKey: "AIzaSyD-qlIfpFyam5UgjxzhwAEhkttIQCBZXUw",
   authDomain: "carmanagement-79bfb.f
 itId: "carmanagement-79bfb",
   storageBucket: "carmanagement-79bfb.firebasestorage.app",
   messagingSenderId: "313516916430",
   appId: "1:313516916430:web:6f2c20740bced9e7211a9f"
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010};
+UR};
 
 // تهيئة Firebase و Firestore
 const app = initializeApp(firebaseConfig);
@@ -133,32 +36,8 @@ DATION_DAYS = 30;
 // ========== عناصر جديدة ==========
 const currentUserBadge = document.getElementById("current-user-badge");
 const refreshBtn = document.getElementById("refresh-btn");
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010const globalSearchContainer = document.getElementById("global-search-container");
+t.getElementById("global-search-btn");
+const searchTypeSelect = document.getElemeconst globalSearchContainer = document.getElementById("global-search-container");
 const globalSearchInput = document.getElementById("global-search-input");
 const globalSearchBtn = docume
 nntById("search-type");
@@ -169,32 +48,8 @@ const printTemplate = document.getElementById("print-template");
 const shareTemplate = document.getElementById("share-template");
 
 // ========== عناصر عامة ==========
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010const headerDatetime = document.getElementById("header-datetime");
+getElementById("login-form");
+const loginError = document.getElemeconst headerDatetime = document.getElementById("header-datetime");
 const footerYear = document.getElementById("footer-year");
 const logoutBtn = document.getElementById("logout-btn");
 
@@ -209,32 +64,8 @@ const adminChangeError = document.getElementById("admin-change-error");
 const appSection = document.getElementById("app-section");
 
 const tabButtons = document.querySelectorAll(".tab-btn");
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010const tabContents = document.querySelectorAll(".tab-content");
+-role");
+const userPhoneInput = document.getElementById("user-const tabContents = document.querySelectorAll(".tab-content");
 
 // الأعضاء
 const userForm = document.getElementById("user-form");
@@ -252,32 +83,8 @@ const movCarNumberInput = document.getElementById("mov-car-number");
 const movPlateCodeInput = document.getElementById("mov-plate-code");
 const movUserSelect = document.getElementById("mov-user-select");
 const movActionSelect = document.getElementById("mov-action");
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010const movNotesInput = document.getElementById("mov-notes");
+/ العهدة
+const assForm = document.getElementById("assignmenconst movNotesInput = document.getElementById("mov-notes");
 const movementsFormError = document.getElementById("movements-form-error");
 const movementsList = document.getElementById("movements-list");
 const movReportRange = document.getElementById("mov-report-range");
@@ -287,32 +94,8 @@ const movPrintAllBtn = document.getElementById("mov-print-all");
 
 /t-form");
 const assCarNumberInput = document.getElementById("ass-car-number");
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010const assPlateCodeInput = document.getElementById("ass-plate-code");
+fleetPlateCodeInput = document.getElementById("fleet-plate-code");
+cconst assPlateCodeInput = document.getElementById("ass-plate-code");
 const assUserSelect = document.getElementById("ass-user-select");
 const assOwnerInput = document.getElementById("ass-owner");
 const assNotesInput = document.getElementById("ass-notes");
@@ -336,32 +119,12 @@ const searchBtn = document.getElementById("search-btn");
 const searchResultsDiv = document.getElementById("search-results");
 
 // سنة الفوتر
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
+ {
+    showLoading(false);
+  }
+}
 
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010footerYear.textContent = new Date().getFullYear().toString();
+/** ========== دالة إظهار/إfooterYear.textContent = new Date().getFullYear().toString();
 
 /** ========== دالة التحديث اليدوي ========== */
 async function manualRefresh() {
@@ -407,32 +170,7 @@ function showNotification(message, type = 'info') {
   `;
   
   // إضافة أنماط للإشعار
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010  const style = document.createElement('style');
+ation-info { background: linear-gradient(135deg,  const style = document.createElement('style');
   style.textContent = `
     .notification {
       position: fixed;
@@ -481,32 +219,8 @@ c #1976d2 0%, #2196f3 100%); }
   
   // إزالة الإشعار تلقائياً بعد 5 ثواني
   setTimeout(() => {
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010    if (notification.parentNode) {
+ue;
+  const sort = searchSortSelec    if (notification.parentNode) {
       notification.remove();
     }
   }, 5000);
@@ -564,32 +278,8 @@ lt.value;
           (u.role && u.role.includes(query))
         );
       
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010      if (session.role === 'member') {
+) {
+        results.movements = result      if (session.role === 'member') {
         results.users = results.users.filter(u => u.id === session.userId);
       }
     }
@@ -631,32 +321,8 @@ Notice: syntax highlight function is only for small text
     }
 
     // البحث في الأسطول
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010    if (type === 'all' || type === 'fleet') {
+) => a.createdAt - b.createdAt);
+      result    if (type === 'all' || type === 'fleet') {
       const fleetSnap = await getDocs(collection(db, "fleet"));
       results.fleet = fleetSnap.docs
         .map(d => ({ id: d.id, ...d.data() }))
@@ -697,32 +363,7 @@ function renderSearchResults(results, query) {
   
   const totalResults = results.users.length + results.movements.length + 
                       results.assignments.length + results.fleet.length;
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010  
+d=  
   if (totalResults === 0) {
     searchResultsDiv.innerHTML = `
       <div class="card">
@@ -773,32 +414,8 @@ i"print-search-results">🖨️ طباعة نتائج البحث</button>
               </div>
               <div class="accordion-meta">
                 ${user.phone || 'لا يوجد جوال'}
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010              </div>
+     </div>
+                      </div>
             </div>
           </div>
         `).join('')}
@@ -858,32 +475,7 @@ Notice: syntax highlight function is only for small text
                 <div class="user-info">
                   👤 ${ass.userName || ''}
                 </div>
- 
-Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
-search		
-replace		
-match case regular expressions 
-find next replace replace all
- 
-Editarea 0.8.2
-
-
-Shortcuts:
-
- Tab: add tabulation to text
- Shift+Tab: remove tabulation to text
- Ctrl+f: search next / open search area
- Ctrl+r: replace / open search area
- Ctrl+h: toggle syntax highlight on/off
- Ctrl+g: go to line
- Ctrl+z: undo
- Ctrl+y: redo
- Ctrl+e: about
- Ctrl+q, Esc: close popup
- Accesskey E: Toggle editor
-
-Notice: syntax highlight function is only for small text 
-© Christophe Dolivet 2007-2010              </div>
+                ${ca              </div>
               <div class="accordion-meta">
                 ${ass.owner || ''}
               </div>
@@ -915,17 +507,16 @@ Notice: syntax highlight function is only for small text
               </div>
               <div class="accordion-meta">
 r.licenseEnd ? formatTimestampMs(car.licenseEnd).split(' ')[0] : 'لا يوجد'}
-              </div>
+ng: 10px; margin: 25              </div>
             </div>
           </div>
         `).join('')}
-        
       </div>
     `;
     searchResultsDiv.appendChild(card);
   }
-  
 }
+
 /** ========== دالة طباعة نتائج البحث ========== */
 function printSearchResults(results, query) {
   const printWindow = window.open('', '_blank');
@@ -944,7 +535,8 @@ function printSearchResults(results, query) {
           table { width: 100%; border-collapse: collapse; margin: 20px 0; }
           th { background-color: #f5f5f5; padding: 12px; border: 1px solid #ddd; }
           td { padding: 10px; border: 1px solid #ddd; }
-          .section-title { background-color: #e3f2fd; padding: 10px; margin: 25px 0 15px; }
+          .section-title { background-color: #e3f2fd; padd
+ipx 0 15px; }
         </style>
       </head>
       <body>
@@ -986,7 +578,8 @@ function printSearchResults(results, query) {
       <h3 class="section-title">التحركات (${results.movements.length})</h3>
       <table>
         <thead>
-          <tr>
+
+                       <tr>
             <th>رقم السيارة</th>
             <th>كود اللوحة</th>
             <th>السائق</th>
@@ -1026,8 +619,8 @@ function printSearchResults(results, query) {
           ${results.assignments.map(ass => `
             <tr>
               <td>${ass.carNumber || '-'}</td>
-              <td>${ass.plateCode || '-'}</td>
-              <td>${ass.userName || '-'}</td>
+              <td>${ass.plateCode || '-'}</td
+> <td>${ass.userName || '-'}</td>
               <td>${ass.owner || '-'}</td>
             </tr>
           `).join('')}
@@ -1070,7 +663,8 @@ function printSearchResults(results, query) {
         </div>
       </body>
     </html>
-  `;
+  
+   `;
   
   printWindow.document.write(content);
   printWindow.document.close();
@@ -1109,7 +703,7 @@ async function shareAsImage(element, title, data) {
           <h2 style="color: #1a4399; margin: 0 0 10px 0; font-size: 24px;">حركة سيارة</h2>
           <div style="color: #666; font-size: 14px;">نظام إدارة وتسجيل حركة السيارات المتكامل</div>
         </div>
-        
+     
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
           <div style="background: #f5f7fa; padding: 12px; border-radius: 8px;">
             <div style="color: #666; font-size: 13px;">رقم السيارة</div>
@@ -1128,7 +722,8 @@ async function shareAsImage(element, title, data) {
           </div>
           <div style="background: #f5f7fa; padding: 12px; border-radius: 8px;">
             <div style="color: #666; font-size: 13px;">الحركة</div>
-            <div style="font-weight: bold; font-size: 16px; color: #d32f2f;">${data.action || '-'}</div>
+ansform: translate(-50%, -50%); opacity: 0.05; pointer-events: none; z-index: 1;">
+        <div style="f            <div style="font-weight: bold; font-size: 16px; color: #d32f2f;">${data.action || '-'}</div>
           </div>
         </div>
         
@@ -1153,8 +748,8 @@ async function shareAsImage(element, title, data) {
     
     // إضافة العلامة المائية
     const watermark = `
-      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; pointer-events: none; z-index: 1;">
-        <div style="font-size: 100px; color: #1a4399; font-weight: bold; white-space: nowrap;">AL MASAOOD</div>
+      <div style="position: absolute; top: 50%; left: 50%; t
+ront-size: 100px; color: #1a4399; font-weight: bold; white-space: nowrap;">AL MASAOOD</div>
       </div>
     `;
     
@@ -1202,7 +797,8 @@ async function shareAsImage(element, title, data) {
     }
     
   } catch (error) {
-    console.error('خطأ في المشاركة:', error);
+r>
+        <td>${item.carNumber || '-'}</td>    console.error('خطأ في المشاركة:', error);
     alert('حدث خطأ في إنشاء الصورة. جاري المشاركة كنص...');
     
     // العودة للمشاركة كنص
@@ -1254,9 +850,8 @@ async function printReport(data, type, title) {
     `;
     
     tableRows = data.map(item => `
-      <tr>
-        <td>${item.carNumber || '-'}</td>
-        <td>${item.plateCode || '-'}</td>
+      <
+t        <td>${item.plateCode || '-'}</td>
         <td>${item.userName || '-'}</td>
         <td>${item.action || '-'}</td>
         <td>${item.notes || '-'}</td>
@@ -1305,7 +900,11 @@ async function printReport(data, type, title) {
         <td>${item.plateCode || '-'}</td>
         <td>${item.owner || '-'}</td>
         <td>${item.licenseEnd ? formatTimestampMs(item.licenseEnd).split(' ')[0] : '-'}</td>
-        <td>${item.insuranceEnd ? formatTimestampMs(item.insuranceEnd).split(' ')[0] : '-'}</td>
+ #f5f7fa;
+            padding: 15px;
+            border-radius: 8px;
+          }
+          table        <td>${item.insuranceEnd ? formatTimestampMs(item.insuranceEnd).split(' ')[0] : '-'}</td>
         <td>${item.notes || '-'}</td>
       </tr>
     `).join('');
@@ -1353,11 +952,8 @@ async function printReport(data, type, title) {
             margin: 25px 0; 
             font-size: 14px; 
             color: #666;
-            background: #f5f7fa;
-            padding: 15px;
-            border-radius: 8px;
-          }
-          table { 
+            background
+: { 
             width: 100%; 
             border-collapse: collapse; 
             margin: 30px 0; 
@@ -1405,7 +1001,12 @@ async function printReport(data, type, title) {
           <h1 class="print-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
           <h2 class="print-subtitle">${title}</h2>
           <div class="print-info">
-            <div class="print-date"><strong>تاريخ الطباعة:</strong> ${new Date().toLocaleDateString('ar')} ${new Date().toLocaleTimeString('ar')}</div>
+tHours();
+  const minutes = gmt4.getMinutes();
+  const seconds = gmt4.getSeconds();
+  const ampm = hours >= 12 ? "م" : "ص";
+  hours = hours % 12;
+  if             <div class="print-date"><strong>تاريخ الطباعة:</strong> ${new Date().toLocaleDateString('ar')} ${new Date().toLocaleTimeString('ar')}</div>
             <div class="print-count"><strong>عدد السجلات:</strong> ${data.length}</div>
             <div class="print-user"><strong>المستخدم:</strong> ${loadSession()?.username || '-'}</div>
           </div>
@@ -1445,12 +1046,8 @@ function updateHeaderDateTime() {
   const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
   const dayName = days[gmt4.getDay()];
 
-  let hours = gmt4.getHours();
-  const minutes = gmt4.getMinutes();
-  const seconds = gmt4.getSeconds();
-  const ampm = hours >= 12 ? "م" : "ص";
-  hours = hours % 12;
-  if (hours === 0) hours = 12;
+  let hours = gmt4.g
+e(hours === 0) hours = 12;
 
   const pad = (n) => n.toString().padStart(2, "0");
 
@@ -1466,7 +1063,29 @@ function updateHeaderDateTime() {
 // بدء تحديث الوقت
 updateHeaderDateTime();
 
-/** ========== دوال الجلسة (كما هي) ========== */
+/** تنسيق timestamp */
+function formatTimestampMs(ms) {
+  if (!ms) return "";
+  const date = new Date(ms);
+  const utc = date.getTime() + date.getTimezoneOffset() * 60000;
+  const local = new Date(utc + 4 * 60 * 60 * 1000);
+
+  let hours = local.getHours();
+  const minutes = local.getMinutes();
+  const ampm = hours >= 12 ? "م" : "ص";
+  hours = hours % 12;
+  if (hours === 0) hours = 12;
+
+  const pad = (n) => n.toString().padStart(2, "0");
+  const dateStr = `${local.getFullYear()}-${pad(local.getMonth() + 1)}-${pad(
+    local.getDate()
+  )}`;
+  const timeStr = `${pad(hours)}:${pad(minutes)} ${ampm}`;
+
+  return `${dateStr} ${timeStr}`;
+}
+
+/** الجلسة */
 function saveSession(user) {
   const now = Date.now();
   const expiry = now + SESSION_DURATION_DAYS * 24 * 60 * 60 * 1000;
@@ -1487,7 +1106,8 @@ function loadSession() {
     const session = JSON.parse(raw);
     if (!session.expiry || Date.now() > session.expiry) {
       localStorage.removeItem(SESSION_KEY);
-      return null;
+t.add("hidden");
+       return null;
     }
     return session;
   } catch {
@@ -1500,7 +1120,7 @@ function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
-/** ========== دوال الشاشات المعدلة ========== */
+/** الشاشات */
 function showLogin() {
   loginSection.classList.remove("hidden");
   adminForceChangeSection.classList.add("hidden");
@@ -1534,19 +1154,16 @@ function showAppForUser(session) {
   currentUserBadge.className = `user-badge ${session.role}`;
   currentUserBadge.classList.remove("hidden");
   
-  // تعديل التبويبات حسب الصلاحية
   const tabFleetBtn = document.querySelector('[data-tab="tab-fleet"]');
   const tabUsersBtn = document.querySelector('[data-tab="tab-users"]');
-  
   if (session.role === "member") {
     if (tabFleetBtn) tabFleetBtn.classList.add("hidden");
-    if (tabUsersBtn) tabUsersBtn.classList.add("hidden");
-  } else {
+    if (tabUsersBtn) tabUsersBtn.classLi
+s } else {
     if (tabFleetBtn) tabFleetBtn.classList.remove("hidden");
     if (tabUsersBtn) tabUsersBtn.classList.remove("hidden");
   }
-  
-  // تحميل البيانات
+
   loadAllUsers().then(() => {
     populateUserSelects();
     loadMovements();
@@ -1555,7 +1172,125 @@ function showAppForUser(session) {
   });
 }
 
-/** ========== دوال الأعضاء (مع تعديل عرض الأكورديون) ========== */
+/** التأكد من وجود مدير افتراضي */
+async function ensureDefaultAdmin() {
+  const usersCol = collection(db, "users");
+  const qAdmin = query(usersCol, where("role", "==", "admin"));
+  const snap = await getDocs(qAdmin);
+  if (snap.empty) {
+    const adminDocRef = doc(usersCol);
+    await setDoc(adminDocRef, {
+      username: "admin",
+      password: "admin123",
+      role: "admin",
+      phone: "",
+      mustChangePassword: true,
+      createdAt: Date.now()
+    });
+    return {
+      id: adminDocRef.id,
+      username: "admin",
+      password: "admin123",
+      role: "admin",
+      phone: "",
+      mustChangePassword: true
+    };
+  } else {
+    const d = snap.docs[0];
+    return { id: d.id, ...d.data() };
+  }
+}
+
+/** البحث عن مستخدم */
+async function findUserByCredentials(username, password) {
+  const usersCol = collection(db, "users");
+  const qUser = query(
+    usersCol,
+    where("username", "==", username),
+    where("password", "==", password)
+  );
+  const snap = await getDocs(qUser);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { id: d.id, ...d.data() };
+}
+
+/** تحديث بيانات المدير */
+async function updateAdminCredentials(userId, newUsername, newPassword, newPhone) {
+  const userRef = doc(db, "users", userId);
+  const d = await getDoc(userRef);
+  if (!d.exists()) throw new Error("لا يمكن العثور على حساب المدير.");
+  const data = d.data();
+  if (data.role !== "admin") throw new Error("هذا المستخدم ليس مديرًا.");
+
+  await setDoc(userRef, {
+    ...data,
+    username: newUsername,
+    password: newPassword,
+    phone: newPhone,
+    mustChangePassword: false
+  });
+}
+
+/** التبويبات */
+function initTabs() {
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.getAttribute("data-tab");
+      if (!target) return;
+      tabButtons.forEach((b) => b.classList.remove("active"));
+      tabContents.forEach((c) => c.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(target).classList.add("active");
+    });
+  });
+}
+
+/** الأعضاء */
+let cachedUsers = [];
+
+async function loadAllUsers() {
+  const usersCol = collection(db, "users");
+  const qUsers = query(usersCol, orderBy("createdAt", "asc"));
+  const snap = await getDocs(qUsers);
+  cachedUsers = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  renderUsersList();
+}
+
+function populateUserSelects() {
+  const session = loadSession();
+  movUserSelect.innerHTML = "";
+  assUserSelect.innerHTML = "";
+
+  const optionsSource =
+    session && (session.role === "admin" || session.role === "supervisor")
+      ? cachedUsers
+      : cachedUsers.filter((u) => u.id === session.userId);
+
+  optionsSource.forEach((user) => {
+    const opt1 = document.createElement("option");
+    opt1.value = user.id;
+    opt1.textContent = user.username;
+    movUserSelect.appendChild(opt1);
+
+    const opt2 = document.createElement("option");
+    opt2.value = user.id;
+    opt2.textContent = user.username;
+    assUserSelect.appendChild(opt2);
+  });
+
+  const emptyOpt1 = document.createElement("option");
+  emptyOpt1.value = "";
+  emptyOpt1.textContent = "اختر العضو";
+  movUserSelect.insertBefore(emptyOpt1, movUserSelect
+.firstChild);
+
+  const emptyOpt2 = document.createElement("option");
+  emptyOpt2.value = "";
+  emptyOpt2.textContent = "اختر العضو";
+  assUserSelect.insertBefore(emptyOpt2, assUserSelect.firstChild);
+}
+
 function renderUsersList() {
   const session = loadSession();
   if (!session) return;
@@ -1597,10 +1332,68 @@ function renderUsersList() {
     const body = document.createElement("div");
     body.className = "accordion-body hidden";
 
-    // ... باقي كود الأكورديون كما هو ...
-    
-    header.addEventListener("click", () => {
-      body.classList.toggle("hidden");
+    const row1 = document.createElement("div");
+    row1.className = "accordion-row";
+    row1.innerHTML = `
+      <span class="accordion-label">اسم المستخدم:</span>
+      <span>${user.username}</span>
+    `;
+
+    const row2 = document.createElement("div");
+er.addEventListener("click", () => {    row2.className = "accordion-row";
+    row2.innerHTML = `
+      <span class="accordion-label">الدور:</span>
+      <span>${user.role}</span>
+    `;
+
+    const row3 = document.createElement("div");
+    row3.className = "accordion-row";
+    row3.innerHTML = `
+      <span class="accordion-label">الجوال:</span>
+      <span>${user.phone || "-"}</span>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "accordion-actions";
+
+    const sessionUserRole = session.role;
+    const canEdit =
+      sessionUserRole === "admin" ||
+      (sessionUserRole === "supervisor" && user.role !== "admin");
+
+    if (canEdit) {
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn btn-secondary";
+      editBtn.textContent = "تعديل";
+      editBtn.addEventListener("click", () => {
+        userIdInput.value = user.id;
+        userUsernameInput.value = user.username;
+        userPasswordInput.value = user.password;
+        userRoleInput.value = user.role;
+        userPhoneInput.value = user.phone || "";
+        window.scrollTo({ top: userForm.offsetTop - 20, behavior: "smooth" });
+      });
+      actions.appendChild(editBtn);
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn btn-secondary";
+      delBtn.style.backgroundColor = "#c62828";
+      delBtn.textContent = "حذف";
+      delBtn.addEventListener("click", async () => {
+        if (!confirm("هل أنت متأكد من حذف هذا العضو؟")) return;
+        await deleteDoc(doc(db, "users", user.id));
+        await loadAllUsers();
+      });
+      actions.appendChild(delBtn);
+    }
+
+    body.appendChild(row1);
+    body.appendChild(row2);
+    body.appendChild(row3);
+    body.appendChild(actions);
+
+    hea
+d      body.classList.toggle("hidden");
     });
 
     item.appendChild(header);
@@ -1609,7 +1402,104 @@ function renderUsersList() {
   });
 }
 
-/** ========== دوال التحركات (مع تعديل عرض الأكورديون) ========== */
+async function handleUserFormSubmit(e) {
+  e.preventDefault();
+  usersFormError.textContent = "";
+  const session = loadSession();
+  if (!session) return;
+
+  const isEdit = !!userIdInput.value;
+  const username = userUsernameInput.value.trim();
+  const password = userPasswordInput.value.trim();
+  const role = userRoleInput.value;
+  const phone = userPhoneInput.value.trim();
+
+  if (username.length < 4) {
+    usersFormError.textContent = "اسم المستخدم يجب ألا يقل عن 4 أحرف.";
+    return;
+  }
+  if (password.length < 6) {
+    usersFormError.textContent = "كلمة المرور يجب ألا تقل عن 6 أحرف/أرقام.";
+    return;
+  }
+  if (!/^\d{10}$/.test(phone)) {
+    usersFormError.textContent = "رقم الجوال يجب أن يكون 10 أرقام.";
+    return;
+  }
+
+  if (session.role === "member") {
+    usersFormError.textContent = "ليست لديك صلاحية لإدارة الأعضاء.";
+    return;
+  }
+  if (session.role === "supervisor") {
+    if (isEdit) {
+      const existing = cachedUsers.find((u) => u.id === userIdInput.value);
+      if (existing && existing.role === "admin") {
+        usersFormError.textContent = "لا يمكنك تعديل بيانات المدير.";
+        return;
+      }
+    }
+    if (role === "admin") {
+      usersFormError.textContent = "لا يمكنك إنشاء مدير جديد.";
+      return;
+    }
+  }
+
+  const usersCol = collection(db, "users");
+  if (isEdit) {
+    const ref = doc(db, "users", userIdInput.value);
+    const existingSnap = await getDoc(ref);
+    if (!existingSnap.exists()) {
+      usersFormError.textContent = "لا يمكن العثور على هذا العضو.";
+      return;
+    }
+    const existing = existingSnap.data();
+    await setDoc(ref, {
+      ...existing,
+      username,
+warning";
+    a      password,
+      role,
+      phone
+    });
+  } else {
+    const ref = doc(usersCol);
+    await setDoc(ref, {
+      username,
+      password,
+      role,
+      phone,
+      mustChangePassword: false,
+      createdAt: Date.now()
+    });
+  }
+
+  userIdInput.value = "";
+  userUsernameInput.value = "";
+  userPasswordInput.value = "";
+  userPhoneInput.value = "";
+  userRoleInput.value = "member";
+
+  await loadAllUsers();
+  populateUserSelects();
+}
+
+/** التحركات */
+async function loadMovements() {
+  const session = loadSession();
+  if (!session) return;
+  const movesCol = collection(db, "movements");
+  const qBase = query(movesCol, orderBy("createdAt", "desc"));
+  const snap = await getDocs(qBase);
+  let moves = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  if (session.role === "member") {
+    moves = moves.filter((m) => m.userId === session.userId);
+  }
+
+  renderMovementsList(moves);
+}
+
 function renderMovementsList(moves) {
   const session = loadSession();
   movementsList.innerHTML = "";
@@ -1634,8 +1524,8 @@ function renderMovementsList(moves) {
     userInfo.innerHTML = `👤 ${m.userName || ""}`;
     
     const actionBadge = document.createElement("span");
-    actionBadge.className = "badge-warning";
-    actionBadge.textContent = m.action;
+    actionBadge.className = "badge
+-ctionBadge.textContent = m.action;
     
     headerContent.appendChild(carInfo);
     headerContent.appendChild(userInfo);
@@ -1651,9 +1541,33 @@ function renderMovementsList(moves) {
     const body = document.createElement("div");
     body.className = "accordion-body hidden";
 
-    // ... باقي كود الأكورديون كما هو مع تعديلات المشاركة ...
-    
-    // تعديل زر المشاركة لاستخدام الصورة
+    const row1 = document.createElement("div");
+    row1.className = "accordion-row";
+    row1.innerHTML = `
+      <span class="accordion-label">السائق:</span>
+      <span>${m.userName || ""}</span>
+    `;
+
+    const row2 = document.createElement("div");
+    row2.className = "accordion-row";
+    row2.innerHTML = `
+      <span class="accordion-label">ملاحظات:</span>
+      <span>${m.notes || "-"}</span>
+    `;
+
+    const row3 = document.createElement("div");
+    row3.className = "accordion-row";
+    let editInfo = "";
+    if (m.edited) {
+      editInfo = `<span class="badge-warning">تم التعديل - الملاحظات الأصلية: ${
+        m.originalNotes || "-"
+      }</span>`;
+    }
+    row3.innerHTML = editInfo;
+
+    const actions = document.createElement("div");
+    actions.className = "accordion-actions";
+
     const shareBtn = document.createElement("button");
     shareBtn.className = "btn btn-secondary";
     shareBtn.textContent = "📤 مشاركة";
@@ -1668,9 +1582,62 @@ function renderMovementsList(moves) {
         createdAt: m.createdAt
       });
     });
-    
-    // ... باقي الأزرار كما هي ...
-    
+    actions.appendChild(shareBtn);
+
+    const printBtn = document.createElement("button");
+w2);
+    if (editInfo) body.appendChild(row3)    printBtn.className = "btn btn-secondary";
+    printBtn.textContent = "🖨️ طباعة";
+    printBtn.addEventListener("click", () => {
+      const w = window.open("", "_blank");
+      w.document.write(`<pre>${JSON.stringify(m, null, 2)}</pre>`);
+      w.print();
+      w.close();
+    });
+    actions.appendChild(printBtn);
+
+    const sessionRole = session.role;
+    const canEdit =
+      sessionRole === "admin" ||
+      sessionRole === "supervisor" ||
+      (sessionRole === "member" && m.userId === session.userId);
+    const canDelete = sessionRole === "admin" || sessionRole === "supervisor";
+    const within24h = Date.now() - m.createdAt <= 24 * 60 * 60 * 1000;
+
+    if (canEdit && (sessionRole !== "member" || within24h)) {
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn btn-secondary";
+      editBtn.textContent = "✏️ تعديل";
+      editBtn.addEventListener("click", () => {
+        movCarNumberInput.value = m.carNumber;
+        movPlateCodeInput.value = m.plateCode;
+        movUserSelect.value = m.userId;
+        movActionSelect.value = m.action;
+        movNotesInput.value = m.notes || "";
+        movForm.dataset.editId = m.id;
+        window.scrollTo({ top: movForm.offsetTop - 20, behavior: "smooth" });
+      });
+      actions.appendChild(editBtn);
+    }
+
+    if (canDelete) {
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn btn-secondary";
+      delBtn.style.backgroundColor = "#c62828";
+      delBtn.textContent = "🗑️ حذف";
+      delBtn.addEventListener("click", async () => {
+        if (!confirm("هل أنت متأكد من حذف هذه الحركة؟")) return;
+        await deleteDoc(doc(db, "movements", m.id));
+        await loadMovements();
+      });
+      actions.appendChild(delBtn);
+    }
+
+    body.appendChild(row1);
+    body.appendChild(r
+o;
+    body.appendChild(actions);
+
     header.addEventListener("click", () => {
       body.classList.toggle("hidden");
     });
@@ -1681,14 +1648,94 @@ function renderMovementsList(moves) {
   });
 }
 
-/** ========== تعديل دالة طباعة التقرير ========== */
+async function handleMovementFormSubmit(e) {
+  e.preventDefault();
+  movementsFormError.textContent = "";
+  const session = loadSession();
+  if (!session) return;
+
+  const carNumber = movCarNumberInput.value.trim();
+  const plateCode = movPlateCodeInput.value.trim();
+  const userId = movUserSelect.value;
+  const action = movActionSelect.value;
+  const notes = movNotesInput.value.trim();
+
+  if (!carNumber || !plateCode || !userId || !action) {
+    movementsFormError.textContent = "يرجى تعبئة جميع الحقول المطلوبة.";
+    return;
+  }
+
+  if (session.role === "member" && userId !== session.userId) {
+    movementsFormError.textContent = "لا يمكنك إضافة حركة لعضو آخر.";
+    return;
+  }
+
+  const targetUser = cachedUsers.find((u) => u.id === userId);
+  const userName = targetUser ? targetUser.username : "";
+
+  const editId = movForm.dataset.editId;
+  const now = Date.now();
+  const movesCol = collection(db, "movements");
+
+  if (editId) {
+    const ref = doc(db, "movements", editId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      movementsFormError.textContent = "لا يمكن العثور على هذه الحركة.";
+      return;
+    }
+    const existing = snap.data();
+
+    if (session.role === "member" && now - existing.createdAt > 24 * 60 * 60 * 1000) {
+      movementsFormError.textContent = "لا يمكنك تعديل الحركة بعد مرور 24 ساعة.";
+      return;
+    }
+
+    await setDoc(ref, {
+      ...existing,
+      carNumber,
+      plateCode,
+      userId,
+      userName,
+      action,
+      originalNotes: existing.notes || "",
+      notes,
+      edited: true,
+      editedAt: now
+    });
+    delete movForm.dataset.editId;
+  } else {
+ves, 'movements', title), 1000    const ref = doc(movesCol);
+    await setDoc(ref, {
+      carNumber,
+      plateCode,
+      userId,
+      userName,
+      action,
+      notes,
+      createdAt: now,
+      edited: false,
+      originalNotes: "",
+      createdByUserId: session.userId
+    });
+  }
+
+  movCarNumberInput.value = "";
+  movPlateCodeInput.value = "";
+  movUserSelect.value = "";
+  movActionSelect.value = "";
+  movNotesInput.value = "";
+
+  await loadMovements();
+}
+
 async function handleMovPrintReport(e) {
   e.preventDefault();
   const session = loadSession();
   if (!session) return;
 
   const range = movReportRange.value;
-  const reportType = movReportType.value;
+  const reportType = movReportType ? movReportType.value : 'print';
   const movesCol = collection(db, "movements");
   const snap = await getDocs(query(movesCol, orderBy("createdAt", "desc")));
   let moves = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -1727,7 +1774,8 @@ async function handleMovPrintReport(e) {
     // معاينة قبل الطباعة
     const previewWindow = window.open('', '_blank');
     previewWindow.document.write('<h2>جاري تحضير المعاينة...</h2>');
-    setTimeout(() => printReport(moves, 'movements', title), 1000);
+    setTimeout(() => printReport(m
+o);
   } else if (reportType === 'export') {
     // تصدير كملف CSV
     const csvContent = moves.map(m => 
@@ -1742,55 +1790,719 @@ async function handleMovPrintReport(e) {
   }
 }
 
-/** ========== دوال العهدة والأسطول (بنفس التعديلات) ========== */
-// ... نفس الكود مع تعديلات عرض الأكورديون والمشاركة ...
+async function handleMovPrintAll(e) {
+  if (e) e.preventDefault();
+  const session = loadSession();
+  if (!session) return;
+  
+  const movesCol = collection(db, "movements");
+  const snap = await getDocs(query(movesCol, orderBy("createdAt", "desc")));
+  let moves = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  
+  if (session.role === "member") {
+    moves = moves.filter((m) => m.userId === session.userId);
+  }
+  
+  await printReport(moves, 'movements', 'تقرير التحركات - الكل');
+}
 
-/** ========== إعداد الأحداث ========== */
+/** العهدة */
+async function loadAssignments() {
+  const session = loadSession();
+  if (!session) return;
+  const assCol = collection(db, "assignments");
+  const snap = await getDocs(assCol);
+  let assignments = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  if (session.role === "member") {
+    assignments = assignments.filter((a) => a.userId === session.userId);
+  }
+
+  renderAssignmentsList(assignments);
+}
+
+function renderAssignmentsList(assignments) {
+  const session = loadSession();
+  assignmentsList.innerHTML = "";
+  const grouped = {};
+  assignments.forEach((a) => {
+    if (!grouped[a.userId]) grouped[a.userId] = { userName: a.userName, items: [] };
+    grouped[a.userId].items.push(a);
+  });
+
+  Object.keys(grouped).forEach((userId) => {
+    const g = grouped[userId];
+
+    const item = document.createElement("div");
+    item.className = "accordion-item";
+
+    const header = document.createElement("div");
+shareBtn);
+
+      const printBtn = documen    header.className = "accordion-header";
+
+    const headerContent = document.createElement("div");
+    headerContent.className = "accordion-header-content";
+    
+    const userInfo = document.createElement("div");
+    userInfo.className = "user-info";
+    userInfo.innerHTML = `👤 ${g.userName}`;
+    
+    const countBadge = document.createElement("span");
+    countBadge.className = "badge-warning";
+    countBadge.textContent = `${g.items.length} سيارة`;
+    
+    headerContent.appendChild(userInfo);
+    headerContent.appendChild(countBadge);
+
+    const meta = document.createElement("div");
+    meta.className = "accordion-meta";
+    meta.textContent = "عهدة";
+
+    header.appendChild(headerContent);
+    header.appendChild(meta);
+
+    const body = document.createElement("div");
+    body.className = "accordion-body hidden";
+
+    g.items.forEach((a) => {
+      const row = document.createElement("div");
+      row.className = "accordion-row";
+      row.innerHTML = `
+        <span class="accordion-label">السيارة:</span>
+        <span>${a.carNumber} - ${a.plateCode} (مالك: ${a.owner})</span>
+      `;
+      const notesRow = document.createElement("div");
+      notesRow.className = "accordion-row";
+      notesRow.innerHTML = `
+        <span class="accordion-label">ملاحظات:</span>
+        <span>${a.notes || "-"}</span>
+      `;
+
+      const actions = document.createElement("div");
+      actions.className = "accordion-actions";
+
+      const shareBtn = document.createElement("button");
+      shareBtn.className = "btn btn-secondary";
+      shareBtn.textContent = "📤 مشاركة";
+      shareBtn.addEventListener("click", () => {
+        shareAsImage(shareBtn, "عهدة سيارة", {
+          type: 'assignment',
+          carNumber: a.carNumber,
+          plateCode: a.plateCode,
+          userName: a.userName,
+          owner: a.owner,
+          notes: a.notes,
+          createdAt: a.createdAt
+        });
+      });
+      actions.appendChild
+(t.createElement("button");
+      printBtn.className = "btn btn-secondary";
+      printBtn.textContent = "🖨️ طباعة";
+      printBtn.addEventListener("click", () => {
+        const w = window.open("", "_blank");
+        w.document.write(`<pre>${JSON.stringify(a, null, 2)}</pre>`);
+        w.print();
+        w.close();
+      });
+      actions.appendChild(printBtn);
+
+      const canManage = session.role === "admin" || session.role === "supervisor";
+      if (canManage) {
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn btn-secondary";
+        editBtn.textContent = "✏️ تعديل";
+        editBtn.addEventListener("click", () => {
+          assCarNumberInput.value = a.carNumber;
+          assPlateCodeInput.value = a.plateCode;
+          assUserSelect.value = a.userId;
+          assOwnerInput.value = a.owner;
+          assNotesInput.value = a.notes || "";
+          assForm.dataset.editId = a.id;
+          window.scrollTo({ top: assForm.offsetTop - 20, behavior: "smooth" });
+        });
+        actions.appendChild(editBtn);
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn btn-secondary";
+        delBtn.style.backgroundColor = "#c62828";
+        delBtn.textContent = "🗑️ حذف";
+        delBtn.addEventListener("click", async () => {
+          if (!confirm("هل أنت متأكد من حذف هذه العهدة؟")) return;
+          await deleteDoc(doc(db, "assignments", a.id));
+          await loadAssignments();
+        });
+        actions.appendChild(delBtn);
+      }
+
+      body.appendChild(row);
+      body.appendChild(notesRow);
+      body.appendChild(actions);
+      body.appendChild(document.createElement("hr"));
+    });
+
+    header.addEventListener("click", () => {
+      body.classList.toggle("hidden");
+    });
+
+    item.appendChild(header);
+    item.appendChild(body);
+    assignmentsList.appendChild(item);
+  });
+}
+
+async function handleAssignmentFormSubmit(e) {
+  e.preventDefault();
+  assignmentsFormError.textContent = "";
+eetList.innerHTML = "";
+  cars.f  const session = loadSession();
+  if (!session) return;
+
+  const carNumber = assCarNumberInput.value.trim();
+  const plateCode = assPlateCodeInput.value.trim();
+  const userId = assUserSelect.value;
+  const owner = assOwnerInput.value.trim();
+  const notes = assNotesInput.value.trim();
+
+  if (!carNumber || !plateCode || !userId || !owner) {
+    assignmentsFormError.textContent = "يرجى تعبئة جميع الحقول المطلوبة.";
+    return;
+  }
+
+  if (session.role === "member") {
+    assignmentsFormError.textContent = "ليست لديك صلاحية لإدارة العهدة.";
+    return;
+  }
+
+  const targetUser = cachedUsers.find((u) => u.id === userId);
+  const userName = targetUser ? targetUser.username : "";
+
+  const assCol = collection(db, "assignments");
+  const editId = assForm.dataset.editId;
+
+  if (editId) {
+    const ref = doc(db, "assignments", editId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      assignmentsFormError.textContent = "لا يمكن العثور على هذه العهدة.";
+      return;
+    }
+    const existing = snap.data();
+    await setDoc(ref, {
+      ...existing,
+      carNumber,
+      plateCode,
+      userId,
+      userName,
+      owner,
+      notes
+    });
+    delete assForm.dataset.editId;
+  } else {
+    const ref = doc(assCol);
+    await setDoc(ref, {
+      carNumber,
+      plateCode,
+      userId,
+      userName,
+      owner,
+      notes,
+      createdAt: Date.now()
+    });
+  }
+
+  assCarNumberInput.value = "";
+  assPlateCodeInput.value = "";
+  assUserSelect.value = "";
+  assOwnerInput.value = "";
+  assNotesInput.value = "";
+
+  await loadAssignments();
+}
+
+/** الأسطول */
+async function loadFleet() {
+  const session = loadSession();
+  if (!session) return;
+  const fleetCol = collection(db, "fleet");
+  const snap = await getDocs(fleetCol);
+  const cars = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  renderFleetList(cars);
+}
+
+function renderFleetList(cars) {
+  const today = new Date();
+  const todayMs = today.getTime();
+  const fifteenDaysMs = 15 * 24 * 60 * 60 * 1000;
+
+  f
+lorEach((c) => {
+    const item = document.createElement("div");
+    item.className = "accordion-item";
+
+    const header = document.createElement("div");
+    header.className = "accordion-header";
+
+    const headerContent = document.createElement("div");
+    headerContent.className = "accordion-header-content";
+    
+    const carInfo = document.createElement("div");
+    carInfo.className = "car-info";
+    carInfo.innerHTML = `🚗 ${c.carNumber} - ${c.plateCode}`;
+    
+    const ownerInfo = document.createElement("div");
+    ownerInfo.style.cssText = "color: #1976d2; font-weight: 600; font-size: 1rem; background-color: rgba(25, 118, 210, 0.1); padding: 6px 12px; border-radius: 6px; display: flex; align-items: center; gap: 8px;";
+    ownerInfo.innerHTML = `👑 ${c.owner}`;
+    
+    headerContent.appendChild(carInfo);
+    headerContent.appendChild(ownerInfo);
+
+    const meta = document.createElement("div");
+    meta.className = "accordion-meta";
+
+    const licenseDateStr = c.licenseEnd ? formatTimestampMs(c.licenseEnd).split(" ")[0] : "-";
+    const insuranceDateStr = c.insuranceEnd ? formatTimestampMs(c.insuranceEnd).split(" ")[0] : "-";
+
+    meta.innerHTML = `📅 ترخيص: ${licenseDateStr}<br>📄 تأمين: ${insuranceDateStr}`;
+
+    header.appendChild(headerContent);
+    header.appendChild(meta);
+
+    const body = document.createElement("div");
+    body.className = "accordion-body hidden";
+
+    const row1 = document.createElement("div");
+    row1.className = "accordion-row";
+    row1.innerHTML = `
+      <span class="accordion-label">المالك:</span>
+      <span>${c.owner}</span>
+    `;
+
+    const row2 = document.createElement("div");
+    row2.className = "accordion-row";
+    row2.innerHTML = `
+      <span class="accordion-label">ملاحظات:</span>
+      <span>${c.notes || "-"}</span>
+    `;
+
+    const row3 = document.createElement("div");
+    row3.className = "accordion-row";
+    let alertsHtml = "";
+    if (c.licenseEnd && c.licenseEnd - todayMs <= fifteenDaysMs && c.licenseEnd >= todayMs) {
+      alertsHtml += `<span class="badge-warning">⚠️ تنبيه: ترخيص ينتهي خلال 15 يوم</span>`;
+leetI    }
+    if (c.insuranceEnd && c.insuranceEnd - todayMs <= fifteenDaysMs && c.insuranceEnd >= todayMs) {
+      alertsHtml += `<span class="badge-warning">⚠️ تنبيه: تأمين ينتهي خلال 15 يوم</span>`;
+    }
+    row3.innerHTML = alertsHtml;
+
+    const actions = document.createElement("div");
+    actions.className = "accordion-actions";
+
+    const shareBtn = document.createElement("button");
+    shareBtn.className = "btn btn-secondary";
+    shareBtn.textContent = "📤 مشاركة";
+    shareBtn.addEventListener("click", () => {
+      shareAsImage(shareBtn, "سيارة الأسطول", {
+        type: 'fleet',
+        carNumber: c.carNumber,
+        plateCode: c.plateCode,
+        owner: c.owner,
+        licenseEnd: c.licenseEnd,
+        insuranceEnd: c.insuranceEnd,
+        notes: c.notes
+      });
+    });
+    actions.appendChild(shareBtn);
+
+    const printBtn = document.createElement("button");
+    printBtn.className = "btn btn-secondary";
+    printBtn.textContent = "🖨️ طباعة";
+    printBtn.addEventListener("click", () => {
+      const w = window.open("", "_blank");
+      w.document.write(`<pre>${JSON.stringify(c, null, 2)}</pre>`);
+      w.print();
+      w.close();
+    });
+    actions.appendChild(printBtn);
+
+    const canManage = session.role === "admin" || session.role === "supervisor";
+    if (canManage) {
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn btn-secondary";
+      editBtn.textContent = "✏️ تعديل";
+      editBtn.addEventListener("click", () => {
+        fleetCarNumberInput.value = c.carNumber;
+        fleetPlateCodeInput.value = c.plateCode;
+        fleetOwnerInput.value = c.owner;
+        fleetNotesInput.value = c.notes || "";
+        if (c.licenseEnd) {
+          const d = new Date(c.licenseEnd);
+          const pad = (n) => n.toString().padStart(2, "0");
+          fleetLicenseEndInput.value = `${d.getFullYear()}-${pad(
+            d.getMonth() + 1
+          )}-${pad(d.getDate())}`;
+        }
+        if (c.insuranceEnd) {
+          const d = new Date(c.insuranceEnd);
+          const pad = (n) => n.toString().padStart(2, "0");
+          
+fnsuranceEndInput.value = `${d.getFullYear()}-${pad(
+            d.getMonth() + 1
+          )}-${pad(d.getDate())}`;
+        }
+        fleetForm.dataset.editId = c.id;
+        window.scrollTo({ top: fleetForm.offsetTop - 20, behavior: "smooth" });
+      });
+      actions.appendChild(editBtn);
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn btn-secondary";
+      delBtn.style.backgroundColor = "#c62828";
+      delBtn.textContent = "🗑️ حذف";
+      delBtn.addEventListener("click", async () => {
+        if (!confirm("هل أنت متأكد من حذف هذه السيارة؟")) return;
+        await deleteDoc(doc(db, "fleet", c.id));
+        await loadFleet();
+      });
+      actions.appendChild(delBtn);
+    }
+
+    body.appendChild(row1);
+    body.appendChild(row2);
+    if (alertsHtml) body.appendChild(row3);
+    body.appendChild(actions);
+
+    header.addEventListener("click", () => {
+      body.classList.toggle("hidden");
+    });
+
+    item.appendChild(header);
+    item.appendChild(body);
+    fleetList.appendChild(item);
+  });
+}
+
+async function handleFleetFormSubmit(e) {
+  e.preventDefault();
+  fleetFormError.textContent = "";
+  const session = loadSession();
+  if (!session) return;
+
+  if (session.role === "member") {
+    fleetFormError.textContent = "ليست لديك صلاحية لإدارة الأسطول.";
+    return;
+  }
+
+  const carNumber = fleetCarNumberInput.value.trim();
+  const plateCode = fleetPlateCodeInput.value.trim();
+  const owner = fleetOwnerInput.value.trim();
+  const notes = fleetNotesInput.value.trim();
+  const licenseEndStr = fleetLicenseEndInput.value;
+  const insuranceEndStr = fleetInsuranceEndInput.value;
+
+  if (!carNumber || !plateCode || !owner || !licenseEndStr || !insuranceEndStr) {
+    fleetFormError.textContent = "يرجى تعبئة جميع الحقول المطلوبة.";
+    return;
+  }
+
+  const licenseEndMs = new Date(licenseEndStr + "T00:00:00Z").getTime();
+  const insuranceEndMs = new Date(insuranceEndStr + "T00:00:00Z").getTime();
+
+  const fleetCol = collection(db, "fleet");
+  const editId = fleetForm.dataset.editId;
+
+  if (editId) {
+    const ref = doc(db, "fleet", editId);
+    const snap = await getDoc(ref);
+   contains(m.carNumber)     if (!snap.exists()) {
+      fleetFormError.textContent = "لا يمكن العثور على هذه السيارة.";
+      return;
+    }
+    const existing = snap.data();
+    await setDoc(ref, {
+      ...existing,
+      carNumber,
+      plateCode,
+      owner,
+      notes,
+      licenseEnd: licenseEndMs,
+      insuranceEnd: insuranceEndMs
+    });
+    delete fleetForm.dataset.editId;
+  } else {
+    const ref = doc(fleetCol);
+    await setDoc(ref, {
+      carNumber,
+      plateCode,
+      owner,
+      notes,
+      licenseEnd: licenseEndMs,
+      insuranceEnd: insuranceEndMs,
+      createdAt: Date.now()
+    });
+  }
+
+  fleetCarNumberInput.value = "";
+  fleetPlateCodeInput.value = "";
+  fleetOwnerInput.value = "";
+  fleetLicenseEndInput.value = "";
+  fleetInsuranceEndInput.value = "";
+  fleetNotesInput.value = "";
+
+  await loadFleet();
+}
+
+/** البحث */
+async function handleSearch(e) {
+  e.preventDefault();
+  const session = loadSession();
+  if (!session) return;
+
+  const qStr = searchQueryInput.value.trim().toLowerCase();
+  if (!qStr) {
+    searchResultsDiv.innerHTML = "";
+    return;
+  }
+
+  searchResultsDiv.innerHTML = "جاري البحث...";
+
+  const [usersSnap, movSnap, assSnap, fleetSnap] = await Promise.all([
+    getDocs(collection(db, "users")),
+    getDocs(collection(db, "movements")),
+    getDocs(collection(db, "assignments")),
+    getDocs(collection(db, "fleet"))
+  ]);
+
+  let users = usersSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  let moves = movSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  let assignments = assSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  let cars = fleetSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  if (session.role === "member") {
+    users = users.filter((u) => u.id === session.userId);
+    moves = moves.filter((m) => m.userId === session.userId);
+    assignments = assignments.filter((a) => a.userId === session.userId);
+    cars = [];
+  }
+
+  const contains = (val) =>
+    val && val.toString().toLowerCase().includes(qStr);
+
+  const usersRes = users.filter(
+    (u) => contains(u.username) || contains(u.phone) || contains(u.role)
+  );
+  const movesRes = moves.filter(
+    (m) =>
+  
+ ||
+      contains(m.plateCode) ||
+      contains(m.userName) ||
+      contains(m.action) ||
+      contains(m.notes)
+  );
+  const assignmentsRes = assignments.filter(
+    (a) =>
+      contains(a.carNumber) ||
+      contains(a.plateCode) ||
+      contains(a.userName) ||
+      contains(a.owner) ||
+      contains(a.notes)
+  );
+  const fleetRes = cars.filter(
+    (c) =>
+      contains(c.carNumber) ||
+      contains(c.plateCode) ||
+      contains(c.owner) ||
+      contains(c.notes)
+  );
+
+  searchResultsDiv.innerHTML = "";
+
+  const addSection = (title, items) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const h = document.createElement("h3");
+    h.className = "section-subtitle";
+    h.textContent = `${title} (${items.length})`;
+    card.appendChild(h);
+
+    if (items.length === 0) {
+      const p = document.createElement("p");
+      p.textContent = "لا توجد نتائج.";
+      card.appendChild(p);
+    } else {
+      items.forEach((it) => {
+        const div = document.createElement("div");
+        div.className = "accordion-row";
+        div.style.borderBottom = "1px solid #eee";
+        div.style.paddingBottom = "4px";
+        div.style.marginBottom = "4px";
+        div.textContent = JSON.stringify(it);
+        card.appendChild(div);
+      });
+    }
+    searchResultsDiv.appendChild(card);
+  };
+
+  addSection("الأعضاء", usersRes);
+  addSection("التحركات", movesRes);
+  addSection("العهدة", assignmentsRes);
+  addSection("الأسطول", fleetRes);
+}
+
+/** تسجيل الدخول والجلسات */
+async function initAuthFlow() {
+  await ensureDefaultAdmin();
+
+  const session = loadSession();
+  if (session) {
+    showAppForUser(session);
+  } else {
+    showLogin();
+  }
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    loginError.textContent = "";
+
+    const username = document.getElementById("login-username").value.trim();
+    const password = document.getElementById("login-password").value.trim();
+
+    if (username.length < 4 || password.length < 6) {
+      loginError.textContent =
+        "يرجى إدخال اسم مستخدم لا يقل عن 4 أحرف وكلمة مرور لا تقل عن 6.";
+      return;
+    }
+
+    try {
+      const user = await findUserByCredentials(username, password);
+========= إعداد ال      if (!user) {
+        loginError.textContent = "بيانات الدخول غير صحيحة.";
+        return;
+      }
+
+      if (user.role === "admin" && user.mustChangePassword) {
+        sessionStorage.setItem("pending_admin_id", user.id);
+        showAdminForceChange();
+      } else {
+        saveSession(user);
+        showAppForUser({
+          id: user.id,
+          username: user.username,
+          role: user.role,
+          phone: user.phone
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      loginError.textContent = "حدث خطأ أثناء تسجيل الدخول.";
+    }
+  });
+
+  adminChangeForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    adminChangeError.textContent = "";
+
+    const newUsername = document.getElementById("new-admin-username").value.trim();
+    const newPassword = document.getElementById("new-admin-password").value.trim();
+    const newPhone = document.getElementById("new-admin-phone").value.trim();
+
+    if (newUsername.length < 4) {
+      adminChangeError.textContent = "اسم المستخدم يجب ألا يقل عن 4 أحرف.";
+      return;
+    }
+    if (newPassword.length < 6) {
+      adminChangeError.textContent = "كلمة المرور يجب ألا تقل عن 6 أحرف/أرقام.";
+      return;
+    }
+    if (!/^\d{10}$/.test(newPhone)) {
+      adminChangeError.textContent = "رقم الجوال يجب أن يكون 10 أرقام.";
+      return;
+    }
+
+    const pendingAdminId = sessionStorage.getItem("pending_admin_id");
+    if (!pendingAdminId) {
+      adminChangeError.textContent = "خطأ داخلي، أعد تحميل الصفحة.";
+      return;
+    }
+
+    try {
+      await updateAdminCredentials(pendingAdminId, newUsername, newPassword, newPhone);
+      sessionStorage.removeItem("pending_admin_id");
+
+      const userRef = doc(db, "users", pendingAdminId);
+      const d = await getDoc(userRef);
+      const user = { id: userRef.id, ...d.data() };
+
+      saveSession(user);
+      showAppForUser({
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        phone: user.phone
+      });
+    } catch (err) {
+      console.error(err);
+      adminChangeError.textContent = "حدث خطأ أثناء تحديث البيانات.";
+    }
+  });
+
+  logoutBtn.addEventListener("click", () => {
+    clearSession();
+    showLogin();
+  });
+}
+
+/** 
+=أحداث ========== */
 function initEventListeners() {
   // زر التحديث اليدوي
-  refreshBtn.addEventListener("click", manualRefresh);
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", manualRefresh);
+  }
   
   // البحث العام
-  globalSearchInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") handleGlobalSearch();
-  });
-  globalSearchBtn.addEventListener("click", handleGlobalSearch);
+  if (globalSearchInput && globalSearchBtn) {
+    globalSearchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") handleGlobalSearch();
+    });
+    globalSearchBtn.addEventListener("click", handleGlobalSearch);
+  }
   
   // البحث المتقدم
-  searchBtn.addEventListener("click", handleAdvancedSearch);
+  if (searchBtn) {
+    searchBtn.addEventListener("click", handleAdvancedSearch);
+  }
   
   // طباعة الكل
   if (movPrintAllBtn) {
-    movPrintAllBtn.addEventListener("click", async () => {
-      const session = loadSession();
-      if (!session) return;
-      
-      const movesCol = collection(db, "movements");
-      const snap = await getDocs(query(movesCol, orderBy("createdAt", "desc")));
-      let moves = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      
-      if (session.role === "member") {
-        moves = moves.filter((m) => m.userId === session.userId);
-      }
-      
-      await printReport(moves, 'movements', 'تقرير التحركات - الكل');
+    movPrintAllBtn.addEventListener("click", handleMovPrintAll);
+  }
+}
+
+/** Service Worker */
+function registerServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js").catch((err) => {
+      console.warn("Service worker registration failed:", err);
     });
   }
 }
 
-/** ========== التهيئة الرئيسية ========== */
+/** تشغيل */
 document.addEventListener("DOMContentLoaded", () => {
   initTabs();
   initAuthFlow();
   initEventListeners();
 
-  // الأحداث الأصلية
   if (userForm) userForm.addEventListener("submit", handleUserFormSubmit);
   if (movForm) movForm.addEventListener("submit", handleMovementFormSubmit);
   if (movPrintReportBtn) movPrintReportBtn.addEventListener("click", handleMovPrintReport);
   if (assForm) assForm.addEventListener("submit", handleAssignmentFormSubmit);
   if (fleetForm) fleetForm.addEventListener("submit", handleFleetFormSubmit);
-  
-  // Service Worker
+  if (searchBtn) searchBtn.addEventListener("click", handleSearch);
+
   registerServiceWorker();
 });
