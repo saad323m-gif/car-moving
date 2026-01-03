@@ -5,54 +5,33 @@
   <title>نظام إدارة وتسجيل حركة السيارات المتكامل</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="autocomplete" content="off" />
-  
+
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="logo.png" type="image/png" />
-  
-  <!-- مكتبة html2canvas للمشاركة كصورة -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="app-container">
-    <!-- ========== الهيدر المعدل ========== -->
+    <!-- الهيدر -->
     <header class="app-header">
-      <!-- يسار: معلومات المستخدم والأزرار -->
+      <!-- يسار: المستخدم + خروج -->
       <div class="header-left">
-        <div id="current-user-badge" class="user-badge hidden"></div>
-        <div class="header-actions">
-          <button id="refresh-btn" class="refresh-btn hidden">
-            <span>🔄 تحديث</span>
-          </button>
-          <button id="logout-btn" class="logout-btn hidden">تسجيل الخروج</button>
-        </div>
+        <div id="current-user-info" class="current-user-info"></div>
+        <button id="logout-btn" class="logout-btn hidden">تسجيل الخروج</button>
       </div>
 
-      <!-- المنتصف: الشعار -->
+      <!-- المنتصف: الشعار + العنوان -->
       <div class="header-center">
         <img src="logo.png" alt="AL MASAOOD" class="app-logo" />
+        <h1 class="app-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
       </div>
 
-      <!-- يمين: العنوان والتاريخ -->
+      <!-- يمين: التاريخ والوقت -->
       <div class="header-right">
-        <h1 class="app-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
         <div id="header-datetime" class="header-datetime"></div>
       </div>
     </header>
-
-    <!-- ========== شريط البحث العام ========== -->
-    <div id="global-search-container" class="global-search-container hidden">
-      <div class="search-box">
-        <input 
-          type="text" 
-          id="global-search-input" 
-          placeholder="🔍 ابحث في جميع البيانات (رقم السيارة، العضو، الحركة، الملاحظات...)"
-          autocomplete="off"
-        />
-        <button id="global-search-btn">بحث</button>
-      </div>
-    </div>
 
     <!-- المحتوى الرئيسي -->
     <main class="app-main">
@@ -91,7 +70,7 @@
       <section id="admin-force-change-section" class="card hidden">
         <h2 class="section-title">تحديث بيانات المدير</h2>
         <p class="section-note">
-          يجب تغيير بيانات الدخول الافتراضية (admin / admin123) قبل المتابعة.
+          يجب تغيير بيانات الدخول الافترية (admin / admin123) قبل المتابعة.
         </p>
         <form id="admin-change-form" autocomplete="off" novalidate>
           <div class="form-group">
@@ -171,15 +150,13 @@
                   <option value="">اختر</option>
                   <option value="استلام">استلام</option>
                   <option value="تسليم">تسليم</option>
-                  <option value="صيانة">صيانة</option>
-                  <option value="استبدال">استبدال</option>
                 </select>
               </div>
             </div>
 
             <div class="form-group">
               <label>ملاحظات</label>
-              <textarea id="mov-notes" rows="3"></textarea>
+              <textarea id="mov-notes" rows="2"></textarea>
             </div>
 
             <div id="movements-form-error" class="form-error"></div>
@@ -201,30 +178,13 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>نوع التقرير</label>
-                <select id="mov-report-type">
-                  <option value="print">طباعة</option>
-                  <option value="preview">معاينة</option>
-                  <option value="export">تصدير</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <button id="mov-print-report" class="btn btn-primary btn-block">
-                  🖨️ إنشاء التقرير
-                </button>
-              </div>
-              <div class="form-group">
-                <button id="mov-print-all" class="btn btn-secondary btn-block">
-                  🖨️ طباعة الكل
+                <label>&nbsp;</label>
+                <button id="mov-print-report" class="btn btn-secondary btn-block">
+                  طباعة التقرير
                 </button>
               </div>
             </div>
           </div>
-
-          <!-- حاوية الطباعة المخفية -->
-          <div id="print-movements-container" class="print-container hidden"></div>
 
           <div id="movements-list" class="accordion-list"></div>
         </div>
@@ -257,14 +217,11 @@
             </div>
             <div class="form-group">
               <label>ملاحظات</label>
-              <textarea id="ass-notes" rows="3"></textarea>
+              <textarea id="ass-notes" rows="2"></textarea>
             </div>
             <div id="assignments-form-error" class="form-error"></div>
             <button type="submit" class="btn btn-primary btn-block">حفظ العهدة</button>
           </form>
-
-          <!-- حاوية الطباعة المخفية -->
-          <div id="print-assignments-container" class="print-container hidden"></div>
 
           <div id="assignments-list" class="accordion-list"></div>
         </div>
@@ -308,9 +265,6 @@
             <div id="fleet-form-error" class="form-error"></div>
             <button type="submit" class="btn btn-primary btn-block">حفظ السيارة</button>
           </form>
-
-          <!-- حاوية الطباعة المخفية -->
-          <div id="print-fleet-container" class="print-container hidden"></div>
 
           <div id="fleet-list" class="accordion-list"></div>
         </div>
@@ -358,45 +312,22 @@
             </button>
           </form>
 
-          <!-- حاوية الطباعة المخفية -->
-          <div id="print-users-container" class="print-container hidden"></div>
-
           <div id="users-list" class="accordion-list"></div>
         </div>
 
         <!-- البحث -->
         <div id="tab-search" class="tab-content">
-          <h2 class="section-title">البحث المتقدم</h2>
+          <h2 class="section-title">البحث</h2>
           <div class="card">
             <div class="form-group">
               <label>نص البحث</label>
               <input
                 id="search-query"
                 type="text"
-                placeholder="ابحث في جميع البيانات (الأعضاء، التحركات، العهدة، الأسطول)"
+                placeholder="ابحث في الأعضاء، التحركات، العهدة، الأسطول"
               />
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>نوع البحث</label>
-                <select id="search-type">
-                  <option value="all">الكل</option>
-                  <option value="movements">التحركات فقط</option>
-                  <option value="assignments">العهدة فقط</option>
-                  <option value="fleet">الأسطول فقط</option>
-                  <option value="users">الأعضاء فقط</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>ترتيب النتائج</label>
-                <select id="search-sort">
-                  <option value="newest">الأحدث أولاً</option>
-                  <option value="oldest">الأقدم أولاً</option>
-                  <option value="carNumber">رقم السيارة</option>
-                </select>
-              </div>
-            </div>
-            <button id="search-btn" class="btn btn-primary btn-block">بحث متقدم</button>
+            <button id="search-btn" class="btn btn-primary btn-block">بحث</button>
           </div>
           <div id="search-results" class="search-results"></div>
         </div>
@@ -405,53 +336,10 @@
 
     <!-- الفوتر -->
     <footer class="app-footer">
-      <div class="footer-content">
-        <div>جميع الحقوق محفوظة © <span id="footer-year"></span></div>
-        <div>نظام إدارة وتسجيل حركة السيارات المتكامل - الإصدار 2.0</div>
-        <div>تمت البرمجة والتطوير بواسطة ( MOHAMED SAAD )</div>
-      </div>
+      <div>جميع الحقوق محفوظة © <span id="footer-year"></span></div>
+      <div>تمت البرمجة والتطوير بواسطة ( MIOHAMED SAAD )</div>
     </footer>
   </div>
-
-  <!-- قالب الطباعة المخفي -->
-  <template id="print-template">
-    <div class="print-header">
-      <img src="logo.png" class="print-logo" alt="شعار المسعود">
-      <h1 class="print-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
-      <h2 class="print-subtitle" data-type="title"></h2>
-      <div class="print-info">
-        <div class="print-date" data-type="date"></div>
-        <div class="print-user" data-type="user"></div>
-      </div>
-    </div>
-    <table class="print-table">
-      <thead>
-        <tr data-type="headers"></tr>
-      </thead>
-      <tbody data-type="rows"></tbody>
-    </table>
-    <div class="print-footer">
-      <p>تم الإنشاء تلقائياً من النظام - شكراً لاستخدامكم خدمات المسعود</p>
-    </div>
-  </template>
-
-  <!-- قالب المشاركة كصورة -->
-  <template id="share-template">
-    <div class="share-card">
-      <div class="share-watermark">
-        <img src="logo.png" alt="شعار المسعود">
-      </div>
-      <div class="share-header">
-        <h3>نظام إدارة وتسجيل حركة السيارات المتكامل</h3>
-        <p data-type="title"></p>
-      </div>
-      <div class="share-content" data-type="content"></div>
-      <div class="share-footer">
-        <p>تاريخ الإنشاء: <span data-type="date"></span></p>
-        <p class="share-signature">المسعود ©</p>
-      </div>
-    </div>
-  </template>
 
   <script type="module" src="app.js"></script>
 </body>

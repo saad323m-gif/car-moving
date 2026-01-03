@@ -1,12 +1,11 @@
-const CACHE_NAME = "car-mgmt-cache-v2";
+const CACHE_NAME = "car-mgmt-cache-v1";
 const URLS_TO_CACHE = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./manifest.json",
-  "./logo.png",
-  "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+  "./logo.png"
 ];
 
 self.addEventListener("install", (event) => {
