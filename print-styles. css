@@ -1,0 +1,51 @@
+@media print {
+  body * { visibility: hidden; }
+  #print-content, #print-content * { visibility: visible; }
+  #print-content { position: absolute; left: 0; top: 0; width: 100%; }
+  .print-header { display: none !important; }
+
+ 
+Position:	 Ln 1, Ch 1 	Total:	 Ln 1, Ch 0 	 
+search		
+replace		
+match case regular expressions 
+find next replace replace all
+ 
+Editarea 0.8.2
+
+
+Shortcuts:
+
+ Tab: add tabulation to text
+ Shift+Tab: remove tabulation to text
+ Ctrl+f: search next / open search area
+ Ctrl+r: replace / open search area
+ Ctrl+h: toggle syntax highlight on/off
+ Ctrl+g: go to line
+ Ctrl+z: undo
+ Ctrl+y: redo
+ Ctrl+e: about
+ Ctrl+q, Esc: close popup
+ Accesskey E: Toggle editor
+
+Notice: syntax highlight function is only for small text 
+© Christophe Dolivet 2007-2010  /* العلامة المائية */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 500px;
+    height: 500px;
+    background-image: url('logo.png');
+    background-repeat: no-repeat;
+    bac
+k;
+    background-size: contain;
+    opacity: 0.08;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    z-index: -1;
+  }
+
+  @page { size: A4; margin: 20mm; }
+}

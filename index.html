@@ -1,346 +1,1283 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <title>نظام إدارة وتسجيل حركة السيارات المتكامل</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="autocomplete" content="off" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة السيارات - AL MASAOOD</title>
+  
+  <!-- الحماية -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://www.gstatic.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com;">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Print Styles -->
+  <link rel="stylesheet" href="print-styles.css" media="print">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b2c6a">
+  
+  <style>
+    :root {
+      --primary: #0b2c6a;
+      --primary-light: #1a4a8f;
+      --success: #2e7d32;
+      --danger: #c62828;
+      --warning: #f57c00;
+      --bg: #f4f6f9;
+      --white: #ffffff;
+      --text: #222;
+      --text-light: #666;
+      --radius: 12px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
 
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="logo.png" type="image/png" />
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    .hidden { display: none !important; }
 
-  <link rel="stylesheet" href="styles.css" />
+    /* Loading Screen */
+    #loading-screen {
+      position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      z-index: 9999; color: white;
+    }
+    #loading-screen .car { font-size: 4rem; animation: drive 1.5s infinite; }
+    @keyframes drive { 0%, 100% { transform: translateX(-20px); } 50% { transform: translateX(20px); } }
+
+    /* Header */
+    .app-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white; padding: 15px 20px; display: flex; justify-content: space-between;
+      align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow);
+    }
+    .header-left { display: flex; align-items: center; gap: 15px; }
+    .app-logo { height: 50px; filter: brightness(0) invert(1); }
+    .app-title { font-size: 1.3rem; font-weight: 700; }
+    .header-right { display: flex; gap: 10px; }
+    .btn-icon {
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: 0.3s;
+    }
+    .btn-icon:hover { background: rgba(255,255,255,0.4); transform: rotate(180deg); }
+    .user-info { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px; }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+    /* Tabs */
+    .tabs-nav {
+      background: white; display: flex; padding: 8px; gap: 8px;
+      overflow-x: auto; box-shadow: var(--shadow); margin-bottom: 20px;
+    }
+    .tabs-nav::-webkit-scrollbar { height: 4px; }
+    .tabs-nav::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+    .tab-btn {
+      padding: 12px 20px; border: none; border-radius: var(--radius);
+      background: transparent; color: var(--text); cursor: pointer;
+      white-space: nowrap; font-weight: 600; transition: 0.3s; display: flex; align-items: center; gap: 8px;
+    }
+    .tab-btn:hover { background: #f0f0f0; }
+    .tab-btn.active { background: var(--primary); color: white; }
+
+    /* Container */
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+    /* Card */
+    .card {
+      background: white; padding: 20px; border-radius: var(--radius);
+      box-shadow: var(--shadow); margin-bottom: 20px;
+    }
+    .card-title { font-size: 1.3rem; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+
+    /* Form */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-weight: 600; color: var(--text-light); font-size: 0.9rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;
+      font-size: 1rem; transition: 0.3s; font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(11, 44, 106, 0.1);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 24px; border: none; border-radius: 8px;
+      font-weight: 600; cursor: pointer; transition: 0.3s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-secondary { background: #e0e0e0; color: var(--text); }
+    .btn-small { padding: 8px 16px; font-size: 0.9rem; }
+
+    /* Toast */
+    .toast-container {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 10000; display: flex; flex-direction: column; gap: 10px;
+    }
+    .toast {
+      background: white; padding: 15px 20px; border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px;
+      animation: slideIn 0.3s, fadeOut 0.3s 2.7s;
+    }
+    .toast-success { border-left: 4px solid var(--success); }
+    .toast-error { border-left: 4px solid var(--danger); }
+    .toast-info { border-left: 4px solid var(--primary); }
+    @keyframes slideIn { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeOut { to { opacity: 0; } }
+
+    /* Accordion */
+    .accordion-item {
+      background: white; border-radius: var(--radius); margin-bottom: 12px;
+      box-shadow: var(--shadow); overflow: hidden; transition: 0.3s;
+    }
+    .accordion-item:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+    .accordion-header {
+      padding: 16px 20px; cursor: pointer; display: flex;
+      justify-content: space-between; align-items: center;
+      background: linear-gradient(to right, #f8f9fa, white);
+    }
+    .accordion-header:hover { background: linear-gradient(to right, #e9ecef, #f8f9fa); }
+    .accordion-title { font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 12px; }
+    .accordion-badge { background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; }
+    .accordion-icon { transition: transform 0.3s; color: var(--text-light); }
+    .accordion-header.active .accordion-icon { transform: rotate(180deg); }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s; }
+    .accordion-content.active { max-height: 1000px; }
+    .accordion-body { padding: 20px; border-top: 1px solid #e0e0e0; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
+    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .info-label { font-weight: 600; color: var(--text-light); font-size: 0.85rem; }
+    .info-value { color: var(--text); font-size: 1rem; }
+    .item-actions { display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card {
+      background: white; border-radius: var(--radius); padding: 20px;
+      box-shadow: var(--shadow); display: flex; align-items: center; gap: 15px;
+      border-left: 4px solid var(--primary); transition: 0.3s;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .stat-icon {
+      width: 60px; height: 60px; border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; color: white; background: var(--primary);
+    }
+    .stat-details { flex: 1; }
+    .stat-value { display: block; font-size: 2rem; font-weight: 700; color: var(--text); line-height: 1; }
+    .stat-label { font-size: 0.9rem; color: var(--text-light); }
+
+    /* Modal */
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px;
+    }
+    .modal-content {
+      background: white; border-radius: var(--radius); padding: 30px;
+      max-width: 500px; width: 100%; animation: modalPop 0.3s;
+    }
+    @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-header { text-align: center; margin-bottom: 20px; }
+    .modal-icon { font-size: 3rem; margin-bottom: 10px; }
+    .modal-title { font-size: 1.5rem; color: var(--text); margin-bottom: 10px; }
+    .modal-message { color: var(--text-light); }
+    .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+
+    /* Print Preview */
+    .print-preview {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10001;
+      display: flex; flex-direction: column;
+    }
+    .print-header {
+      background: white; padding: 15px 20px; display: flex;
+      justify-content: space-between; align-items: center; box-shadow: var(--shadow);
+    }
+    .print-body {
+      flex: 1; overflow-y: auto; padding: 40px; background: #f0f0f0;
+    }
+    .print-page {
+      background: white; max-width: 800px; margin: 0 auto;
+      padding: 40px; box-shadow: 0 0 20px rgba(0,0,0,0.3); min-height: 1000px;
+    }
+
+    /* Footer */
+    .app-footer {
+      background: white; padding: 40px 20px; margin-top: 60px;
+      border-top: 3px solid var(--primary);
+    }
+    .footer-content { max-width: 1400px; margin: 0 auto; }
+    .footer-top { text-align: center; margin-bottom: 30px; }
+    .footer-logo { height: 70px; }
+    .footer-bottom {
+      display: flex; justify-content: flex-start; align-items: center;
+      padding-top: 20px; border-top: 1px solid #e0e0e0;
+    }
+    .footer-names { color: var(--text-light); line-height: 1.8; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .app-title { font-size: 1rem; }
+      .header-right { gap: 5px; }
+      .user-info span { display: none; }
+      .tab-btn span { display: none; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .form-grid { grid-template-columns: 1fr; }
+      .footer-bottom { justify-content: center; text-align: center; }
+    }
+  </style>
 </head>
 <body>
-  <div class="app-container">
-    <!-- الهيدر -->
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="car">🚗</div>
+    <p style="font-size: 1.2rem; margin-top: 20px;">جاري التحميل...</p>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-icon">⚠️</div>
+        <h3 class="modal-title">تأكيد الحذف</h3>
+        <p class="modal-message">هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="confirm-delete">
+          <i class="fas fa-trash"></i> نعم، احذف
+        </button>
+        <button class="btn btn-secondary" onclick="closeDeleteModal()">
+          <i class="fas fa-times"></i> إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print Preview Modal -->
+  <div id="print-preview" class="print-preview hidden">
+    <div class="print-header">
+      <h3><i class="fas fa-print"></i> معاينة الطباعة</h3>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-primary" onclick="confirmPrint()">
+          <i class="fas fa-print"></i> طباعة الآن
+        </button>
+        <button class="btn btn-secondary" onclick="closePrintPreview()">
+          <i class="fas fa-times"></i> رجوع / إلغاء
+        </button>
+      </div>
+    </div>
+    <div class="print-body">
+      <div class="print-page" id="print-content">
+        <!-- سيتم ملؤه ديناميكياً -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Page -->
+  <div id="login-page" class="hidden">
+    <div style="min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;">
+      <div class="card" style="max-width: 450px; width: 100%;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <img src="logo.png" alt="AL MASAOOD" style="height: 80px; margin-bottom: 15px;">
+          <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 8px;">نظام إدارة السيارات</h1>
+          <p style="color: var(--text-light);">قم بتسجيل الدخول للمتابعة</p>
+        </div>
+        <form id="login-form">
+          <div class="form-group">
+            <label>اسم المستخدم <span style="color: var(--danger);">*</span></label>
+            <input id="login-username" type="text" required placeholder="أدخل اسم المستخدم">
+          </div>
+          <div class="form-group">
+            <label>كلمة المرور <span style="color: var(--danger);">*</span></label>
+            <input id="login-password" type="password" required minlength="4" placeholder="أدخل كلمة المرور">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
+            <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+          </button>
+        </form>
+        <div id="login-error" style="color: var(--danger); margin-top: 15px; text-align: center; display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="main-app" class="hidden">
+    <!-- Header -->
     <header class="app-header">
-      <!-- يسار: المستخدم + خروج -->
       <div class="header-left">
-        <div id="current-user-info" class="current-user-info"></div>
-        <button id="logout-btn" class="logout-btn hidden">تسجيل الخروج</button>
+        <img src="logo.png" alt="AL MASAOOD" class="app-logo">
+        <h1 class="app-title">نظام إدارة السيارات</h1>
       </div>
-
-      <!-- المنتصف: الشعار + العنوان -->
-      <div class="header-center">
-        <img src="logo.png" alt="AL MASAOOD" class="app-logo" />
-        <h1 class="app-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
-      </div>
-
-      <!-- يمين: التاريخ والوقت -->
       <div class="header-right">
-        <div id="header-datetime" class="header-datetime"></div>
+        <button class="btn-icon" onclick="refreshPage()" title="تحديث الصفحة">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar">A</div>
+          <span id="user-name" style="font-size: 0.9rem; font-weight: 600;">المستخدم</span>
+        </div>
+        <button class="btn-icon" onclick="logout()" title="تسجيل الخروج">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
       </div>
     </header>
 
-    <!-- المحتوى الرئيسي -->
-    <main class="app-main">
-      <!-- تسجيل الدخول -->
-      <section id="login-section" class="card">
-        <h2 class="section-title">تسجيل الدخول</h2>
-        <form id="login-form" autocomplete="off" novalidate>
-          <div class="form-group">
-            <label for="login-username">اسم المستخدم</label>
-            <input
-              id="login-username"
-              type="text"
-              minlength="4"
-              required
-              autocomplete="new-username"
-              placeholder="ادخل اسم المستخدم"
-            />
-          </div>
-          <div class="form-group">
-            <label for="login-password">كلمة المرور</label>
-            <input
-              id="login-password"
-              type="password"
-              minlength="6"
-              required
-              autocomplete="new-password"
-              placeholder="ادخل كلمة المرور"
-            />
-          </div>
-          <div id="login-error" class="form-error"></div>
-          <button type="submit" class="btn btn-primary btn-block">دخول</button>
-        </form>
+    <!-- Tabs Navigation -->
+    <nav class="tabs-nav" id="tabs-nav">
+      <!-- سيتم بناؤها ديناميكياً -->
+    </nav>
+
+    <!-- Container -->
+    <div class="container">
+      <!-- Tab: Dashboard -->
+      <section id="tab-dashboard" class="hidden">
+        <h2 class="card-title"><i class="fas fa-chart-line"></i> لوحة التحكم والإحصائيات</h2>
+        <div class="stats-grid" id="stats-grid">
+          <!-- سيتم ملؤها ديناميكياً -->
+        </div>
+        <div class="card" id="recent-activity">
+          <h3 style="margin-bottom: 15px;"><i class="fas fa-history"></i> النشاط الأخير</h3>
+          <div id="recent-list"></div>
+        </div>
       </section>
 
-      <!-- إجبار المدير على تغيير البيانات -->
-      <section id="admin-force-change-section" class="card hidden">
-        <h2 class="section-title">تحديث بيانات المدير</h2>
-        <p class="section-note">
-          يجب تغيير بيانات الدخول الافترية (admin / admin123) قبل المتابعة.
-        </p>
-        <form id="admin-change-form" autocomplete="off" novalidate>
-          <div class="form-group">
-            <label for="new-admin-username">اسم مستخدم جديد (مدير)</label>
-            <input
-              id="new-admin-username"
-              type="text"
-              minlength="4"
-              required
-              placeholder="ادخل اسم مستخدم جديد"
-            />
-          </div>
-          <div class="form-group">
-            <label for="new-admin-password">كلمة مرور جديدة</label>
-            <input
-              id="new-admin-password"
-              type="password"
-              minlength="6"
-              required
-              placeholder="ادخل كلمة مرور جديدة"
-            />
-          </div>
-          <div class="form-group">
-            <label for="new-admin-phone">رقم الجوال (10 أرقام)</label>
-            <input
-              id="new-admin-phone"
-              type="tel"
-              inputmode="numeric"
-              pattern="\\d{10}"
-              required
-              placeholder="مثال: 0501234567"
-            />
-          </div>
-          <div id="admin-change-error" class="form-error"></div>
-          <button type="submit" class="btn btn-primary btn-block">
-            حفظ ومتابعة
-          </button>
-        </form>
-      </section>
-
-      <!-- التطبيق بعد تسجيل الدخول -->
-      <section id="app-section" class="hidden">
-        <!-- التبويبات -->
-        <nav class="tabs-nav">
-          <button class="tab-btn active" data-tab="tab-movements">التحركات</button>
-          <button class="tab-btn" data-tab="tab-assignments">العهدة</button>
-          <button class="tab-btn" data-tab="tab-fleet">الأسطول</button>
-          <button class="tab-btn" data-tab="tab-users">الأعضاء</button>
-          <button class="tab-btn" data-tab="tab-search">البحث</button>
-        </nav>
-
-        <!-- التحركات -->
-        <div id="tab-movements" class="tab-content active">
-          <h2 class="section-title">حركات السيارات</h2>
-
-          <form id="movement-form" class="card">
-            <h3 class="section-subtitle">إضافة حركة</h3>
-            <div class="form-row">
+      <!-- Tab: Movements -->
+      <section id="tab-movements" class="hidden">
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-car"></i> تسجيل تحرك جديد</h2>
+          <form id="form-movements">
+            <div class="form-grid">
               <div class="form-group">
-                <label>رقم السيارة</label>
-                <input id="mov-car-number" type="text" required />
+                <label>رقم السيارة <span style="color: var(--danger);">*</span></label>
+                <input id="mov-car-number" type="text" required placeholder="أدخل رقم السيارة">
               </div>
               <div class="form-group">
-                <label>كود اللوحة</label>
-                <input id="mov-plate-code" type="text" required />
+                <label>نوع السيارة <span style="color: var(--danger);">*</span></label>
+                <select id="mov-car-brand" required>
+                  <option value="">اختر نوع السيارة</option>
+                  <option value="تويوتا">🚗 تويوتا (Toyota)</option>
+                  <option value="نيسان">🚙 نيسان (Nissan)</option>
+                  <option value="مرسيدس">🚐 مرسيدس (Mercedes)</option>
+                  <option value="بي إم دبليو">🏎️ بي إم دبليو (BMW)</option>
+                  <option value="فورد">🚕 فورد (Ford)</option>
+                  <option value="هوندا">🚙 هوندا (Honda)</option>
+                  <option value="أخرى">⚙️ أخرى</option>
+                </select>
               </div>
-            </div>
-
-            <div class="form-row">
               <div class="form-group">
-                <label>اسم العضو (السائق)</label>
-                <select id="mov-user-select" required></select>
+                <label>السائق <span style="color: var(--danger);">*</span></label>
+                <input id="mov-driver" type="text" required placeholder="اسم السائق">
               </div>
               <div class="form-group">
-                <label>الحركة</label>
+                <label>الحركة <span style="color: var(--danger);">*</span></label>
                 <select id="mov-action" required>
-                  <option value="">اختر</option>
-                  <option value="استلام">استلام</option>
-                  <option value="تسليم">تسليم</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>ملاحظات</label>
-              <textarea id="mov-notes" rows="2"></textarea>
-            </div>
-
-            <div id="movements-form-error" class="form-error"></div>
-
-            <button type="submit" class="btn btn-primary btn-block">حفظ الحركة</button>
-          </form>
-
-          <div class="card">
-            <h3 class="section-subtitle">تقرير التحركات</h3>
-            <div class="form-row">
-              <div class="form-group">
-                <label>المدة</label>
-                <select id="mov-report-range">
-                  <option value="day">اليوم</option>
-                  <option value="week">أسبوع</option>
-                  <option value="month">شهر</option>
-                  <option value="year">سنة</option>
-                  <option value="all">الكل</option>
+                  <option value="">اختر الحركة</option>
+                  <option value="دخول">📥 دخول</option>
+                  <option value="خروج">📤 خروج</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>&nbsp;</label>
-                <button id="mov-print-report" class="btn btn-secondary btn-block">
-                  طباعة التقرير
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div id="movements-list" class="accordion-list"></div>
-        </div>
-
-        <!-- العهدة -->
-        <div id="tab-assignments" class="tab-content">
-          <h2 class="section-title">العهدة</h2>
-
-          <form id="assignment-form" class="card">
-            <h3 class="section-subtitle">إضافة عهدة</h3>
-            <div class="form-row">
-              <div class="form-group">
-                <label>رقم السيارة</label>
-                <input id="ass-car-number" type="text" required />
+                <label>الوجهة</label>
+                <input id="mov-destination" type="text" placeholder="أدخل الوجهة">
               </div>
               <div class="form-group">
-                <label>كود اللوحة</label>
-                <input id="ass-plate-code" type="text" required />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>اسم المستخدم</label>
-                <select id="ass-user-select" required></select>
+                <label>التاريخ <span style="color: var(--danger);">*</span></label>
+                <input id="mov-date" type="date" required>
               </div>
               <div class="form-group">
-                <label>المالك</label>
-                <input id="ass-owner" type="text" required />
-              </div>
-            </div>
-            <div class="form-group">
-              <label>ملاحظات</label>
-              <textarea id="ass-notes" rows="2"></textarea>
-            </div>
-            <div id="assignments-form-error" class="form-error"></div>
-            <button type="submit" class="btn btn-primary btn-block">حفظ العهدة</button>
-          </form>
-
-          <div id="assignments-list" class="accordion-list"></div>
-        </div>
-
-        <!-- الأسطول -->
-        <div id="tab-fleet" class="tab-content">
-          <h2 class="section-title">إدارة الأسطول</h2>
-
-          <form id="fleet-form" class="card">
-            <h3 class="section-subtitle">إضافة سيارة</h3>
-            <div class="form-row">
-              <div class="form-group">
-                <label>رقم السيارة</label>
-                <input id="fleet-car-number" type="text" required />
-              </div>
-              <div class="form-group">
-                <label>كود اللوحة</label>
-                <input id="fleet-plate-code" type="text" required />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>المالك</label>
-                <input id="fleet-owner" type="text" required />
-              </div>
-              <div class="form-group">
-                <label>نهاية الترخيص</label>
-                <input id="fleet-license-end" type="date" required />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>نهاية التأمين</label>
-                <input id="fleet-insurance-end" type="date" required />
+                <label>الوقت <span style="color: var(--danger);">*</span></label>
+                <input id="mov-time" type="time" required>
               </div>
               <div class="form-group">
                 <label>ملاحظات</label>
-                <input id="fleet-notes" type="text" />
+                <textarea id="mov-notes" placeholder="أضف ملاحظات"></textarea>
               </div>
             </div>
-            <div id="fleet-form-error" class="form-error"></div>
-            <button type="submit" class="btn btn-primary btn-block">حفظ السيارة</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> حفظ التحرك
+            </button>
           </form>
-
-          <div id="fleet-list" class="accordion-list"></div>
         </div>
+        <h3 style="margin: 30px 0 15px; color: var(--primary);">
+          <i class="fas fa-list"></i> قائمة التحركات
+        </h3>
+        <div id="list-movements"></div>
+      </section>
 
-        <!-- الأعضاء -->
-        <div id="tab-users" class="tab-content">
-          <h2 class="section-title">إدارة الأعضاء</h2>
-
-          <form id="user-form" class="card">
-            <h3 class="section-subtitle">إضافة / تعديل عضو</h3>
-            <input id="user-id" type="hidden" />
-            <div class="form-row">
+      <!-- Tab: Assignments -->
+      <section id="tab-assignments" class="hidden">
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-hand-holding"></i> تسجيل عهدة جديدة</h2>
+          <form id="form-assignments">
+            <div class="form-grid">
               <div class="form-group">
-                <label>اسم المستخدم</label>
-                <input id="user-username" type="text" minlength="4" required />
+                <label>رقم السيارة <span style="color: var(--danger);">*</span></label>
+                <input id="asg-car-number" type="text" required placeholder="أدخل رقم السيارة">
               </div>
               <div class="form-group">
-                <label>كلمة المرور</label>
-                <input id="user-password" type="password" minlength="6" required />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>الدور</label>
-                <select id="user-role" required>
-                  <option value="member">عضو</option>
-                  <option value="supervisor">مشرف</option>
-                  <option value="admin">مدير</option>
+                <label>نوع السيارة <span style="color: var(--danger);">*</span></label>
+                <select id="asg-car-brand" required>
+                  <option value="">اختر نوع السيارة</option>
+                  <option value="تويوتا">🚗 تويوتا</option>
+                  <option value="نيسان">🚙 نيسان</option>
+                  <option value="مرسيدس">🚐 مرسيدس</option>
+                  <option value="بي إم دبليو">🏎️ بي إم دبليو</option>
+                  <option value="أخرى">⚙️ أخرى</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>رقم الجوال (10 أرقام)</label>
-                <input
-                  id="user-phone"
-                  type="tel"
-                  inputmode="numeric"
-                  pattern="\\d{10}"
-                  required
-                />
+                <label>المُعهد إليه <span style="color: var(--danger);">*</span></label>
+                <input id="asg-assigned-to" type="text" required placeholder="اسم الموظف">
+              </div>
+              <div class="form-group">
+                <label>تاريخ البداية <span style="color: var(--danger);">*</span></label>
+                <input id="asg-start-date" type="date" required>
+              </div>
+              <div class="form-group">
+                <label>تاريخ الانتهاء</label>
+                <input id="asg-end-date" type="date">
+              </div>
+              <div class="form-group">
+                <label>الغرض</label>
+                <input id="asg-purpose" type="text" placeholder="سبب العهدة">
+              </div>
+              <div class="form-group">
+                <label>الحالة <span style="color: var(--danger);">*</span></label>
+                <select id="asg-status" required>
+                  <option value="نشط">✅ نشط</option>
+                  <option value="منتهي">❌ منتهي</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ملاحظات</label>
+                <textarea id="asg-notes" placeholder="أضف ملاحظات"></textarea>
               </div>
             </div>
-            <div id="users-form-error" class="form-error"></div>
-            <button type="submit" class="btn btn-primary btn-block">
-              حفظ العضو
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> حفظ العهدة
             </button>
           </form>
-
-          <div id="users-list" class="accordion-list"></div>
         </div>
-
-        <!-- البحث -->
-        <div id="tab-search" class="tab-content">
-          <h2 class="section-title">البحث</h2>
-          <div class="card">
-            <div class="form-group">
-              <label>نص البحث</label>
-              <input
-                id="search-query"
-                type="text"
-                placeholder="ابحث في الأعضاء، التحركات، العهدة، الأسطول"
-              />
-            </div>
-            <button id="search-btn" class="btn btn-primary btn-block">بحث</button>
-          </div>
-          <div id="search-results" class="search-results"></div>
-        </div>
+        <h3 style="margin: 30px 0 15px; color: var(--primary);">
+          <i class="fas fa-list"></i> قائمة العهدة
+        </h3>
+        <div id="list-assignments"></div>
       </section>
-    </main>
 
-    <!-- الفوتر -->
+      <!-- Tab: Fleet -->
+      <section id="tab-fleet" class="hidden">
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-truck-monster"></i> إضافة سيارة للأسطول</h2>
+          <form id="form-fleet">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>رقم السيارة <span style="color: var(--danger);">*</span></label>
+                <input id="flt-car-number" type="text" required>
+              </div>
+              <div class="form-group">
+                <label>نوع السيارة <span style="color: var(--danger);">*</span></label>
+                <select id="flt-car-brand" required>
+                  <option value="">اختر النوع</option>
+                  <option value="تويوتا">تويوتا</option>
+                  <option value="نيسان">نيسان</option>
+                  <option value="مرسيدس">مرسيدس</option>
+                  <option value="أخرى">أخرى</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>الموديل</label>
+                <input id="flt-model" type="text">
+              </div>
+              <div class="form-group">
+                <label>سنة الصنع</label>
+                <input id="flt-year" type="number" min="1990" max="2030">
+              </div>
+              <div class="form-group">
+                <label>اللون</label>
+                <input id="flt-color" type="text">
+              </div>
+              <div class="form-group">
+                <label>رقم الشاصي</label>
+                <input id="flt-chassis" type="text">
+              </div>
+              <div class="form-group">
+                <label>المالك</label>
+                <input id="flt-owner" type="text">
+              </div>
+              <div class="form-group">
+                <label>انتهاء الترخيص <span style="color: var(--danger);">*</span></label>
+                <input id="flt-license-expiry" type="date" required>
+              </div>
+              <div class="form-group">
+                <label>انتهاء التأمين <span style="color: var(--danger);">*</span></label>
+                <input id="flt-insurance-expiry" type="date" required>
+              </div>
+              <div class="form-group">
+                <label>الحالة <span style="color: var(--danger);">*</span></label>
+                <select id="flt-status" required>
+                  <option value="نشط">نشط</option>
+                  <option value="صيانة">صيانة</option>
+                  <option value="متوقف">متوقف</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> حفظ السيارة
+            </button>
+          </form>
+        </div>
+        <h3 style="margin: 30px 0 15px; color: var(--primary);">
+          <i class="fas fa-list"></i> قائمة الأسطول
+        </h3>
+        <div id="list-fleet"></div>
+      </section>
+
+      <!-- Tab: Users (Manager Only) -->
+      <section id="tab-users" class="hidden">
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-users"></i> إدارة المستخدمين</h2>
+          <form id="form-users">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>اسم المستخدم <span style="color: var(--danger);">*</span></label>
+                <input id="usr-username" type="text" required>
+              </div>
+              <div class="form-group">
+                <label>كلمة المرور <span style="color: var(--danger);">*</span></label>
+                <input id="usr-password" type="password" required minlength="4">
+              </div>
+              <div class="form-group">
+                <label>الصلاحية <span style="color: var(--danger);">*</span></label>
+                <select id="usr-role" required>
+                  <option value="">اختر الصلاحية</option>
+                  <option value="manager">👔 مدير</option>
+                  <option value="supervisor">👨‍💼 مشرف</option>
+                  <option value="employee">👤 موظف</option>
+                  <option value="viewer">👁️ مراقب</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>الاسم الكامل</label>
+                <input id="usr-fullname" type="text">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-user-plus"></i> إضافة مستخدم
+            </button>
+          </form>
+        </div>
+        <h3 style="margin: 30px 0 15px; color: var(--primary);">
+          <i class="fas fa-list"></i> قائمة المستخدمين
+        </h3>
+        <div id="list-users"></div>
+      </section>
+
+      <!-- Tab: Search -->
+      <section id="tab-search" class="hidden">
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-search"></i> البحث</h2>
+          <div class="form-grid" style="margin-bottom: 20px;">
+            <div class="form-group">
+              <label>كلمة البحث</label>
+              <input id="search-query" type="text" placeholder="ابحث عن رقم سيارة، اسم، تاريخ...">
+            </div>
+            <div class="form-group">
+              <label>نوع البحث</label>
+              <select id="search-type">
+                <option value="all">الكل</option>
+                <option value="movements">التحركات</option>
+                <option value="assignments">العهدة</option>
+                <option value="fleet">الأسطول</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="performSearch()">
+            <i class="fas fa-search"></i> بحث
+          </button>
+        </div>
+        <h3 style="margin: 30px 0 15px; color: var(--primary);">
+          <i class="fas fa-list-alt"></i> نتائج البحث
+        </h3>
+        <div id="search-results"></div>
+      </section>
+    </div>
+
+    <!-- Footer -->
     <footer class="app-footer">
-      <div>جميع الحقوق محفوظة © <span id="footer-year"></span></div>
-      <div>تمت البرمجة والتطوير بواسطة ( MIOHAMED SAAD )</div>
+      <div class="footer-content">
+        <div class="footer-top">
+          <img src="logo.png" alt="AL MASAOOD" class="footer-logo">
+        </div>
+        <div class="footer-bottom">
+          <div class="footer-names">
+            <p><i class="fas fa-user"></i> المطور: محمد الحارثي</p>
+            <p><i class="fas fa-envelope"></i> البريد: m@example.com</p>
+            <p><i class="fas fa-phone"></i> الهاتف: 050 123 4567</p>
+          </div>
+        </div>
+      </div>
     </footer>
   </div>
 
-  <script type="module" src="app.js"></script>
+  <!-- Firebase & App Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+      getFirestore, collection, addDoc, getDocs, doc, 
+      updateDoc, deleteDoc, query, where, serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-qlIfpFyam5UgjxzhwAEhkttIQCBZXUw",
+      authDomain: "carmanagement-79bfb.firebaseapp.com",
+      projectId: "carmanagement-79bfb",
+      storageBucket: "carmanagement-79bfb.firebasestorage.app",
+      messagingSenderId: "313516916430",
+      appId: "1:313516916430:web:6f2c20740bced9e7211a9f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let deleteItemId = null;
+    let deleteCollection = null;
+
+    // Utility Functions
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      toast.innerHTML = `<span>${icons[type]}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function hideLoadingScreen() {
+      const screen = document.getElementById('loading-screen');
+      screen.style.opacity = '0';
+      setTimeout(() => screen.remove(), 500);
+    }
+
+    // Login
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errorDiv = document.getElementById('login-error');
+
+      try {
+        const q = query(collection(db, 'users'), where('username', '==', username));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          errorDiv.textContent = 'اسم المستخدم غير موجود';
+          errorDiv.style.display = 'block';
+          return;
+        }
+
+        const userDoc = snapshot.docs[0];
+        const userData = userDoc.data();
+
+        if (userData.password !== password) {
+          errorDiv.textContent = 'كلمة المرور غير صحيحة';
+          errorDiv.style.display = 'block';
+          return;
+        }
+
+        currentUser = { id: userDoc.id, ...userData };
+        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        await updateDoc(doc(db, 'users', userDoc.id), { lastLogin: serverTimestamp() });
+
+        showToast('تم تسجيل الدخول بنجاح', 'success');
+        initializeApp();
+      } catch (error) {
+        console.error(error);
+        errorDiv.textContent = 'حدث خطأ أثناء تسجيل الدخول';
+        errorDiv.style.display = 'block';
+      }
+    });
+
+    window.logout = function() {
+      sessionStorage.removeItem('currentUser');
+      currentUser = null;
+      document.getElementById('main-app').classList.add('hidden');
+      document.getElementById('login-page').classList.remove('hidden');
+      showToast('تم تسجيل الخروج', 'info');
+    }
+
+    window.refreshPage = function() {
+      location.reload();
+    }
+
+    // Initialize App
+    function initializeApp() {
+      document.getElementById('login-page').classList.add('hidden');
+      document.getElementById('main-app').classList.remove('hidden');
+
+      const avatar = document.getElementById('user-avatar');
+      const name = document.getElementById('user-name');
+      avatar.textContent = (currentUser.fullName || currentUser.username).charAt(0).toUpperCase();
+      name.textContent = currentUser.fullName || currentUser.username;
+
+      buildTabs();
+      loadAllData();
+      setDefaultDates();
+    }
+
+    function buildTabs() {
+      const tabsNav = document.getElementById('tabs-nav');
+      const allTabs = [
+        { id: 'dashboard', icon: 'fa-chart-line', label: 'لوحة التحكم', roles: ['manager', 'supervisor'] },
+        { id: 'movements', icon: 'fa-car', label: 'التحركات', roles: ['manager', 'supervisor', 'employee', 'viewer'] },
+        { id: 'assignments', icon: 'fa-hand-holding', label: 'العهدة', roles: ['manager', 'supervisor', 'employee', 'viewer'] },
+        { id: 'fleet', icon: 'fa-truck-monster', label: 'الأسطول', roles: ['manager', 'supervisor', 'employee', 'viewer'] },
+        { id: 'users', icon: 'fa-users', label: 'المستخدمين', roles: ['manager'] },
+        { id: 'search', icon: 'fa-search', label: 'البحث', roles: ['manager', 'supervisor', 'employee', 'viewer'] }
+      ];
+
+      tabsNav.innerHTML = '';
+      allTabs.forEach((tab, i) => {
+        if (tab.roles.includes(currentUser.role)) {
+          const btn = document.createElement('button');
+          btn.className = `tab-btn ${i === 0 ? 'active' : ''}`;
+          btn.innerHTML = `<i class="fas ${tab.icon}"></i><span>${tab.label}</span>`;
+          btn.onclick = () => switchTab(`tab-${tab.id}`);
+          tabsNav.appendChild(btn);
+          
+          if (i === 0) document.getElementById(`tab-${tab.id}`).classList.remove('hidden');
+        }
+      });
+    }
+
+    window.switchTab = function(tabId) {
+      document.querySelectorAll('.container > section').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.remove('hidden');
+      event.target.closest('.tab-btn').classList.add('active');
+      
+      if (tabId === 'tab-dashboard') loadDashboard();
+    }
+
+    function setDefaultDates() {
+      const today = new Date().toISOString().split('T')[0];
+      const time = new Date().toTimeString().split(' ')[0].substring(0, 5);
+      document.getElementById('mov-date').value = today;
+      document.getElementById('mov-time').value = time;
+      document.getElementById('asg-start-date').value = today;
+    }
+
+    async function loadAllData() {
+      await Promise.all([loadMovements(), loadAssignments(), loadFleet(), loadUsers()]);
+      hideLoadingScreen();
+    }
+
+    // Load Movements
+    async function loadMovements() {
+      try {
+        const snapshot = await getDocs(collection(db, 'movements'));
+        const list = document.getElementById('list-movements');
+        list.innerHTML = '';
+
+        if (snapshot.empty) {
+          list.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">لا توجد تحركات</p>';
+          return;
+        }
+
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const item = document.createElement('div');
+          item.className = 'accordion-item';
+          item.innerHTML = `
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+              <div class="accordion-title">
+                <i class="fas fa-chevron-down accordion-icon"></i>
+                <span>${data.driver} - ${data.carNumber}</span>
+                <span class="accordion-badge">${data.action}</span>
+              </div>
+            </div>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <div class="info-grid">
+                  <div class="info-item"><span class="info-label">رقم السيارة</span><span class="info-value">${data.carNumber}</span></div>
+                  <div class="info-item"><span class="info-label">نوع السيارة</span><span class="info-value">${data.carBrand || '-'}</span></div>
+                  <div class="info-item"><span class="info-label">السائق</span><span class="info-value">${data.driver}</span></div>
+                  <div class="info-item"><span class="info-label">الحركة</span><span class="info-value">${data.action}</span></div>
+                  <div class="info-item"><span class="info-label">الوجهة</span><span class="info-value">${data.destination || '-'}</span></div>
+                  <div class="info-item"><span class="info-label">التاريخ</span><span class="info-value">${data.date}</span></div>
+                  <div class="info-item"><span class="info-label">الوقت</span><span class="info-value">${data.time}</span></div>
+                </div>
+                ${currentUser.role !== 'viewer' ? `
+                  <div class="item-actions">
+                    <button class="btn btn-primary btn-small" onclick="printItem('${docSnap.id}', 'movements')">
+                      <i class="fas fa-print"></i> طباعة
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="deleteItem('${docSnap.id}', 'movements')">
+                      <i class="fas fa-trash"></i> حذف
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+          list.appendChild(item);
+        });
+      } catch (error) {
+        console.error(error);
+        showToast('خطأ في تحميل التحركات', 'error');
+      }
+    }
+
+    // Load Assignments
+    async function loadAssignments() {
+      try {
+        const snapshot = await getDocs(collection(db, 'assignments'));
+        const list = document.getElementById('list-assignments');
+        list.innerHTML = '';
+
+        if (snapshot.empty) {
+          list.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">لا توجد عهدة</p>';
+          return;
+        }
+
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const item = document.createElement('div');
+          item.className = 'accordion-item';
+          item.innerHTML = `
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+              <div class="accordion-title">
+                <i class="fas fa-chevron-down accordion-icon"></i>
+                <span>${data.assignedTo} - ${data.carNumber}</span>
+                <span class="accordion-badge">${data.status}</span>
+              </div>
+            </div>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <div class="info-grid">
+                  <div class="info-item"><span class="info-label">رقم السيارة</span><span class="info-value">${data.carNumber}</span></div>
+                  <div class="info-item"><span class="info-label">نوع السيارة</span><span class="info-value">${data.carBrand || '-'}</span></div>
+                  <div class="info-item"><span class="info-label">المُعهد إليه</span><span class="info-value">${data.assignedTo}</span></div>
+                  <div class="info-item"><span class="info-label">تاريخ البداية</span><span class="info-value">${data.startDate}</span></div>
+                  <div class="info-item"><span class="info-label">تاريخ الانتهاء</span><span class="info-value">${data.endDate || '-'}</span></div>
+                  <div class="info-item"><span class="info-label">الحالة</span><span class="info-value">${data.status}</span></div>
+                </div>
+                ${currentUser.role !== 'viewer' ? `
+                  <div class="item-actions">
+                    <button class="btn btn-danger btn-small" onclick="deleteItem('${docSnap.id}', 'assignments')">
+                      <i class="fas fa-trash"></i> حذف
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+          list.appendChild(item);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Load Fleet
+    async function loadFleet() {
+      try {
+        const snapshot = await getDocs(collection(db, 'fleet'));
+        const list = document.getElementById('list-fleet');
+        list.innerHTML = '';
+
+        if (snapshot.empty) {
+          list.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">لا توجد سيارات</p>';
+          return;
+        }
+
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const item = document.createElement('div');
+          item.className = 'accordion-item';
+          item.innerHTML = `
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+              <div class="accordion-title">
+                <i class="fas fa-chevron-down accordion-icon"></i>
+                <span>${data.carBrand || 'غير محدد'} - ${data.carNumber}</span>
+                <span class="accordion-badge">${data.status}</span>
+              </div>
+            </div>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <div class="info-grid">
+                  <div class="info-item"><span class="info-label">رقم السيارة</span><span class="info-value">${data.carNumber}</span></div>
+                  <div class="info-item"><span class="info-label">نوع السيارة</span><span class="info-value">${data.carBrand || '-'}</span></div>
+                  <div class="info-item"><span class="info-label">الموديل</span><span class="info-value">${data.model || '-'}</span></div>
+                  <div class="info-item"><span class="info-label">سنة الصنع</span><span class="info-value">${data.year || '-'}</span></div>
+                  <div class="info-item"><span class="info-label">انتهاء الترخيص</span><span class="info-value">${data.licenseExpiry}</span></div>
+                  <div class="info-item"><span class="info-label">الحالة</span><span class="info-value">${data.status}</span></div>
+                </div>
+                ${currentUser.role !== 'viewer' ? `
+                  <div class="item-actions">
+                    <button class="btn btn-danger btn-small" onclick="deleteItem('${docSnap.id}', 'fleet')">
+                      <i class="fas fa-trash"></i> حذف
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+          list.appendChild(item);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Load Users
+    async function loadUsers() {
+      if (currentUser.role !== 'manager') return;
+      
+      try {
+        const snapshot = await getDocs(collection(db, 'users'));
+        const list = document.getElementById('list-users');
+        list.innerHTML = '';
+
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const item = document.createElement('div');
+          item.className = 'accordion-item';
+          item.innerHTML = `
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+              <div class="accordion-title">
+                <i class="fas fa-chevron-down accordion-icon"></i>
+                <span>${data.fullName || data.username}</span>
+                <span class="accordion-badge">${data.role}</span>
+              </div>
+            </div>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <div class="info-grid">
+                  <div class="info-item"><span class="info-label">اسم المستخدم</span><span class="info-value">${data.username}</span></div>
+                  <div class="info-item"><span class="info-label">الصلاحية</span><span class="info-value">${data.role}</span></div>
+                  <div class="info-item"><span class="info-label">الاسم الكامل</span><span class="info-value">${data.fullName || '-'}</span></div>
+                </div>
+                <div class="item-actions">
+                  <button class="btn btn-danger btn-small" onclick="deleteItem('${docSnap.id}', 'users')">
+                    <i class="fas fa-trash"></i> حذف
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          list.appendChild(item);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Load Dashboard
+    async function loadDashboard() {
+      try {
+        const [movSnap, asgSnap, fltSnap] = await Promise.all([
+          getDocs(collection(db, 'movements')),
+          getDocs(collection(db, 'assignments')),
+          getDocs(collection(db, 'fleet'))
+        ]);
+
+        const statsGrid = document.getElementById('stats-grid');
+        statsGrid.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-car"></i></div>
+            <div class="stat-details">
+              <span class="stat-value">${fltSnap.size}</span>
+              <span class="stat-label">إجمالي السيارات</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-route"></i></div>
+            <div class="stat-details">
+              <span class="stat-value">${movSnap.size}</span>
+              <span class="stat-label">التحركات</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-hand-holding"></i></div>
+            <div class="stat-details">
+              <span class="stat-value">${asgSnap.size}</span>
+              <span class="stat-label">العهدة</span>
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Toggle Accordion
+    window.toggleAccordion = function(header) {
+      header.classList.toggle('active');
+      header.nextElementSibling.classList.toggle('active');
+    }
+
+    // Forms
+    document.getElementById('form-movements').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (currentUser.role === 'viewer') return showToast('ليس لديك صلاحية', 'error');
+
+      try {
+        await addDoc(collection(db, 'movements'), {
+          carNumber: document.getElementById('mov-car-number').value,
+          carBrand: document.getElementById('mov-car-brand').value,
+          driver: document.getElementById('mov-driver').value,
+          action: document.getElementById('mov-action').value,
+          destination: document.getElementById('mov-destination').value,
+          date: document.getElementById('mov-date').value,
+          time: document.getElementById('mov-time').value,
+          notes: document.getElementById('mov-notes').value,
+          timestamp: serverTimestamp(),
+          createdBy: currentUser.username
+        });
+        showToast('تم حفظ التحرك', 'success');
+        e.target.reset();
+        setDefaultDates();
+        loadMovements();
+      } catch (error) {
+        console.error(error);
+        showToast('خطأ في الحفظ', 'error');
+      }
+    });
+
+    document.getElementById('form-assignments').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (currentUser.role === 'viewer') return showToast('ليس لديك صلاحية', 'error');
+
+      try {
+        await addDoc(collection(db, 'assignments'), {
+          carNumber: document.getElementById('asg-car-number').value,
+          carBrand: document.getElementById('asg-car-brand').value,
+          assignedTo: document.getElementById('asg-assigned-to').value,
+          startDate: document.getElementById('asg-start-date').value,
+          endDate: document.getElementById('asg-end-date').value,
+          purpose: document.getElementById('asg-purpose').value,
+          status: document.getElementById('asg-status').value,
+          notes: document.getElementById('asg-notes').value,
+          timestamp: serverTimestamp()
+        });
+        showToast('تم حفظ العهدة', 'success');
+        e.target.reset();
+        loadAssignments();
+      } catch (error) {
+        console.error(error);
+        showToast('خطأ في الحفظ', 'error');
+      }
+    });
+
+    document.getElementById('form-fleet').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (currentUser.role === 'viewer') return showToast('ليس لديك صلاحية', 'error');
+
+      try {
+        await addDoc(collection(db, 'fleet'), {
+          carNumber: document.getElementById('flt-car-number').value,
+          carBrand: document.getElementById('flt-car-brand').value,
+          model: document.getElementById('flt-model').value,
+          year: document.getElementById('flt-year').value,
+          color: document.getElementById('flt-color').value,
+          chassisNumber: document.getElementById('flt-chassis').value,
+          owner: document.getElementById('flt-owner').value,
+          licenseExpiry: document.getElementById('flt-license-expiry').value,
+          insuranceExpiry: document.getElementById('flt-insurance-expiry').value,
+          status: document.getElementById('flt-status').value,
+          timestamp: serverTimestamp()
+        });
+        showToast('تم حفظ السيارة', 'success');
+        e.target.reset();
+        loadFleet();
+      } catch (error) {
+        console.error(error);
+        showToast('خطأ في الحفظ', 'error');
+      }
+    });
+
+    document.getElementById('form-users').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (currentUser.role !== 'manager') return showToast('ليس لديك صلاحية', 'error');
+
+      try {
+        await addDoc(collection(db, 'users'), {
+          username: document.getElementById('usr-username').value,
+          password: document.getElementById('usr-password').value,
+          role: document.getElementById('usr-role').value,
+          fullName: document.getElementById('usr-fullname').value,
+          createdAt: serverTimestamp(),
+          isActive: true
+        });
+        showToast('تم إضافة المستخدم', 'success');
+        e.target.reset();
+        loadUsers();
+      } catch (error) {
+        console.error(error);
+        showToast('خطأ في الإضافة', 'error');
+      }
+    });
+
+    // Delete
+    window.deleteItem = function(id, coll) {
+      if (currentUser.role === 'viewer' || currentUser.role === 'employee') {
+        return showToast('ليس لديك صلاحية للحذف', 'error');
+      }
+      deleteItemId = id;
+      deleteCollection = coll;
+      document.getElementById('delete-modal').classList.remove('hidden');
+    }
+
+    window.closeDeleteModal = function() {
+      document.getElementById('delete-modal').classList.add('hidden');
+    }
+
+    document.getElementById('confirm-delete').addEventListener('click', async () => {
+      try {
+        await deleteDoc(doc(db, deleteCollection, deleteItemId));
+        showToast('تم الحذف', 'success');
+        closeDeleteModal();
+        
+        if (deleteCollection === 'movements') loadMovements();
+        else if (deleteCollection === 'assignments') loadAssignments();
+        else if (deleteCollection === 'fleet') loadFleet();
+        else if (deleteCollection === 'users') loadUsers();
+      } catch (error) {
+        console.error(error);
+        showToast('خطأ في الحذف', 'error');
+      }
+    });
+
+    // Print
+    window.printItem = async function(id, coll) {
+      try {
+        const snapshot = await getDocs(collection(db, coll));
+        const docSnap = snapshot.docs.find(d => d.id === id);
+        if (!docSnap) return;
+
+        const data = docSnap.data();
+        const content = document.getElementById('print-content');
+        content.innerHTML = `
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: var(--primary);">تقرير تحرك سيارة</h1>
+            <p>التاريخ: ${new Date().toLocaleDateString('ar-SA')}</p>
+          </div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">رقم السيارة</td><td style="padding: 10px; border: 1px solid #ddd;">${data.carNumber}</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">نوع السيارة</td><td style="padding: 10px; border: 1px solid #ddd;">${data.carBrand || '-'}</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">السائق</td><td style="padding: 10px; border: 1px solid #ddd;">${data.driver}</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">الحركة</td><td style="padding: 10px; border: 1px solid #ddd;">${data.action}</td></tr>
+            <tr><td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">التاريخ</td><td style="padding: 10px; border: 1px solid #ddd;">${data.date} ${data.time}</td></tr>
+          </table>
+        `;
+        document.getElementById('print-preview').classList.remove('hidden');
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    window.confirmPrint = function() {
+      window.print();
+    }
+
+    window.closePrintPreview = function() {
+      document.getElementById('print-preview').classList.add('hidden');
+    }
+
+    // Search
+    window.performSearch = async function() {
+      const query = document.getElementById('search-query').value.toLowerCase();
+      const type = document.getElementById('search-type').value;
+      const results = document.getElementById('search-results');
+
+      if (!query) return showToast('أدخل كلمة البحث', 'error');
+
+      results.innerHTML = '<p style="text-align:center; padding:20px;">جاري البحث...</p>';
+
+      try {
+        let found = [];
+
+        if (type === 'all' || type === 'movements') {
+          const snap = await getDocs(collection(db, 'movements'));
+          snap.forEach(d => {
+            const data = d.data();
+            if (JSON.stringify(data).toLowerCase().includes(query)) {
+              found.push({ ...data, type: 'تحرك' });
+            }
+          });
+        }
+
+        if (type === 'all' || type === 'assignments') {
+          const snap = await getDocs(collection(db, 'assignments'));
+          snap.forEach(d => {
+            const data = d.data();
+            if (JSON.stringify(data).toLowerCase().includes(query)) {
+              found.push({ ...data, type: 'عهدة' });
+            }
+          });
+        }
+
+        if (type === 'all' || type === 'fleet') {
+          const snap = await getDocs(collection(db, 'fleet'));
+          snap.forEach(d => {
+            const data = d.data();
+            if (JSON.stringify(data).toLowerCase().includes(query)) {
+              found.push({ ...data, type: 'سيارة' });
+            }
+          });
+        }
+
+        results.innerHTML = '';
+        if (found.length === 0) {
+          results.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">لا توجد نتائج</p>';
+        } else {
+          found.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `
+              <h4 style="color: var(--primary); margin-bottom: 10px;">${item.type}</h4>
+              <p><strong>رقم السيارة:</strong> ${item.carNumber}</p>
+              <p><strong>نوع السيارة:</strong> ${item.carBrand || '-'}</p>
+            `;
+            results.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        showToast('خطأ في البحث', 'error');
+      }
+    }
+
+    // Check Session
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = sessionStorage.getItem('currentUser');
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        initializeApp();
+      } else {
+        document.getElementById('login-page').classList.remove('hidden');
+        hideLoadingScreen();
+      }
+    });
+
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').catch(console.error);
+    }
+  </script>
 </body>
 </html>
