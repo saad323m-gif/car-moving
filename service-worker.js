@@ -1,14 +1,35 @@
-const CACHE_NAME = 'masaood-v1';
-const urlsToCache = ['index.html', 'print-styles.css', 'logo.png'];
+const CACHE_NAME = "car-mgmt-cache-v1";
+const URLS_TO_CACHE = [
+  "./",
+  "./index.html",
+  "./styles.css",
+  "./app.js",
+  "./manifest.json",
+  "./logo.png"
+];
 
-self.addEventListener('install', event => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(URLS_TO_CACHE);
+    })
   );
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((names) =>
+      Promise.all(
+        names.map((name) => {
+          if (name !== CACHE_NAME) {
+            return caches.delete(name);
+          }
+        })
+      )
+    )
   );
+});
+
+self.addEventListener("fetch", (event) => {
+  event.respondWith(caches.match(event.request).then((res) => res || fetch(event.request)));
 });
