@@ -1,0 +1,22 @@
+{
+  "name": "نظام إدارة وتسجيل حركة السيارات المتكامل",
+  "short_name": "إدارة السيارات",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b2c6a",
+  "theme_color": "#0b2c6a",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
