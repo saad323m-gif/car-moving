@@ -1,0 +1,58 @@
+// Firestore rules (مقترح)
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // users collection: each user doc has role: "developer","manager","supervisor","member"
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && isAdmin(request.auth.uid);
+      allow update: if request.auth != null && isAdmin(request.auth.uid);
+      allow delete: if false;
+    }
+
+    // movements collection
+    match /movements/{docId} {
+      allow create: if request.auth != null && validMovementCreate();
+      allow read: if request.auth != null && (isAdmin(request.auth.uid) || resource.data.userId == request.auth.uid);
+      allow update: if request.auth != null && canUpdateMovement(resource, request);
+      allow delete: if request.auth != null && isAdmin(request.auth.uid);
+    }
+
+    // assets (عهد)
+    match /assets/{docId} {
+      allow create: if request.auth != null && isStaff(request.auth.uid);
+      allow read: if request.auth != null && (isStaff(request.auth.uid) || resource.data.holderId == request.auth.uid);
+      allow update, delete: if request.auth != null && isStaff(request.auth.uid);
+    }
+
+    // fleet
+    match /fleet/{docId} {
+      allow read, create, update, delete: if request.auth != null && isStaff(request.auth.uid);
+    }
+
+    function isAdmin(uid){
+      return get(/databases/$(database)/documents/users/$(uid)).data.role in ['developer','manager','supervisor'];
+    }
+    function isStaff(uid){
+      return isAdmin(uid);
+    }
+
+    function validMovementCreate(){
+      // require server timestamp for createdAt (cannot be client-supplied)
+      return request.resource.data.keys().hasAll(['vehicleNumber','plateCode','vehicleType','driverId','actionType','notes','createdAt','userId'])
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.userId == request.auth.uid;
+    }
+
+    function canUpdateMovement(resource, request){
+      // Admins can update any; members can update their own within 24 hours only
+      if (isAdmin(request.auth.uid)) { return true; }
+      if (resource.data.userId != request.auth.uid) { return false; }
+      // cannot change createdAt
+      if (request.resource.data.createdAt != resource.data.createdAt) { return false; }
+      // allow update only within 24 hours
+      return request.time < resource.data.createdAt + duration.value(24, "h");
+    }
+  }
+}
