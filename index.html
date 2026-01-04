@@ -5,53 +5,44 @@
     <title>نظام إدارة وتسجيل حركة السيارات المتكامل</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Manifest & PWA -->
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#0a275c" />
 
-    <!-- Styles -->
     <link rel="stylesheet" href="styles.css" />
 
-    <!-- Icon -->
     <link rel="icon" type="image/png" href="logo.png" />
   </head>
   <body>
     <div class="app-container">
-o" class="current-use      <!-- الهيدر -->
       <header class="app-header">
-        <!-- يمين الهيدر: عنوان النظام -->
         <div class="header-right">
           <h1 class="app-title">
-            نظام إدارة وتسجيل حركة السيارات المتكامل
+صفحة">
+              ⟳
+            </button>
+                   نظام إدارة وتسجيل حركة السيارات المتكامل
           </h1>
         </div>
 
-        <!-- منتصف الهيدر: الشعار -->
         <div class="header-center">
           <img src="logo.png" alt="AL MASAOOD" class="app-logo" />
         </div>
 
-        <!-- يسار الهيدر: المستخدم + خروج + الوقت + تحديث -->
         <div class="header-left">
-          <div id="current-user-in
-fr-info"></div>
+          <div id="current-user-info" class="current-user-info"></div>
           <button id="logout-btn" class="logout-btn hidden">تسجيل الخروج</button>
 
           <div class="header-left-bottom">
             <div id="header-datetime" class="header-datetime"></div>
-            <button id="refresh-btn" class="refresh-btn" title="تحديث الصفحة">
-              ⟳
-            </button>
-          </div>
+            <button id="refresh-btn" class="refresh-btn" title="تحديث ا
+ل   </div>
         </div>
       </header>
 
-      <!-- شريط البحث الثابت في كل الصفحات (بعد تسجيل الدخول) -->
       <section id="global-search-section" class="card hidden">
         <div class="global-search-row">
           <div class="form-group global-search-input">
-   <!-- قسم تسجيل الدخول -->
-        <section id="login-section"            <label for="search-query">بحث في كل البيانات</label>
+            <label for="search-query">بحث في كل البيانات</label>
             <input
               id="search-query"
               type="text"
@@ -63,14 +54,13 @@ fr-info"></div>
               بحث
             </button>
           </div>
-        </div>
+"
+                    </div>
         <div id="search-results" class="search-results"></div>
       </section>
 
-      <!-- المحتوى الرئيسي -->
       <main class="app-main">
-    
-  class="card">
+        <section id="login-section" class="card">
           <h2 class="section-title">تسجيل الدخول</h2>
           <p class="section-note">
             أدخل اسم المستخدم وكلمة المرور للدخول إلى النظام.
@@ -82,17 +72,15 @@ fr-info"></div>
                 id="login-username"
                 type="text"
                 autocomplete="username"
-                placeholder="مثال: admin"
-                required
+                placeholder="مثال: admi
+n    required
               />
             </div>
             <div class="form-group">
               <label for="login-password">كلمة المرور</label>
               <input
                 id="login-password"
-افتراضي.
-          </p>
-                       type="password"
+                type="password"
                 autocomplete="current-password"
                 placeholder="********"
                 required
@@ -105,12 +93,14 @@ fr-info"></div>
           </form>
         </section>
 
-        <!-- قسم إجبار المدير على تغيير البيانات لأول مرة -->
         <section id="admin-force-change-section" class="card hidden">
-          <h2 class="section-title">إعداد حساب المدير لأول مرة</h2>
+              <input
+                id="new-admin-password"
+                <h2 class="section-title">إعداد حساب المدير لأول مرة</h2>
           <p class="section-note">
-            يرجى تغيير اسم المستخدم وكلمة المرور ورقم الجوال لحساب المدير ا
-ل   <form id="admin-change-form">
+            يرجى تغيير اسم المستخدم وكلمة المرور ورقم الجوال لحساب المدير الافتراضي.
+          </p>
+          <form id="admin-change-form">
             <div class="form-group">
               <label for="new-admin-username">اسم المستخدم الجديد</label>
               <input
@@ -122,16 +112,14 @@ fr-info"></div>
             </div>
             <div class="form-group">
               <label for="new-admin-password">كلمة المرور الجديدة</label>
-              <input
-                id="new-admin-password"
-                type="password"
+          type="password"
                 placeholder="********"
                 required
-              />
+on class="tab-bt              />
             </div>
             <div class="form-group">
               <label for="new-admin-phone">رقم الجوال</label>
-               التحر              <input
+              <input
                 id="new-admin-phone"
                 type="tel"
                 maxlength="10"
@@ -147,16 +135,14 @@ fr-info"></div>
           </form>
         </section>
 
-        <!-- قسم التطبيق بعد تسجيل الدخول -->
         <section id="app-section" class="hidden">
-          <!-- التبويبات -->
           <section class="card">
             <div class="tabs-nav">
-              <button class="tab-btn active" data-tab="tab-movements">
- كات
+              <but
+tn active" data-tab="tab-movements">
+                التحركات
               </button>
-             <label for="mov-car-number">رقم السيارة</label>
-                  <button class="tab-btn" data-tab="tab-assignments">
+              <button class="tab-btn" data-tab="tab-assignments">
                 العهدة
               </button>
               <button class="tab-btn" data-tab="tab-fleet">
@@ -167,7 +153,6 @@ fr-info"></div>
               </button>
             </div>
 
-            <!-- تبويب التحركات -->
             <div id="tab-movements" class="tab-content active">
               <h2 class="section-title">تسجيل حركة سيارة</h2>
               <p class="section-note">
@@ -175,9 +160,10 @@ fr-info"></div>
               </p>
               <form id="movement-form">
                 <div class="form-row">
-                  <div class="form-group">
-      
-                 <input
+lass="form-group">
+                    <la                  <div class="form-group">
+                    <label for="mov-car-number">رقم السيارة</label>
+                    <input
                       id="mov-car-number"
                       type="text"
                       placeholder="مثال: 1234"
@@ -196,11 +182,11 @@ fr-info"></div>
                 </div>
 
                 <div class="form-row">
-                  <div class="form-group">
-                    <label for="mov-user-select">العضو / السائق</label>
+                  <div 
+cbel for="mov-user-select">العضو / السائق</label>
                     <select id="mov-user-select" required>
                       <option value="">اختر العضو</option>
-="submit" class="btn btn-prim                    </select>
+                    </select>
                   </div>
                   <div class="form-group">
                     <label for="mov-action">نوع الحركة</label>
@@ -217,14 +203,15 @@ fr-info"></div>
                   <textarea
                     id="mov-notes"
                     rows="2"
-                    placeholder="أي ملاحظات إضافية..."
+ت</option>
+                  </select>
+                                   placeholder="أي ملاحظات إضافية..."
                   ></textarea>
                 </div>
 
                 <div id="movements-form-error" class="form-error"></div>
 
-                <button typ
-eary btn-block">
+                <button type="submit" class="btn btn-primary btn-block">
                   حفظ الحركة
                 </button>
               </form>
@@ -239,22 +226,19 @@ eary btn-block">
                     <option value="week">أسبوع</option>
                     <option value="month">شهر</option>
                     <option value="year">سنة</option>
-                    <option value="all">كل التحركات</option>
-                  </select>
-                </div>
+                    <option value="all">كل التحرك
+ا </div>
                 <div class="form-group" style="align-self: flex-end; min-width: 160px;">
                   <button id="mov-print-report" class="btn btn-secondary btn-block">
                     طباعة تقرير التحركات
                   </button>
                 </div>
-m-group">
-                        </div>
+              </div>
 
               <h3 class="section-subtitle">سجل التحركات</h3>
               <div id="movements-list" class="accordion-list"></div>
             </div>
 
-            <!-- تبويب العهدة -->
             <div id="tab-assignments" class="tab-content">
               <h2 class="section-title">إدارة العهدة</h2>
               <p class="section-note">
@@ -265,15 +249,16 @@ m-group">
                 <div class="form-row">
                   <div class="form-group">
                     <label for="ass-car-number">رقم السيارة</label>
-                    <input
+
+                  </div>                    <input
                       id="ass-car-number"
                       type="text"
                       placeholder="مثال: 1234"
                       required
                     />
                   </div>
-                  <div class="fo
-r          <label for="ass-plate-code">كود اللوحة</label>
+                  <div class="form-group">
+                    <label for="ass-plate-code">كود اللوحة</label>
                     <input
                       id="ass-plate-code"
                       type="text"
@@ -288,9 +273,8 @@ r          <label for="ass-plate-code">كود اللوحة</label>
                     <label for="ass-user-select">العضو</label>
                     <select id="ass-user-select" required>
                       <option value="">اختر العضو</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
+                    </select
+>                  <div class="form-group">
                     <label for="ass-owner">المالك</label>
                     <input
                       id="ass-owner"
@@ -298,7 +282,7 @@ r          <label for="ass-plate-code">كود اللوحة</label>
                       placeholder="مثال: شركة المسعود"
                       required
                     />
-        إدارة بيانات الس                  </div>
+                  </div>
                 </div>
 
                 <div class="form-group">
@@ -320,15 +304,14 @@ r          <label for="ass-plate-code">كود اللوحة</label>
               <hr />
 
               <h3 class="section-subtitle">العهدة الحالية</h3>
-              <div id="assignments-list" class="accordion-list"></div>
+         type="text"
+                      placeholder="مثال: أبوظبي أ              <div id="assignments-list" class="accordion-list"></div>
             </div>
 
-            <!-- تبويب الأسطول -->
             <div id="tab-fleet" class="tab-content">
               <h2 class="section-title">إدارة الأسطول</h2>
               <p class="section-note">
-       
- يارات الأساسية، تواريخ انتهاء الترخيص والتأمين، والملاحظات.
+                إدارة بيانات السيارات الأساسية، تواريخ انتهاء الترخيص والتأمين، والملاحظات.
               </p>
 
               <form id="fleet-form">
@@ -346,8 +329,8 @@ r          <label for="ass-plate-code">كود اللوحة</label>
                     <label for="fleet-plate-code">كود اللوحة</label>
                     <input
                       id="fleet-plate-code"
-                      type="text"
-                      placeholder="مثال: أبوظبي أ12345"
+            
+ 12345"
                       required
                     />
                   </div>
@@ -356,7 +339,7 @@ r          <label for="ass-plate-code">كود اللوحة</label>
                 <div class="form-row">
                   <div class="form-group">
                     <label for="fleet-owner">المالك</label>
-="fleet-form-error" class=                    <input
+                    <input
                       id="fleet-owner"
                       type="text"
                       placeholder="مثال: شركة المسعود"
@@ -375,15 +358,14 @@ r          <label for="ass-plate-code">كود اللوحة</label>
 
                 <div class="form-group">
                   <label for="fleet-notes">ملاحظات</label>
-                  <textarea
+r="user-username">اسم المست                  <textarea
                     id="fleet-notes"
                     rows="2"
                     placeholder="أي ملاحظات إضافية..."
                   ></textarea>
                 </div>
 
-                <div i
-d"form-error"></div>
+                <div id="fleet-form-error" class="form-error"></div>
 
                 <button type="submit" class="btn btn-primary btn-block">
                   حفظ بيانات السيارة
@@ -396,7 +378,6 @@ d"form-error"></div>
               <div id="fleet-list" class="accordion-list"></div>
             </div>
 
-            <!-- تبويب الأعضاء -->
             <div id="tab-users" class="tab-content">
               <h2 class="section-title">إدارة الأعضاء</h2>
               <p class="section-note">
@@ -408,13 +389,14 @@ d"form-error"></div>
 
                 <div class="form-row">
                   <div class="form-group">
-                    <label for="user-username">اسم المستخدم</label>
+                    <label f
+oخدم</label>
                     <input
                       id="user-username"
                       type="text"
                       placeholder="مثال: mohamed"
                       required
-              maxlengt                    />
+                    />
                   </div>
                   <div class="form-group">
                     <label for="user-password">كلمة المرور</label>
@@ -437,12 +419,12 @@ d"form-error"></div>
                     </select>
                   </div>
                   <div class="form-group">
-                    <label for="user-phone">رقم الجوال</label>
+body>
+</html>                    <label for="user-phone">رقم الجوال</label>
                     <input
                       id="user-phone"
                       type="tel"
-       
- h="10"
+                      maxlength="10"
                       inputmode="numeric"
                       placeholder="مثال: 0501234567"
                       required
@@ -466,14 +448,12 @@ d"form-error"></div>
         </section>
       </main>
 
-      <!-- الفوتر -->
       <footer class="app-footer">
         <div>AL MASAOOD - المسعود</div>
         <div>جميع الحقوق محفوظة &copy; <span id="footer-year"></span></div>
       </footer>
     </div>
 
-    <!-- السكربت -->
     <script type="module" src="app.js"></script>
-  </body>
-</html>
+  <
+/
