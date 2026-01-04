@@ -1,6 +1,6 @@
-// استيراد Firebase من CDNimport { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-query,
- import {
+// استيراد Firebase من CDN
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
   getFirestore,
   collection,
   doc,
@@ -8,21 +8,20 @@ query,
   getDocs,
   setDoc,
   deleteDoc,
- 
+  query,
   where,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // إعدادات Firebase
-rebaseapp.com",
-  projecconst firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyD-qlIfpFyam5UgjxzhwAEhkttIQCBZXUw",
-  authDomain: "carmanagement-79bfb.f
-itId: "carmanagement-79bfb",
+  authDomain: "carmanagement-79bfb.firebaseapp.com",
+  projectId: "carmanagement-79bfb",
   storageBucket: "carmanagement-79bfb.firebasestorage.app",
   messagingSenderId: "313516916430",
   appId: "1:313516916430:web:6f2c20740bced9e7211a9f"
-UR};
+};
 
 // تهيئة Firebase و Firestore
 const app = initializeApp(firebaseConfig);
@@ -30,20 +29,16 @@ const db = getFirestore(app);
 
 // ثوابت الجلسة
 const SESSION_KEY = "car_mgmt_session";
-const SESSION_
-DATION_DAYS = 30;
+const SESSION_DURATION_DAYS = 30;
 
 // عناصر عامة
 const headerDatetime = document.getElementById("header-datetime");
 const currentUserInfo = document.getElementById("current-user-info");
 const footerYear = document.getElementById("footer-year");
-lementById("login-section");
-const loginForm = document.const logoutBtn = document.getElementById("logout-btn");
-const refreshBtn = document.getElementById("refresh-btn");
-const globalSearchSection = document.getElementById("global-search-section");
+const logoutBtn = document.getElementById("logout-btn");
 
-const loginSection = document.get
-EgetElementById("login-form");
+const loginSection = document.getElementById("login-section");
+const loginForm = document.getElementById("login-form");
 const loginError = document.getElementById("login-error");
 
 const adminForceChangeSection = document.getElementById("admin-force-change-section");
@@ -58,8 +53,7 @@ const tabContents = document.querySelectorAll(".tab-content");
 // الأعضاء
 const userForm = document.getElementById("user-form");
 const userIdInput = document.getElementById("user-id");
-const userUser
-nameInput = document.getElementById("user-username");
+const userUsernameInput = document.getElementById("user-username");
 const userPasswordInput = document.getElementById("user-password");
 const userRoleInput = document.getElementById("user-role");
 const userPhoneInput = document.getElementById("user-phone");
@@ -72,8 +66,7 @@ const movCarNumberInput = document.getElementById("mov-car-number");
 const movPlateCodeInput = document.getElementById("mov-plate-code");
 const movUserSelect = document.getElementById("mov-user-select");
 const movActionSelect = document.getElementById("mov-action");
-const movNotesInput = document
-.getElementById("mov-notes");
+const movNotesInput = document.getElementById("mov-notes");
 const movementsFormError = document.getElementById("movements-form-error");
 const movementsList = document.getElementById("movements-list");
 const movReportRange = document.getElementById("mov-report-range");
@@ -81,14 +74,13 @@ const movPrintReportBtn = document.getElementById("mov-print-report");
 
 // العهدة
 const assForm = document.getElementById("assignment-form");
-ignments-form-error");
-const assignmentsList = document.getElementByconst assCarNumberInput = document.getElementById("ass-car-number");
+const assCarNumberInput = document.getElementById("ass-car-number");
 const assPlateCodeInput = document.getElementById("ass-plate-code");
 const assUserSelect = document.getElementById("ass-user-select");
 const assOwnerInput = document.getElementById("ass-owner");
 const assNotesInput = document.getElementById("ass-notes");
-const assignmentsFormError = document.getElementById("as
-sId("assignments-list");
+const assignmentsFormError = document.getElementById("assignments-form-error");
+const assignmentsList = document.getElementById("assignments-list");
 
 // الأسطول
 const fleetForm = document.getElementById("fleet-form");
@@ -97,10 +89,7 @@ const fleetPlateCodeInput = document.getElementById("fleet-plate-code");
 const fleetOwnerInput = document.getElementById("fleet-owner");
 const fleetLicenseEndInput = document.getElementById("fleet-license-end");
 const fleetInsuranceEndInput = document.getElementById("fleet-insurance-end");
-tring();
-
-/** التاريخ والوقت GMT+4 بنظام 12 ساعة */
-function upconst fleetNotesInput = document.getElementById("fleet-notes");
+const fleetNotesInput = document.getElementById("fleet-notes");
 const fleetFormError = document.getElementById("fleet-form-error");
 const fleetList = document.getElementById("fleet-list");
 
@@ -110,8 +99,10 @@ const searchBtn = document.getElementById("search-btn");
 const searchResultsDiv = document.getElementById("search-results");
 
 // سنة الفوتر
-footerYear.textContent = new Date().getFullYear().to
-SdateHeaderDateTime() {
+footerYear.textContent = new Date().getFullYear().toString();
+
+/** التاريخ والوقت GMT+4 بنظام 12 ساعة */
+function updateHeaderDateTime() {
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
   const gmt4 = new Date(utc + 4 * 60 * 60 * 1000);
@@ -127,9 +118,7 @@ SdateHeaderDateTime() {
 
   const pad = (n) => n.toString().padStart(2, "0");
 
-  const dateStr = `${gmt4.getFullYear()}-${pad(gmt4.getMonth() + 1)}-${pad(
-f (hours === 0) ho    gmt4.getDate()
-  )}`;
+  const dateStr = `${gmt4.getFullYear()}-${pad(gmt4.getMonth() + 1)}-${pad(gmt4.getDate())}`;
   const timeStr = `${pad(hours)}:${pad(minutes)} ${ampm}`;
 
   headerDatetime.textContent = `${dayName} | ${dateStr} | ${timeStr}`;
@@ -148,8 +137,7 @@ function formatTimestampMs(ms) {
   const minutes = local.getMinutes();
   const ampm = hours >= 12 ? "م" : "ص";
   hours = hours % 12;
-  
-iurs = 12;
+  if (hours === 0) hours = 12;
 
   const pad = (n) => n.toString().padStart(2, "0");
   const dateStr = `${local.getFullYear()}-${pad(local.getMonth() + 1)}-${pad(
@@ -175,8 +163,7 @@ function saveSession(user) {
 }
 
 function loadSession() {
- ? "role-admin"
-      : session.role === "superv  const raw = localStorage.getItem(SESSION_KEY);
+  const raw = localStorage.getItem(SESSION_KEY);
   if (!raw) return null;
   try {
     const session = JSON.parse(raw);
@@ -195,34 +182,12 @@ function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
-/** عرض المستخدم في الهيدر كبادج ملون */
-function renderCurrentUserBadge(session) {
-  if (!session) {
-    currentUserInfo.textContent = "";
-    return;
-  }
-  const roleClass =
-    session.role === "admin"
-    
- isor"
-      ? "role-supervisor"
-      : "role-member";
-
-  currentUserInfo.innerHTML = `
-    <span class="user-role-badge ${roleClass}">
-      <span>${session.username}</span>
-      <span>(${session.role})</span>
-    </span>
-  `;
-}
-
 /** الشاشات */
 function showLogin() {
   loginSection.classList.remove("hidden");
   adminForceChangeSection.classList.add("hidden");
   appSection.classList.add("hidden");
   logoutBtn.classList.add("hidden");
-  globalSearchSection.classList.add("hidden");
   currentUserInfo.textContent = "";
 }
 
@@ -230,8 +195,7 @@ function showAdminForceChange() {
   loginSection.classList.add("hidden");
   adminForceChangeSection.classList.remove("hidden");
   appSection.classList.add("hidden");
-f (tabFleetBtn) tabFleetBtn.classLis  logoutBtn.classList.add("hidden");
-  globalSearchSection.classList.add("hidden");
+  logoutBtn.classList.add("hidden");
 }
 
 function showAppForUser(session) {
@@ -239,9 +203,8 @@ function showAppForUser(session) {
   adminForceChangeSection.classList.add("hidden");
   appSection.classList.remove("hidden");
   logoutBtn.classList.remove("hidden");
-  globalSearchSection.classList.remove("hidden");
 
-  renderCurrentUserBadge(session);
+  currentUserInfo.textContent = `${session.username} (${session.role})`;
 
   const tabFleetBtn = document.querySelector('[data-tab="tab-fleet"]');
   const tabUsersBtn = document.querySelector('[data-tab="tab-users"]');
@@ -249,8 +212,7 @@ function showAppForUser(session) {
     if (tabFleetBtn) tabFleetBtn.classList.add("hidden");
     if (tabUsersBtn) tabUsersBtn.classList.add("hidden");
   } else {
-    
-it.remove("hidden");
+    if (tabFleetBtn) tabFleetBtn.classList.remove("hidden");
     if (tabUsersBtn) tabUsersBtn.classList.remove("hidden");
   }
 
@@ -280,8 +242,7 @@ async function ensureDefaultAdmin() {
     return {
       id: adminDocRef.id,
       username: "admin",
-serRef);
-  if (!d.exists())      password: "admin123",
+      password: "admin123",
       role: "admin",
       phone: "",
       mustChangePassword: true
@@ -309,8 +270,8 @@ async function findUserByCredentials(username, password) {
 /** تحديث بيانات المدير */
 async function updateAdminCredentials(userId, newUsername, newPassword, newPhone) {
   const userRef = doc(db, "users", userId);
-  const d = await getDoc(
-u throw new Error("لا يمكن العثور على حساب المدير.");
+  const d = await getDoc(userRef);
+  if (!d.exists()) throw new Error("لا يمكن العثور على حساب المدير.");
   const data = d.data();
   if (data.role !== "admin") throw new Error("هذا المستخدم ليس مديرًا.");
 
@@ -364,8 +325,7 @@ function populateUserSelects() {
     opt1.textContent = user.username;
     movUserSelect.appendChild(opt1);
 
-    con
-st opt2 = document.createElement("option");
+    const opt2 = document.createElement("option");
     opt2.value = user.id;
     opt2.textContent = user.username;
     assUserSelect.appendChild(opt2);
@@ -393,10 +353,7 @@ function renderUsersList() {
       : cachedUsers;
 
   visibleUsers.forEach((user) => {
-   <span>${user.username}</span>
-    `;
-
-    co    const item = document.createElement("div");
+    const item = document.createElement("div");
     item.className = "accordion-item";
 
     const header = document.createElement("div");
@@ -420,8 +377,10 @@ function renderUsersList() {
     row1.className = "accordion-row";
     row1.innerHTML = `
       <span class="accordion-label">اسم المستخدم:</span>
-  
- nst row2 = document.createElement("div");
+      <span>${user.username}</span>
+    `;
+
+    const row2 = document.createElement("div");
     row2.className = "accordion-row";
     row2.innerHTML = `
       <span class="accordion-label">الدور:</span>
@@ -448,9 +407,7 @@ function renderUsersList() {
       editBtn.className = "btn btn-secondary";
       editBtn.textContent = "تعديل";
       editBtn.addEventListener("click", () => {
-body.appendChild(actions);
-
-    head        userIdInput.value = user.id;
+        userIdInput.value = user.id;
         userUsernameInput.value = user.username;
         userPasswordInput.value = user.password;
         userRoleInput.value = user.role;
@@ -474,8 +431,9 @@ body.appendChild(actions);
     body.appendChild(row1);
     body.appendChild(row2);
     body.appendChild(row3);
-   
- er.addEventListener("click", () => {
+    body.appendChild(actions);
+
+    header.addEventListener("click", () => {
       body.classList.toggle("hidden");
     });
 
@@ -495,9 +453,7 @@ async function handleUserFormSubmit(e) {
   const username = userUsernameInput.value.trim();
   const password = userPasswordInput.value.trim();
   const role = userRoleInput.value;
-  const phoneRaw = userPhoneInput.value.trim();
-
-  const normalizedPhone = phoneRaw.replace(/\D/g, "");
+  const phone = userPhoneInput.value.trim();
 
   if (username.length < 4) {
     usersFormError.textContent = "اسم المستخدم يجب ألا يقل عن 4 أحرف.";
@@ -507,10 +463,9 @@ async function handleUserFormSubmit(e) {
     usersFormError.textContent = "كلمة المرور يجب ألا تقل عن 6 أحرف/أرقام.";
     return;
   }
-  if (normalizedPhone.length !== 10) {
+  if (!/^\d{10}$/.test(phone)) {
     usersFormError.textContent = "رقم الجوال يجب أن يكون 10 أرقام.";
-hone
-    })    return;
+    return;
   }
 
   if (session.role === "member") {
@@ -545,15 +500,15 @@ hone
       username,
       password,
       role,
-      phone: normalized
-P;
+      phone
+    });
   } else {
     const ref = doc(usersCol);
     await setDoc(ref, {
       username,
       password,
       role,
-      phone: normalizedPhone,
+      phone,
       mustChangePassword: false,
       createdAt: Date.now()
     });
@@ -585,46 +540,6 @@ async function loadMovements() {
   renderMovementsList(moves);
 }
 
-/** طباعة حركة واحدة بتقرير منسق */
-function printSingleMovement(m) {
-  const w = window.open("", "_blank");
-><td>${m.notes |  const html = `
-    <html lang="ar" dir="rtl">
-      <head>
-        <meta charset="UTF-8" />
-        <title>بيان حركة سيارة</title>
-        <style>
-          body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; direction: rtl; padding: 16px; }
-          ${document.querySelector("style#print-styles")?.textContent || ""}
-        </style>
-      </head>
-      <body>
-        <div class="print-header">
-          <img src="logo.png" class="print-logo" alt="AL MASAOOD" />
-          <h1 class="print-title">بيان حركة سيارة</h1>
-          <p class="print-subtitle">نظام إدارة وتسجيل حركة السيارات المتكامل - AL MASAOOD</p>
-        </div>
-        <table class="print-table">
-          <tr><th>رقم السيارة</th><td>${m.carNumber || "-"}</td></tr>
-          <tr><th>كود اللوحة</th><td>${m.plateCode || "-"}</td></tr>
-          <tr><th>السائق</th><td>${m.userName || "-"}</td></tr>
-          <tr><th>نوع الحركة</th><td>${m.action || "-"}</td></tr>
-          <tr><th>الملاحظات</t
-h| "-"}</td></tr>
-          <tr><th>التاريخ</th><td>${formatTimestampMs(m.createdAt) || "-"}</td></tr>
-        </table>
-        <div class="print-footer">
-          AL MASAOOD - المسعود | تم إنشاء التقرير من النظام
-        </div>
-      </body>
-    </html>
-  `;
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  w.print();
-}
-
 function renderMovementsList(moves) {
   const session = loadSession();
   movementsList.innerHTML = "";
@@ -637,10 +552,7 @@ function renderMovementsList(moves) {
 
     const title = document.createElement("div");
     title.className = "accordion-title";
-    // رقم السيارة + اللوحة + اسم السائق لسهولة القراءة
-    title.textContent = `${m.carNumber || ""} - ${m.plateCode || ""} | ${
-      m.userName || ""
-    } (${m.action})`;
+    title.textContent = `${m.carNumber || ""} - ${m.plateCode || ""} (${m.action})`;
 
     const meta = document.createElement("div");
     meta.className = "accordion-meta";
@@ -680,22 +592,16 @@ function renderMovementsList(moves) {
     actions.className = "accordion-actions";
 
     const shareBtn = document.createElement("button");
-    shareBtn.className = "btn btn-se
-condary";
+    shareBtn.className = "btn btn-secondary";
     shareBtn.textContent = "مشاركة";
     shareBtn.addEventListener("click", () => {
-      // مشاركة بنص منسق وواضح
       const text = `
-[بيان حركة سيارة - AL MASAOOD]
-
 رقم السيارة: ${m.carNumber}
 كود اللوحة: ${m.plateCode}
 السائق: ${m.userName}
-نوع الحركة: ${m.action}
+الحركة: ${m.action}
 الملاحظات: ${m.notes || "-"}
 التاريخ: ${formatTimestampMs(m.createdAt)}
-
-(تم إنشاء هذا البيان من نظام إدارة حركة السيارات التابع للمسعود)
       `.trim();
       if (navigator.share) {
         navigator.share({ text }).catch(() => {});
@@ -709,7 +615,10 @@ condary";
     printBtn.className = "btn btn-secondary";
     printBtn.textContent = "طباعة";
     printBtn.addEventListener("click", () => {
-      printSingleMovement(m);
+      const w = window.open("", "_blank");
+      w.document.write(`<pre>${JSON.stringify(m, null, 2)}</pre>`);
+      w.print();
+      w.close();
     });
     actions.appendChild(printBtn);
 
@@ -719,11 +628,7 @@ condary";
       sessionRole === "supervisor" ||
       (sessionRole === "member" && m.userId === session.userId);
     const canDelete = sessionRole === "admin" || sessionRole === "supervisor";
-   actions.appendChild(delBtn);
-    }
-
-    body.appendChild(row1);
-       const within24h = Date.now() - m.createdAt <= 24 * 60 * 60 * 1000;
+    const within24h = Date.now() - m.createdAt <= 24 * 60 * 60 * 1000;
 
     if (canEdit && (sessionRole !== "member" || within24h)) {
       const editBtn = document.createElement("button");
@@ -751,8 +656,11 @@ condary";
         await deleteDoc(doc(db, "movements", m.id));
         await loadMovements();
       });
-  
-  body.appendChild(row2);
+      actions.appendChild(delBtn);
+    }
+
+    body.appendChild(row1);
+    body.appendChild(row2);
     if (editInfo) body.appendChild(row3);
     body.appendChild(actions);
 
@@ -847,9 +755,7 @@ async function handleMovementFormSubmit(e) {
   await loadMovements();
 }
 
-/** طباعة تقرير التحركات */
-async function handleMovPrintReport
-(e) {
+async function handleMovPrintReport(e) {
   e.preventDefault();
   const session = loadSession();
   if (!session) return;
@@ -874,64 +780,20 @@ async function handleMovPrintReport
     moves = moves.filter((m) => m.createdAt >= fromTime);
   }
 
-  const w = window.open("", "_blank");
-  const rowsHtml = moves
+  const rows = moves
     .map(
-      (m) => `
-      <tr>
-        <td>${m.carNumber || "-"}</td>
-        <td>${m.plateCode || "-"}</td>
-        <td>${m.userName || "-"}</td>
-        <td>${m.action || "-"}</td>
-        <td>${m.notes || "-"}</td>
-        <td>${formatTimestampMs(m.createdAt) || "-"}</td>
-      </tr>
-    `
+      (m) =>
+        `${m.carNumber}\t${m.plateCode}\t${m.userName}\t${m.action}\t${m.notes || ""}\t${formatTimestampMs(
+          m.createdAt
+        )}`
     )
-    .join("");
+    .join("\n");
 
-  const html = `
-document.close();
-  w.focus();    <html lang="ar" dir="rtl">
-      <head>
-        <meta charset="UTF-8" />
-        <title>تقرير التحركات</title>
-        <style>
-          body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; direction: rtl; padding: 16px; }
-          ${document.querySelector("style#print-styles")?.textContent || ""}
-        </style>
-      </head>
-      <body>
-        <div class="print-header">
-          <img src="logo.png" class="print-logo" alt="AL MASAOOD" />
-          <h1 class="print-title">تقرير التحركات</h1>
-          <p class="print-subtitle">نظام إدارة وتسجيل حركة السيارات المتكامل - AL MASAOOD</p>
-        </div>
-        <table class="print-table">
-          <thead>
-            <tr>
-              <th>رقم السيارة</th>
-              <th>كود اللوحة</th>
-              <th>السائق</th>
-              <th>الحركة</th>
-              <th>الملاحظات</th>
-              <th>التاريخ</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml || '<tr><td colspan="6">لا توجد بيانات</td></tr>'}
-          </tbody>
-        </table>
-        <div class="print-footer">
-          AL MASAOOD - المسعود | تم إنشاء التقرير من النظام
-        </div>
-      </body>
-    </html>
-  `;
-  w.document.write(html);
-  w
-.
+  const text = `تقرير التحركات\n\nرقم السيارة\tكود اللوحة\tالسائق\tالحركة\tملاحظات\tالتاريخ\n${rows}`;
+  const w = window.open("", "_blank");
+  w.document.write(`<pre>${text}</pre>`);
   w.print();
+  w.close();
 }
 
 /** العهدة */
@@ -947,47 +809,6 @@ async function loadAssignments() {
   }
 
   renderAssignmentsList(assignments);
-}
-
-/** طباعة عهدة واحدة */
-function printSingleAssignment(a) {
-  const w = window.open("", "_blank");
-  const html = `
-    <html lang="ar" dir="rtl">
-      <head>
-        <meta charset="UTF-8" />
-        <title>بيان عهدة سيارة</title>
-        <style>
-          body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; direction: rtl; padding: 16px; }
-          ${document.querySelector("style#print-styles")?.textContent || ""}
-        </style>
-      </head>
-      <body>
-        <div class="print-header">
-          <img src="logo.png" class="print-logo" alt="AL MASAOOD" />
-          <h1 class="print-title">بيان عهدة سيارة</h1>
-          <p class="print-subtitle">نظام إدارة وتسجيل حركة السيارات المتكامل - AL MASAOOD</p>
-        </div>
-        <table class="print-table">
-          <tr><th>رقم السيارة</th><td>${a.carNumber || "-"}</td></tr>
- `${g.items.length} سيارة`;
-
-    header.appendChild(title);
-    head          <tr><th>كود اللوحة</th><td>${a.plateCode || "-"}</td></tr>
-          <tr><th>العضو</th><td>${a.userName || "-"}</td></tr>
-          <tr><th>المالك</th><td>${a.owner || "-"}</td></tr>
-          <tr><th>الملاحظات</th><td>${a.notes || "-"}</td></tr>
-        </table>
-        <div class="print-footer">
-          AL MASAOOD - المسعود | تم إنشاء التقرير من النظام
-        </div>
-      </body>
-    </html>
-  `;
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  w.print();
 }
 
 function renderAssignmentsList(assignments) {
@@ -1010,12 +831,14 @@ function renderAssignmentsList(assignments) {
 
     const title = document.createElement("div");
     title.className = "accordion-title";
-    title.textContent = `عهدة: ${g.userName}`;
+    title.textContent = `عهده: ${g.userName}`;
 
     const meta = document.createElement("div");
     meta.className = "accordion-meta";
-    meta.textContent 
-=er.appendChild(meta);
+    meta.textContent = `${g.items.length} سيارة`;
+
+    header.appendChild(title);
+    header.appendChild(meta);
 
     const body = document.createElement("div");
     body.className = "accordion-body hidden";
@@ -1042,15 +865,11 @@ function renderAssignmentsList(assignments) {
       shareBtn.textContent = "مشاركة";
       shareBtn.addEventListener("click", () => {
         const text = `
-[بيان عهدة سيارة - AL MASAOOD]
-
 السيارة: ${a.carNumber}
 اللوحة: ${a.plateCode}
 العضو: ${a.userName}
 المالك: ${a.owner}
 الملاحظات: ${a.notes || "-"}
-
-(تم إنشاء هذا البيان من نظام إدارة حركة السيارات التابع للمسعود)
         `.trim();
         if (navigator.share) {
           navigator.share({ text }).catch(() => {});
@@ -1061,18 +880,17 @@ function renderAssignmentsList(assignments) {
       actions.appendChild(shareBtn);
 
       const printBtn = document.createElement("button");
-    }
-
-      body.appendChild(row);
-      body.      printBtn.className = "btn btn-secondary";
+      printBtn.className = "btn btn-secondary";
       printBtn.textContent = "طباعة";
       printBtn.addEventListener("click", () => {
-        printSingleAssignment(a);
+        const w = window.open("", "_blank");
+        w.document.write(`<pre>${JSON.stringify(a, null, 2)}</pre>`);
+        w.print();
+        w.close();
       });
       actions.appendChild(printBtn);
 
-      const sessionRole = session.role;
-      const canManage = sessionRole === "admin" || sessionRole === "supervisor";
+      const canManage = session.role === "admin" || session.role === "supervisor";
       if (canManage) {
         const editBtn = document.createElement("button");
         editBtn.className = "btn btn-secondary";
@@ -1098,8 +916,10 @@ function renderAssignmentsList(assignments) {
           await loadAssignments();
         });
         actions.appendChild(delBtn);
- 
- appendChild(notesRow);
+      }
+
+      body.appendChild(row);
+      body.appendChild(notesRow);
       body.appendChild(actions);
       body.appendChild(document.createElement("hr"));
     });
@@ -1151,8 +971,7 @@ async function handleAssignmentFormSubmit(e) {
     }
     const existing = snap.data();
     await setDoc(ref, {
- <body>
-        <d      ...existing,
+      ...existing,
       carNumber,
       plateCode,
       userId,
@@ -1193,48 +1012,6 @@ async function loadFleet() {
   renderFleetList(cars);
 }
 
-/** طباعة سيارة واحدة من الأسطول */
-function printSingleCar(c) {
-  const w = window.open("", "_blank");
-  const licenseDateStr = c.licenseEnd ? formatTimestampMs(c.licenseEnd).split(" ")[0] : "-";
-  const insuranceDateStr = c.insuranceEnd ? formatTimestampMs(c.insuranceEnd).split(" ")[0] : "-";
-
-  const html = `
-    <html lang="ar" dir="rtl">
-      <head>
-        <meta charset="UTF-8" />
-        <title>بيان سيارة من الأسطول</title>
-        <style>
-          body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; direction: rtl; padding: 16px; }
-          ${document.querySelector("style#print-styles")?.textContent || ""}
-        </style>
-      </head>
-    
- iv class="print-header">
-          <img src="logo.png" class="print-logo" alt="AL MASAOOD" />
-          <h1 class="print-title">بيان سيارة من الأسطول</h1>
-          <p class="print-subtitle">نظام إدارة وتسجيل حركة السيارات المتكامل - AL MASAOOD</p>
-        </div>
-        <table class="print-table">
-          <tr><th>رقم السيارة</th><td>${c.carNumber || "-"}</td></tr>
-          <tr><th>كود اللوحة</th><td>${c.plateCode || "-"}</td></tr>
-          <tr><th>المالك</th><td>${c.owner || "-"}</td></tr>
-          <tr><th>نهاية الترخيص</th><td>${licenseDateStr}</td></tr>
-          <tr><th>نهاية التأمين</th><td>${insuranceDateStr}</td></tr>
-          <tr><th>الملاحظات</th><td>${c.notes || "-"}</td></tr>
-        </table>
-        <div class="print-footer">
-          AL MASAOOD - المسعود | تم إنشاء التقرير من النظام
-        </div>
-      </body>
-    </html>
-  `;
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  w.print();
-}
-
 function renderFleetList(cars) {
   const today = new Date();
   const todayMs = today.getTime();
@@ -1253,12 +1030,10 @@ function renderFleetList(cars) {
     title.textContent = `${c.carNumber} - ${c.plateCode}`;
 
     const meta = document.createElement("div");
-  const shareBtn = document.createElem    meta.className = "accordion-meta";
+    meta.className = "accordion-meta";
 
     const licenseDateStr = c.licenseEnd ? formatTimestampMs(c.licenseEnd).split(" ")[0] : "-";
-    const insuranceDateStr = c.insuranceEnd
-      ? formatTimestampMs(c.insuranceEnd).split(" ")[0]
-      : "-";
+    const insuranceDateStr = c.insuranceEnd ? formatTimestampMs(c.insuranceEnd).split(" ")[0] : "-";
 
     meta.innerHTML = `ترخيص: ${licenseDateStr} | تأمين: ${insuranceDateStr}`;
 
@@ -1296,22 +1071,17 @@ function renderFleetList(cars) {
     const actions = document.createElement("div");
     actions.className = "accordion-actions";
 
- 
- ent("button");
+    const shareBtn = document.createElement("button");
     shareBtn.className = "btn btn-secondary";
     shareBtn.textContent = "مشاركة";
     shareBtn.addEventListener("click", () => {
       const text = `
-[بيان سيارة من الأسطول - AL MASAOOD]
-
 السيارة: ${c.carNumber}
 اللوحة: ${c.plateCode}
 المالك: ${c.owner}
 نهاية الترخيص: ${licenseDateStr}
 نهاية التأمين: ${insuranceDateStr}
 الملاحظات: ${c.notes || "-"}
-
-(تم إنشاء هذا البيان من نظام إدارة حركة السيارات التابع للمسعود)
       `.trim();
       if (navigator.share) {
         navigator.share({ text }).catch(() => {});
@@ -1325,7 +1095,10 @@ function renderFleetList(cars) {
     printBtn.className = "btn btn-secondary";
     printBtn.textContent = "طباعة";
     printBtn.addEventListener("click", () => {
-      printSingleCar(c);
+      const w = window.open("", "_blank");
+      w.document.write(`<pre>${JSON.stringify(c, null, 2)}</pre>`);
+      w.print();
+      w.close();
     });
     actions.appendChild(printBtn);
 
@@ -1344,8 +1117,7 @@ function renderFleetList(cars) {
           const d = new Date(c.licenseEnd);
           const pad = (n) => n.toString().padStart(2, "0");
           fleetLicenseEndInput.value = `${d.getFullYear()}-${pad(
-rNumberInput.value.trim();
-             d.getMonth() + 1
+            d.getMonth() + 1
           )}-${pad(d.getDate())}`;
         }
         if (c.insuranceEnd) {
@@ -1398,8 +1170,8 @@ async function handleFleetFormSubmit(e) {
     return;
   }
 
-  const carNumber = fleetC
-a const plateCode = fleetPlateCodeInput.value.trim();
+  const carNumber = fleetCarNumberInput.value.trim();
+  const plateCode = fleetPlateCodeInput.value.trim();
   const owner = fleetOwnerInput.value.trim();
   const notes = fleetNotesInput.value.trim();
   const licenseEndStr = fleetLicenseEndInput.value;
@@ -1459,7 +1231,7 @@ a const plateCode = fleetPlateCodeInput.value.trim();
 
 /** البحث */
 async function handleSearch(e) {
-eetRes = cars.filter(  e.preventDefault();
+  e.preventDefault();
   const session = loadSession();
   if (!session) return;
 
@@ -1490,7 +1262,8 @@ eetRes = cars.filter(  e.preventDefault();
     cars = [];
   }
 
-  const contains = (val) => val && val.toString().toLowerCase().includes(qStr);
+  const contains = (val) =>
+    val && val.toString().toLowerCase().includes(qStr);
 
   const usersRes = users.filter(
     (u) => contains(u.username) || contains(u.phone) || contains(u.role)
@@ -1511,8 +1284,7 @@ eetRes = cars.filter(  e.preventDefault();
       contains(a.owner) ||
       contains(a.notes)
   );
-  const f
-l
+  const fleetRes = cars.filter(
     (c) =>
       contains(c.carNumber) ||
       contains(c.plateCode) ||
@@ -1573,7 +1345,7 @@ async function initAuthFlow() {
     const password = document.getElementById("login-password").value.trim();
 
     if (username.length < 4 || password.length < 6) {
-e.getItem("pending_admin_id");      loginError.textContent =
+      loginError.textContent =
         "يرجى إدخال اسم مستخدم لا يقل عن 4 أحرف وكلمة مرور لا تقل عن 6.";
       return;
     }
@@ -1609,9 +1381,7 @@ e.getItem("pending_admin_id");      loginError.textContent =
 
     const newUsername = document.getElementById("new-admin-username").value.trim();
     const newPassword = document.getElementById("new-admin-password").value.trim();
-    const newPhoneRaw = document.getElementById("new-admin-phone").value.trim();
-
-    const normalizedNewPhone = newPhoneRaw.replace(/\D/g, "");
+    const newPhone = document.getElementById("new-admin-phone").value.trim();
 
     if (newUsername.length < 4) {
       adminChangeError.textContent = "اسم المستخدم يجب ألا يقل عن 4 أحرف.";
@@ -1621,25 +1391,19 @@ e.getItem("pending_admin_id");      loginError.textContent =
       adminChangeError.textContent = "كلمة المرور يجب ألا تقل عن 6 أحرف/أرقام.";
       return;
     }
-    if (normalizedNewPhone.length !== 10) {
+    if (!/^\d{10}$/.test(newPhone)) {
       adminChangeError.textContent = "رقم الجوال يجب أن يكون 10 أرقام.";
       return;
     }
 
-    const pendingAdminId = sessionStora
-g
+    const pendingAdminId = sessionStorage.getItem("pending_admin_id");
     if (!pendingAdminId) {
       adminChangeError.textContent = "خطأ داخلي، أعد تحميل الصفحة.";
       return;
     }
 
     try {
-      await updateAdminCredentials(
-        pendingAdminId,
-        newUsername,
-        newPassword,
-        normalizedNewPhone
-      );
+      await updateAdminCredentials(pendingAdminId, newUsername, newPassword, newPhone);
       sessionStorage.removeItem("pending_admin_id");
 
       const userRef = doc(db, "users", pendingAdminId);
@@ -1676,50 +1440,6 @@ function registerServiceWorker() {
 
 /** تشغيل */
 document.addEventListener("DOMContentLoaded", () => {
-  // ستايل الطباعة كـ <style> في الدوكيومنت ليتم نسخها للتقارير
-  const printStyleTag = document.createElement("style");
-  printStyleTag.id = "print-styles";
-  printStyleTag.textContent = `
-    .print-header {
-      text-align: center;
-      margin-bottom: 16px;
-    }
-    .print-logo {
-      height: 64px;
-      display: block;
-      margin: 0 auto 8px auto;
-      opacity: 0.9;
-    }
-    .print-title {
-      font-size: 1.1rem;
-      margin: 0;
-      font-weight: 700;
-    }
-    .print-subtitle {
-      font-size: 0.9rem;
-      margin: 4px 0 0 0;
-    }
-    .print-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-    .print-table th,
-    .print-table td {
-      border: 1px solid #ccc;
-      padding: 6px 8px;
-      text-align: center;
-    }
-    .print-footer {
-      margin-top: 16px;
-      font-size: 0.8rem;
-      text-align: center;
-      color: #555;
-      opacity: 0.9;
-    }
-  `;
-  document.head.appendChild(printStyleTag);
-
   initTabs();
   initAuthFlow();
 
@@ -1729,13 +1449,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (assForm) assForm.addEventListener("submit", handleAssignmentFormSubmit);
   if (fleetForm) fleetForm.addEventListener("submit", handleFleetFormSubmit);
   if (searchBtn) searchBtn.addEventListener("click", handleSearch);
-
-  if (refreshBtn) {
-    refreshBtn.addEventListener("click", () => {
-      // تحديث يدوي للصفحة
-      window.location.reload();
-    });
-  }
 
   registerServiceWorker();
 });
