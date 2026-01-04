@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>نظام إدارة السيارات</title>
+  <link rel="icon" href="logo.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b3d91" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Fuse.js for search -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+  <!-- Firebase SDKs (modular) -->
+  <script type="module" src="app.js"></script>
+  <style>
+    /* small inline fallback to avoid flash before CSS loads */
+    body{visibility:hidden}
+  </style>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+</head>
+<body>
+  <header class="topbar">
+    <img src="logo.png" alt="logo" class="logo" />
+    <div class="title">نظام تسجيل وإدارة السيارات</div>
+    <div class="user-area">
+      <span id="userRoleBadge" class="role-badge"></span>
+      <button id="refreshBtn" title="تحديث">⟳</button>
+      <button id="logoutBtn" class="danger">خروج</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="controls">
+      <input id="searchInput" placeholder="ابحث في الحركات، العهد، أو الأسطول..." />
+      <div class="quick-actions">
+        <button id="newMovementBtn">حركة جديدة</button>
+        <button id="newAssetBtn">عهدة جديدة</button>
+        <button id="newFleetBtn">إضافة سيارة</button>
+        <button id="membersBtn">الأعضاء</button>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button data-tab="movements" class="active">الحركات</button>
+      <button data-tab="assets">العهد</button>
+      <button data-tab="fleet">الأسطول</button>
+      <button data-tab="members">الأعضاء</button>
+      <button data-tab="stats" id="statsTab">الإحصائيات</button>
+    </nav>
+
+    <section id="contentArea">
+      <!-- dynamic content injected here -->
+      <div id="movementsTab" class="tabcontent"></div>
+      <div id="assetsTab" class="tabcontent hidden"></div>
+      <div id="fleetTab" class="tabcontent hidden"></div>
+      <div id="membersTab" class="tabcontent hidden"></div>
+      <div id="statsTabContent" class="tabcontent hidden"></div>
+    </section>
+  </main>
+
+  <!-- Modal templates -->
+  <div id="modal" class="modal hidden"></div>
+
+  <footer class="footer">© 2026 - نظام شخصي لإدارة السيارات</footer>
+
+  <script>
+    // make body visible after CSS loaded
+    document.addEventListener('DOMContentLoaded', ()=>document.body.style.visibility='visible');
+  </script>
+</body>
+</html>
