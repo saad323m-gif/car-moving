@@ -1,459 +1,346 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <title>نظام إدارة وتسجيل حركة السيارات المتكامل</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+  <meta charset="UTF-8" />
+  <title>نظام إدارة وتسجيل حركة السيارات المتكامل</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="autocomplete" content="off" />
 
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#0a275c" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="logo.png" type="image/png" />
 
-    <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- الهيدر -->
+    <header class="app-header">
+      <!-- يسار: المستخدم + خروج -->
+      <div class="header-left">
+        <div id="current-user-info" class="current-user-info"></div>
+        <button id="logout-btn" class="logout-btn hidden">تسجيل الخروج</button>
+      </div>
 
-    <link rel="icon" type="image/png" href="logo.png" />
-  </head>
-  <body>
-    <div class="app-container">
-      <header class="app-header">
-        <div class="header-right">
-          <h1 class="app-title">
-صفحة">
-              ⟳
-            </button>
-                   نظام إدارة وتسجيل حركة السيارات المتكامل
-          </h1>
-        </div>
+      <!-- المنتصف: الشعار + العنوان -->
+      <div class="header-center">
+        <img src="logo.png" alt="AL MASAOOD" class="app-logo" />
+        <h1 class="app-title">نظام إدارة وتسجيل حركة السيارات المتكامل</h1>
+      </div>
 
-        <div class="header-center">
-          <img src="logo.png" alt="AL MASAOOD" class="app-logo" />
-        </div>
+      <!-- يمين: التاريخ والوقت -->
+      <div class="header-right">
+        <div id="header-datetime" class="header-datetime"></div>
+      </div>
+    </header>
 
-        <div class="header-left">
-          <div id="current-user-info" class="current-user-info"></div>
-          <button id="logout-btn" class="logout-btn hidden">تسجيل الخروج</button>
-
-          <div class="header-left-bottom">
-            <div id="header-datetime" class="header-datetime"></div>
-            <button id="refresh-btn" class="refresh-btn" title="تحديث ا
-ل   </div>
-        </div>
-      </header>
-
-      <section id="global-search-section" class="card hidden">
-        <div class="global-search-row">
-          <div class="form-group global-search-input">
-            <label for="search-query">بحث في كل البيانات</label>
+    <!-- المحتوى الرئيسي -->
+    <main class="app-main">
+      <!-- تسجيل الدخول -->
+      <section id="login-section" class="card">
+        <h2 class="section-title">تسجيل الدخول</h2>
+        <form id="login-form" autocomplete="off" novalidate>
+          <div class="form-group">
+            <label for="login-username">اسم المستخدم</label>
             <input
-              id="search-query"
+              id="login-username"
               type="text"
-              placeholder="ابحث برقم السيارة، اسم العضو، المالك، الملاحظات..."
+              minlength="4"
+              required
+              autocomplete="new-username"
+              placeholder="ادخل اسم المستخدم"
             />
           </div>
-          <div class="form-group global-search-button">
-            <button id="search-btn" class="btn btn-secondary btn-block">
-              بحث
-            </button>
+          <div class="form-group">
+            <label for="login-password">كلمة المرور</label>
+            <input
+              id="login-password"
+              type="password"
+              minlength="6"
+              required
+              autocomplete="new-password"
+              placeholder="ادخل كلمة المرور"
+            />
           </div>
-"
-                    </div>
-        <div id="search-results" class="search-results"></div>
+          <div id="login-error" class="form-error"></div>
+          <button type="submit" class="btn btn-primary btn-block">دخول</button>
+        </form>
       </section>
 
-      <main class="app-main">
-        <section id="login-section" class="card">
-          <h2 class="section-title">تسجيل الدخول</h2>
-          <p class="section-note">
-            أدخل اسم المستخدم وكلمة المرور للدخول إلى النظام.
-          </p>
-          <form id="login-form">
-            <div class="form-group">
-              <label for="login-username">اسم المستخدم</label>
-              <input
-                id="login-username"
-                type="text"
-                autocomplete="username"
-                placeholder="مثال: admi
-n    required
-              />
-            </div>
-            <div class="form-group">
-              <label for="login-password">كلمة المرور</label>
-              <input
-                id="login-password"
-                type="password"
-                autocomplete="current-password"
-                placeholder="********"
-                required
-              />
-            </div>
-            <div id="login-error" class="form-error"></div>
-            <button type="submit" class="btn btn-primary btn-block">
-              دخول
-            </button>
-          </form>
-        </section>
+      <!-- إجبار المدير على تغيير البيانات -->
+      <section id="admin-force-change-section" class="card hidden">
+        <h2 class="section-title">تحديث بيانات المدير</h2>
+        <p class="section-note">
+          يجب تغيير بيانات الدخول الافترية (admin / admin123) قبل المتابعة.
+        </p>
+        <form id="admin-change-form" autocomplete="off" novalidate>
+          <div class="form-group">
+            <label for="new-admin-username">اسم مستخدم جديد (مدير)</label>
+            <input
+              id="new-admin-username"
+              type="text"
+              minlength="4"
+              required
+              placeholder="ادخل اسم مستخدم جديد"
+            />
+          </div>
+          <div class="form-group">
+            <label for="new-admin-password">كلمة مرور جديدة</label>
+            <input
+              id="new-admin-password"
+              type="password"
+              minlength="6"
+              required
+              placeholder="ادخل كلمة مرور جديدة"
+            />
+          </div>
+          <div class="form-group">
+            <label for="new-admin-phone">رقم الجوال (10 أرقام)</label>
+            <input
+              id="new-admin-phone"
+              type="tel"
+              inputmode="numeric"
+              pattern="\\d{10}"
+              required
+              placeholder="مثال: 0501234567"
+            />
+          </div>
+          <div id="admin-change-error" class="form-error"></div>
+          <button type="submit" class="btn btn-primary btn-block">
+            حفظ ومتابعة
+          </button>
+        </form>
+      </section>
 
-        <section id="admin-force-change-section" class="card hidden">
-              <input
-                id="new-admin-password"
-                <h2 class="section-title">إعداد حساب المدير لأول مرة</h2>
-          <p class="section-note">
-            يرجى تغيير اسم المستخدم وكلمة المرور ورقم الجوال لحساب المدير الافتراضي.
-          </p>
-          <form id="admin-change-form">
-            <div class="form-group">
-              <label for="new-admin-username">اسم المستخدم الجديد</label>
-              <input
-                id="new-admin-username"
-                type="text"
-                placeholder="مثال: masood-admin"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="new-admin-password">كلمة المرور الجديدة</label>
-          type="password"
-                placeholder="********"
-                required
-on class="tab-bt              />
-            </div>
-            <div class="form-group">
-              <label for="new-admin-phone">رقم الجوال</label>
-              <input
-                id="new-admin-phone"
-                type="tel"
-                maxlength="10"
-                inputmode="numeric"
-                placeholder="مثال: 0501234567"
-                required
-              />
-            </div>
-            <div id="admin-change-error" class="form-error"></div>
-            <button type="submit" class="btn btn-primary btn-block">
-              حفظ ومتابعة
-            </button>
-          </form>
-        </section>
+      <!-- التطبيق بعد تسجيل الدخول -->
+      <section id="app-section" class="hidden">
+        <!-- التبويبات -->
+        <nav class="tabs-nav">
+          <button class="tab-btn active" data-tab="tab-movements">التحركات</button>
+          <button class="tab-btn" data-tab="tab-assignments">العهدة</button>
+          <button class="tab-btn" data-tab="tab-fleet">الأسطول</button>
+          <button class="tab-btn" data-tab="tab-users">الأعضاء</button>
+          <button class="tab-btn" data-tab="tab-search">البحث</button>
+        </nav>
 
-        <section id="app-section" class="hidden">
-          <section class="card">
-            <div class="tabs-nav">
-              <but
-tn active" data-tab="tab-movements">
-                التحركات
-              </button>
-              <button class="tab-btn" data-tab="tab-assignments">
-                العهدة
-              </button>
-              <button class="tab-btn" data-tab="tab-fleet">
-                الأسطول
-              </button>
-              <button class="tab-btn" data-tab="tab-users">
-                الأعضاء
-              </button>
-            </div>
+        <!-- التحركات -->
+        <div id="tab-movements" class="tab-content active">
+          <h2 class="section-title">حركات السيارات</h2>
 
-            <div id="tab-movements" class="tab-content active">
-              <h2 class="section-title">تسجيل حركة سيارة</h2>
-              <p class="section-note">
-                سجّل خروج أو عودة سيارة مع تحديد السائق والملاحظات إن وُجدت.
-              </p>
-              <form id="movement-form">
-                <div class="form-row">
-lass="form-group">
-                    <la                  <div class="form-group">
-                    <label for="mov-car-number">رقم السيارة</label>
-                    <input
-                      id="mov-car-number"
-                      type="text"
-                      placeholder="مثال: 1234"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="mov-plate-code">كود اللوحة</label>
-                    <input
-                      id="mov-plate-code"
-                      type="text"
-                      placeholder="مثال: أبوظبي أ12345"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div 
-cbel for="mov-user-select">العضو / السائق</label>
-                    <select id="mov-user-select" required>
-                      <option value="">اختر العضو</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="mov-action">نوع الحركة</label>
-                    <select id="mov-action" required>
-                      <option value="">اختر الحركة</option>
-                      <option value="خروج">خروج</option>
-                      <option value="عودة">عودة</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="mov-notes">ملاحظات</label>
-                  <textarea
-                    id="mov-notes"
-                    rows="2"
-ت</option>
-                  </select>
-                                   placeholder="أي ملاحظات إضافية..."
-                  ></textarea>
-                </div>
-
-                <div id="movements-form-error" class="form-error"></div>
-
-                <button type="submit" class="btn btn-primary btn-block">
-                  حفظ الحركة
-                </button>
-              </form>
-
-              <hr />
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="mov-report-range">تقرير حسب المدة</label>
-                  <select id="mov-report-range">
-                    <option value="day">اليوم</option>
-                    <option value="week">أسبوع</option>
-                    <option value="month">شهر</option>
-                    <option value="year">سنة</option>
-                    <option value="all">كل التحرك
-ا </div>
-                <div class="form-group" style="align-self: flex-end; min-width: 160px;">
-                  <button id="mov-print-report" class="btn btn-secondary btn-block">
-                    طباعة تقرير التحركات
-                  </button>
-                </div>
+          <form id="movement-form" class="card">
+            <h3 class="section-subtitle">إضافة حركة</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>رقم السيارة</label>
+                <input id="mov-car-number" type="text" required />
               </div>
-
-              <h3 class="section-subtitle">سجل التحركات</h3>
-              <div id="movements-list" class="accordion-list"></div>
+              <div class="form-group">
+                <label>كود اللوحة</label>
+                <input id="mov-plate-code" type="text" required />
+              </div>
             </div>
 
-            <div id="tab-assignments" class="tab-content">
-              <h2 class="section-title">إدارة العهدة</h2>
-              <p class="section-note">
-                ربط السيارات بالأعضاء كعهدة ثابتة مع تحديد المالك والملاحظات.
-              </p>
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم العضو (السائق)</label>
+                <select id="mov-user-select" required></select>
+              </div>
+              <div class="form-group">
+                <label>الحركة</label>
+                <select id="mov-action" required>
+                  <option value="">اختر</option>
+                  <option value="استلام">استلام</option>
+                  <option value="تسليم">تسليم</option>
+                </select>
+              </div>
+            </div>
 
-              <form id="assignment-form">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="ass-car-number">رقم السيارة</label>
+            <div class="form-group">
+              <label>ملاحظات</label>
+              <textarea id="mov-notes" rows="2"></textarea>
+            </div>
 
-                  </div>                    <input
-                      id="ass-car-number"
-                      type="text"
-                      placeholder="مثال: 1234"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="ass-plate-code">كود اللوحة</label>
-                    <input
-                      id="ass-plate-code"
-                      type="text"
-                      placeholder="مثال: أبوظبي أ12345"
-                      required
-                    />
-                  </div>
-                </div>
+            <div id="movements-form-error" class="form-error"></div>
 
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="ass-user-select">العضو</label>
-                    <select id="ass-user-select" required>
-                      <option value="">اختر العضو</option>
-                    </select
->                  <div class="form-group">
-                    <label for="ass-owner">المالك</label>
-                    <input
-                      id="ass-owner"
-                      type="text"
-                      placeholder="مثال: شركة المسعود"
-                      required
-                    />
-                  </div>
-                </div>
+            <button type="submit" class="btn btn-primary btn-block">حفظ الحركة</button>
+          </form>
 
-                <div class="form-group">
-                  <label for="ass-notes">ملاحظات</label>
-                  <textarea
-                    id="ass-notes"
-                    rows="2"
-                    placeholder="أي ملاحظات إضافية..."
-                  ></textarea>
-                </div>
-
-                <div id="assignments-form-error" class="form-error"></div>
-
-                <button type="submit" class="btn btn-primary btn-block">
-                  حفظ العهدة
+          <div class="card">
+            <h3 class="section-subtitle">تقرير التحركات</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>المدة</label>
+                <select id="mov-report-range">
+                  <option value="day">اليوم</option>
+                  <option value="week">أسبوع</option>
+                  <option value="month">شهر</option>
+                  <option value="year">سنة</option>
+                  <option value="all">الكل</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>&nbsp;</label>
+                <button id="mov-print-report" class="btn btn-secondary btn-block">
+                  طباعة التقرير
                 </button>
-              </form>
-
-              <hr />
-
-              <h3 class="section-subtitle">العهدة الحالية</h3>
-         type="text"
-                      placeholder="مثال: أبوظبي أ              <div id="assignments-list" class="accordion-list"></div>
+              </div>
             </div>
+          </div>
 
-            <div id="tab-fleet" class="tab-content">
-              <h2 class="section-title">إدارة الأسطول</h2>
-              <p class="section-note">
-                إدارة بيانات السيارات الأساسية، تواريخ انتهاء الترخيص والتأمين، والملاحظات.
-              </p>
+          <div id="movements-list" class="accordion-list"></div>
+        </div>
 
-              <form id="fleet-form">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="fleet-car-number">رقم السيارة</label>
-                    <input
-                      id="fleet-car-number"
-                      type="text"
-                      placeholder="مثال: 1234"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="fleet-plate-code">كود اللوحة</label>
-                    <input
-                      id="fleet-plate-code"
-            
- 12345"
-                      required
-                    />
-                  </div>
-                </div>
+        <!-- العهدة -->
+        <div id="tab-assignments" class="tab-content">
+          <h2 class="section-title">العهدة</h2>
 
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="fleet-owner">المالك</label>
-                    <input
-                      id="fleet-owner"
-                      type="text"
-                      placeholder="مثال: شركة المسعود"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="fleet-license-end">نهاية الترخيص</label>
-                    <input id="fleet-license-end" type="date" required />
-                  </div>
-                  <div class="form-group">
-                    <label for="fleet-insurance-end">نهاية التأمين</label>
-                    <input id="fleet-insurance-end" type="date" required />
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="fleet-notes">ملاحظات</label>
-r="user-username">اسم المست                  <textarea
-                    id="fleet-notes"
-                    rows="2"
-                    placeholder="أي ملاحظات إضافية..."
-                  ></textarea>
-                </div>
-
-                <div id="fleet-form-error" class="form-error"></div>
-
-                <button type="submit" class="btn btn-primary btn-block">
-                  حفظ بيانات السيارة
-                </button>
-              </form>
-
-              <hr />
-
-              <h3 class="section-subtitle">قائمة الأسطول</h3>
-              <div id="fleet-list" class="accordion-list"></div>
+          <form id="assignment-form" class="card">
+            <h3 class="section-subtitle">إضافة عهدة</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>رقم السيارة</label>
+                <input id="ass-car-number" type="text" required />
+              </div>
+              <div class="form-group">
+                <label>كود اللوحة</label>
+                <input id="ass-plate-code" type="text" required />
+              </div>
             </div>
-
-            <div id="tab-users" class="tab-content">
-              <h2 class="section-title">إدارة الأعضاء</h2>
-              <p class="section-note">
-                إنشاء وتعديل الأعضاء مع تحديد صلاحياتهم وأرقام الجوال.
-              </p>
-
-              <form id="user-form">
-                <input id="user-id" type="hidden" />
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label f
-oخدم</label>
-                    <input
-                      id="user-username"
-                      type="text"
-                      placeholder="مثال: mohamed"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="user-password">كلمة المرور</label>
-                    <input
-                      id="user-password"
-                      type="password"
-                      placeholder="********"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="user-role">الدور</label>
-                    <select id="user-role" required>
-                      <option value="member">عضو</option>
-                      <option value="supervisor">مشرف</option>
-                      <option value="admin">مدير</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-body>
-</html>                    <label for="user-phone">رقم الجوال</label>
-                    <input
-                      id="user-phone"
-                      type="tel"
-                      maxlength="10"
-                      inputmode="numeric"
-                      placeholder="مثال: 0501234567"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div id="users-form-error" class="form-error"></div>
-
-                <button type="submit" class="btn btn-primary btn-block">
-                  حفظ بيانات العضو
-                </button>
-              </form>
-
-              <hr />
-
-              <h3 class="section-subtitle">قائمة الأعضاء</h3>
-              <div id="users-list" class="accordion-list"></div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم المستخدم</label>
+                <select id="ass-user-select" required></select>
+              </div>
+              <div class="form-group">
+                <label>المالك</label>
+                <input id="ass-owner" type="text" required />
+              </div>
             </div>
-          </section>
-        </section>
-      </main>
+            <div class="form-group">
+              <label>ملاحظات</label>
+              <textarea id="ass-notes" rows="2"></textarea>
+            </div>
+            <div id="assignments-form-error" class="form-error"></div>
+            <button type="submit" class="btn btn-primary btn-block">حفظ العهدة</button>
+          </form>
 
-      <footer class="app-footer">
-        <div>AL MASAOOD - المسعود</div>
-        <div>جميع الحقوق محفوظة &copy; <span id="footer-year"></span></div>
-      </footer>
-    </div>
+          <div id="assignments-list" class="accordion-list"></div>
+        </div>
 
-    <script type="module" src="app.js"></script>
-  <
-/
+        <!-- الأسطول -->
+        <div id="tab-fleet" class="tab-content">
+          <h2 class="section-title">إدارة الأسطول</h2>
+
+          <form id="fleet-form" class="card">
+            <h3 class="section-subtitle">إضافة سيارة</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>رقم السيارة</label>
+                <input id="fleet-car-number" type="text" required />
+              </div>
+              <div class="form-group">
+                <label>كود اللوحة</label>
+                <input id="fleet-plate-code" type="text" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>المالك</label>
+                <input id="fleet-owner" type="text" required />
+              </div>
+              <div class="form-group">
+                <label>نهاية الترخيص</label>
+                <input id="fleet-license-end" type="date" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>نهاية التأمين</label>
+                <input id="fleet-insurance-end" type="date" required />
+              </div>
+              <div class="form-group">
+                <label>ملاحظات</label>
+                <input id="fleet-notes" type="text" />
+              </div>
+            </div>
+            <div id="fleet-form-error" class="form-error"></div>
+            <button type="submit" class="btn btn-primary btn-block">حفظ السيارة</button>
+          </form>
+
+          <div id="fleet-list" class="accordion-list"></div>
+        </div>
+
+        <!-- الأعضاء -->
+        <div id="tab-users" class="tab-content">
+          <h2 class="section-title">إدارة الأعضاء</h2>
+
+          <form id="user-form" class="card">
+            <h3 class="section-subtitle">إضافة / تعديل عضو</h3>
+            <input id="user-id" type="hidden" />
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم المستخدم</label>
+                <input id="user-username" type="text" minlength="4" required />
+              </div>
+              <div class="form-group">
+                <label>كلمة المرور</label>
+                <input id="user-password" type="password" minlength="6" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>الدور</label>
+                <select id="user-role" required>
+                  <option value="member">عضو</option>
+                  <option value="supervisor">مشرف</option>
+                  <option value="admin">مدير</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>رقم الجوال (10 أرقام)</label>
+                <input
+                  id="user-phone"
+                  type="tel"
+                  inputmode="numeric"
+                  pattern="\\d{10}"
+                  required
+                />
+              </div>
+            </div>
+            <div id="users-form-error" class="form-error"></div>
+            <button type="submit" class="btn btn-primary btn-block">
+              حفظ العضو
+            </button>
+          </form>
+
+          <div id="users-list" class="accordion-list"></div>
+        </div>
+
+        <!-- البحث -->
+        <div id="tab-search" class="tab-content">
+          <h2 class="section-title">البحث</h2>
+          <div class="card">
+            <div class="form-group">
+              <label>نص البحث</label>
+              <input
+                id="search-query"
+                type="text"
+                placeholder="ابحث في الأعضاء، التحركات، العهدة، الأسطول"
+              />
+            </div>
+            <button id="search-btn" class="btn btn-primary btn-block">بحث</button>
+          </div>
+          <div id="search-results" class="search-results"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="app-footer">
+      <div>جميع الحقوق محفوظة © <span id="footer-year"></span></div>
+      <div>تمت البرمجة والتطوير بواسطة ( MIOHAMED SAAD )</div>
+    </footer>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
