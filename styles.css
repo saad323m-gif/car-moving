@@ -1,0 +1,40 @@
+:root{
+  --bg:#f6f8fb; --card:#ffffff; --accent:#0b3d91; --danger:#d9534f;
+  --dev:#ff3b30; --manager:#ff9500; --supervisor:#0a3d8f; --member:#2dbe60;
+  --text:#222;
+  font-family: "Segoe UI", Tahoma, Arial, "Noto Naskh Arabic", sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.4}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(90deg,var(--accent),#0a2b6b);color:#fff}
+.logo{height:40px;margin-inline-start:8px}
+.title{font-weight:700}
+.user-area{display:flex;gap:8px;align-items:center}
+.role-badge{padding:6px 10px;border-radius:6px;background:rgba(255,255,255,0.12)}
+button{cursor:pointer;border:0;padding:10px 14px;border-radius:8px;background:#fff;color:var(--accent);font-weight:600}
+button.danger{background:var(--danger);color:#fff}
+.container{padding:16px;max-width:1100px;margin:18px auto}
+.controls{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+#searchInput{flex:1;padding:10px;border-radius:8px;border:1px solid #ddd}
+.quick-actions button{background:var(--accent);color:#fff;border-radius:8px;padding:10px 12px}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{background:#fff;border:1px solid #e6e6e6}
+.tabs button.active{background:var(--accent);color:#fff}
+.tabcontent{display:block}
+.hidden{display:none}
+.card{background:var(--card);padding:12px;border-radius:10px;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.accordion-title{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.meta{font-size:13px;color:#666}
+.actions{display:flex;gap:8px;margin-top:8px}
+.action-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:#f0f4ff;color:var(--accent);font-weight:700}
+.action-btn.print{background:#fff3cd;color:#856404}
+.action-btn.delete{background:var(--danger);color:#fff}
+.badge{padding:6px 8px;border-radius:6px;background:#eef; font-weight:700}
+.role-dev{background:var(--dev);color:#fff}
+.role-manager{background:var(--manager);color:#fff}
+.role-supervisor{background:var(--supervisor);color:#fff}
+.role-member{background:var(--member);color:#fff}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal .card{width:100%;max-width:720px}
+.footer{padding:12px;text-align:center;color:#666}
+.small-note{font-size:12px;color:#b00;margin-top:8px}
