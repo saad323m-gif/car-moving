@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تسجيل وإدارة السيارات - مجموعة المسعود</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="logo.png" type="image/png">
+    <style>
+        /* CSS سيتم إضافته في ملف منفصل ولكن أضفته هنا للتكامل */
+    </style>
+</head>
+<body>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="logo.png" alt="شعار المسعود" class="logo">
+                <h1>نظام تسجيل وإدارة السيارات</h1>
+                <h2>مجموعة المسعود</h2>
+            </div>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="loginUsername"><i class="fas fa-user"></i> اسم المستخدم</label>
+                    <input type="text" id="loginUsername" placeholder="أدخل اسم المستخدم">
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword"><i class="fas fa-lock"></i> كلمة المرور</label>
+                    <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور">
+                </div>
+                
+                <button id="loginBtn" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                </button>
+                
+                <div id="loginError" class="error-message"></div>
+                
+                <div class="login-info">
+                    <p><strong>بيانات الدخول التجريبية:</strong></p>
+                    <p>المطور: Admin / admin123</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- الواجهة الرئيسية -->
+    <div id="mainScreen" class="screen">
+        <!-- الهيدر -->
+        <header class="app-header">
+            <div class="header-left">
+                <img src="logo.png" alt="شعار المسعود" class="header-logo">
+                <div class="app-title">
+                    <h1>نظام تسجيل وإدارة السيارات</h1>
+                    <h2>مجموعة المسعود</h2>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <button id="refreshBtn" class="btn-icon" title="تحديث البيانات">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="searchToggle" class="btn-icon" title="بحث">
+                    <i class="fas fa-search"></i>
+                </button>
+                <div class="user-info">
+                    <span id="userName">Admin</span>
+                    <span id="userRole" class="role-developer">مطور النظام</span>
+                </div>
+                <button id="logoutBtn" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
+            </div>
+        </header>
+        
+        <!-- شريط البحث -->
+        <div id="searchBar" class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="globalSearch" placeholder="ابحث في الحركات، العهد، الأسطول، الأعضاء...">
+                <button id="clearSearch" class="btn-icon">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- الإحصائيات -->
+        <div id="statsSection" class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalMovements">0</h3>
+                    <p>إجمالي الحركات</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalCustody">0</h3>
+                    <p>سيارات العهدة</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-truck-moving"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalFleet">0</h3>
+                    <p>سيارات الأسطول</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalMembers">0</h3>
+                    <p>إجمالي الأعضاء</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- التنقل الرئيسي -->
+        <nav class="main-nav">
+            <button class="nav-btn active" data-tab="movements">
+                <i class="fas fa-exchange-alt"></i>
+                <span>الحركات</span>
+            </button>
+            <button class="nav-btn" data-tab="custody">
+                <i class="fas fa-clipboard-list"></i>
+                <span>العهدة</span>
+            </button>
+            <button class="nav-btn" data-tab="fleet">
+                <i class="fas fa-truck-moving"></i>
+                <span>الأسطول</span>
+            </button>
+            <button class="nav-btn" data-tab="members">
+                <i class="fas fa-users"></i>
+                <span>الأعضاء</span>
+            </button>
+            <button class="nav-btn" data-tab="settings" id="settingsTab">
+                <i class="fas fa-cogs"></i>
+                <span>الإعدادات</span>
+            </button>
+        </nav>
+        
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <!-- قسم الحركات -->
+            <div id="movementsTab" class="tab-content active">
+                <div class="tab-header">
+                    <h2><i class="fas fa-exchange-alt"></i> إدارة حركات السيارات</h2>
+                    <button id="addMovementBtn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> إضافة حركة جديدة
+                    </button>
+                </div>
+                
+                <div class="data-container">
+                    <div id="movementsList" class="accordion-list">
+                        <!-- سيتم ملء الحركات هنا ديناميكيًا -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- قسم العهدة -->
+            <div id="custodyTab" class="tab-content">
+                <div class="tab-header">
+                    <h2><i class="fas fa-clipboard-list"></i> إدارة عهدة السيارات</h2>
+                    <button id="addCustodyBtn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> إضافة عهدة جديدة
+                    </button>
+                </div>
+                
+                <div class="data-container">
+                    <div id="custodyList" class="accordion-list">
+                        <!-- سيتم ملء العهدة هنا ديناميكيًا -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- قسم الأسطول -->
+            <div id="fleetTab" class="tab-content">
+                <div class="tab-header">
+                    <h2><i class="fas fa-truck-moving"></i> إدارة أسطول السيارات</h2>
+                    <button id="addFleetBtn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> إضافة سيارة للأسطول
+                    </button>
+                </div>
+                
+                <div class="data-container">
+                    <div id="fleetList" class="accordion-list">
+                        <!-- سيتم ملء الأسطول هنا ديناميكيًا -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- قسم الأعضاء -->
+            <div id="membersTab" class="tab-content">
+                <div class="tab-header">
+                    <h2><i class="fas fa-users"></i> إدارة الأعضاء</h2>
+                    <button id="addMemberBtn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> إضافة عضو جديد
+                    </button>
+                </div>
+                
+                <div class="data-container">
+                    <div id="membersList" class="members-grid">
+                        <!-- سيتم ملء الأعضاء هنا ديناميكيًا -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- قسم الإعدادات (للمطور فقط) -->
+            <div id="settingsTabContent" class="tab-content">
+                <div class="tab-header">
+                    <h2><i class="fas fa-cogs"></i> إعدادات النظام</h2>
+                </div>
+                
+                <div class="settings-container">
+                    <div class="settings-section">
+                        <h3><i class="fas fa-sliders-h"></i> تخصيص حقول البيانات</h3>
+                        
+                        <div class="settings-tabs">
+                            <button class="settings-tab-btn active" data-settings-tab="movementFields">حقول الحركات</button>
+                            <button class="settings-tab-btn" data-settings-tab="custodyFields">حقول العهدة</button>
+                            <button class="settings-tab-btn" data-settings-tab="fleetFields">حقول الأسطول</button>
+                        </div>
+                        
+                        <div id="movementFields" class="settings-tab-content active">
+                            <div class="fields-management">
+                                <h4>إدارة حقول قسم الحركات</h4>
+                                <div id="movementFieldsList" class="fields-list"></div>
+                                <div class="add-field-form">
+                                    <input type="text" id="newMovementField" placeholder="اسم الحقل الجديد">
+                                    <select id="newMovementFieldType">
+                                        <option value="text">نص</option>
+                                        <option value="number">رقم</option>
+                                        <option value="date">تاريخ</option>
+                                        <option value="select">قائمة اختيار</option>
+                                    </select>
+                                    <button id="addMovementFieldBtn" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> إضافة حقل
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="custodyFields" class="settings-tab-content">
+                            <div class="fields-management">
+                                <h4>إدارة حقول قسم العهدة</h4>
+                                <div id="custodyFieldsList" class="fields-list"></div>
+                                <div class="add-field-form">
+                                    <input type="text" id="newCustodyField" placeholder="اسم الحقل الجديد">
+                                    <select id="newCustodyFieldType">
+                                        <option value="text">نص</option>
+                                        <option value="number">رقم</option>
+                                        <option value="date">تاريخ</option>
+                                        <option value="select">قائمة اختيار</option>
+                                    </select>
+                                    <button id="addCustodyFieldBtn" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> إضافة حقل
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="fleetFields" class="settings-tab-content">
+                            <div class="fields-management">
+                                <h4>إدارة حقول قسم الأسطول</h4>
+                                <div id="fleetFieldsList" class="fields-list"></div>
+                                <div class="add-field-form">
+                                    <input type="text" id="newFleetField" placeholder="اسم الحقل الجديد">
+                                    <select id="newFleetFieldType">
+                                        <option value="text">نص</option>
+                                        <option value="number">رقم</option>
+                                        <option value="date">تاريخ</option>
+                                        <option value="select">قائمة اختيار</option>
+                                    </select>
+                                    <button id="addFleetFieldBtn" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> إضافة حقل
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- النوافذ المنبثقة -->
+    
+    <!-- نافذة إضافة/تعديل الحركة -->
+    <div id="movementModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exchange-alt"></i> <span id="movementModalTitle">إضافة حركة جديدة</span></h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="movementForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="movementCarNumber">رقم السيارة *</label>
+                            <input type="text" id="movementCarNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="movementPlateCode">كود اللوحة *</label>
+                            <input type="text" id="movementPlateCode" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="movementCarType">نوع السيارة *</label>
+                            <select id="movementCarType" required>
+                                <option value="">اختر نوع السيارة</option>
+                                <option value="سيدان">سيدان</option>
+                                <option value="دفع رباعي">دفع رباعي</option>
+                                <option value="نقل">نقل</option>
+                                <option value="باص">باص</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="movementDriver">اسم السائق *</label>
+                            <select id="movementDriver" required>
+                                <option value="">اختر السائق</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>نوع الحركة *</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="movementType" value="استلام" required>
+                                    <span class="radio-text">استلام</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="movementType" value="تسليم" required>
+                                    <span class="radio-text">تسليم</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="movementNotes">ملاحظات</label>
+                        <textarea id="movementNotes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary modal-close">إلغاء</button>
+                        <button type="submit" class="btn btn-primary">حفظ الحركة</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة إضافة/تعديل العهدة -->
+    <div id="custodyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-clipboard-list"></i> <span id="custodyModalTitle">إضافة عهدة جديدة</span></h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="custodyForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="custodyCarNumber">رقم السيارة *</label>
+                            <input type="text" id="custodyCarNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="custodyPlateCode">كود اللوحة *</label>
+                            <input type="text" id="custodyPlateCode" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="custodyMember">اسم العضو (المتعهد) *</label>
+                            <select id="custodyMember" required>
+                                <option value="">اختر العضو</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="custodyOwner">المالك *</label>
+                            <input type="text" id="custodyOwner" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="custodyCarType">نوع السيارة *</label>
+                            <select id="custodyCarType" required>
+                                <option value="">اختر نوع السيارة</option>
+                                <option value="سيدان">سيدان</option>
+                                <option value="دفع رباعي">دفع رباعي</option>
+                                <option value="نقل">نقل</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="custodyNotes">ملاحظات</label>
+                        <textarea id="custodyNotes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary modal-close">إلغاء</button>
+                        <button type="submit" class="btn btn-primary">حفظ العهدة</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة إضافة/تعديل الأسطول -->
+    <div id="fleetModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-truck-moving"></i> <span id="fleetModalTitle">إضافة سيارة للأسطول</span></h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="fleetForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fleetCarNumber">رقم السيارة *</label>
+                            <input type="text" id="fleetCarNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fleetPlateCode">كود اللوحة *</label>
+                            <input type="text" id="fleetPlateCode" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fleetOwner">المالك *</label>
+                            <input type="text" id="fleetOwner" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fleetCarType">نوع السيارة *</label>
+                            <select id="fleetCarType" required>
+                                <option value="">اختر نوع السيارة</option>
+                                <option value="سيدان">سيدان</option>
+                                <option value="دفع رباعي">دفع رباعي</option>
+                                <option value="نقل">نقل</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fleetMember">من المتعهد (اختياري)</label>
+                            <select id="fleetMember">
+                                <option value="">اختر المتعهد</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fleetLicenseEnd">تاريخ نهاية الترخيص *</label>
+                            <input type="date" id="fleetLicenseEnd" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fleetInsuranceEnd">تاريخ نهاية التأمين *</label>
+                            <input type="date" id="fleetInsuranceEnd" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fleetNotes">ملاحظات</label>
+                        <textarea id="fleetNotes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary modal-close">إلغاء</button>
+                        <button type="submit" class="btn btn-primary">حفظ السيارة</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة إضافة/تعديل العضو -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> <span id="memberModalTitle">إضافة عضو جديد</span></h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="memberForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="memberName">اسم العضو *</label>
+                            <input type="text" id="memberName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="memberPhone">رقم الموبايل *</label>
+                            <input type="tel" id="memberPhone" pattern="[0-9]{10}" required>
+                            <small class="form-hint">10 أرقام، يمكن أن تبدأ بـ 0</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="memberUsername">اسم المستخدم *</label>
+                            <input type="text" id="memberUsername" minlength="4" required>
+                            <small class="form-hint">4 أحرف على الأقل</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="memberPassword">كلمة المرور *</label>
+                            <input type="password" id="memberPassword" minlength="6" required>
+                            <small class="form-hint">6 أحرف/أرقام على الأقل</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="memberRole">الدور (الصلاحية) *</label>
+                            <select id="memberRole" required>
+                                <option value="">اختر الدور</option>
+                                <option value="عضو">عضو</option>
+                                <option value="مشرف">مشرف</option>
+                                <option value="مدير">مدير</option>
+                                <option value="مطور">مطور النظام</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="memberContractor">متعهد (للاستخدام في الحركات فقط)</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="memberContractor">
+                                <label for="memberContractor" class="checkbox-label">نعم</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary modal-close">إلغاء</button>
+                        <button type="submit" class="btn btn-primary">حفظ العضو</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة التأكيد على الحذف -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> تأكيد الحذف</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">هل أنت متأكد من حذف هذا العنصر؟</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close">إلغاء</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">نعم، احذف</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة عرض التفاصيل -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> تفاصيل البيان</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="detailsContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close">إغلاق</button>
+                <button type="button" id="printDetailsBtn" class="btn btn-primary">
+                    <i class="fas fa-print"></i> طباعة
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة مشاركة -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-share-alt"></i> مشاركة البيان</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="share-options">
+                    <button class="share-btn" data-share="copy">
+                        <i class="fas fa-copy"></i> نسخ الرابط
+                    </button>
+                    <button class="share-btn" data-share="whatsapp">
+                        <i class="fab fa-whatsapp"></i> واتساب
+                    </button>
+                    <button class="share-btn" data-share="email">
+                        <i class="fas fa-envelope"></i> البريد
+                    </button>
+                </div>
+                <div class="share-link">
+                    <input type="text" id="shareUrl" readonly>
+                    <button id="copyShareUrl" class="btn btn-primary">
+                        <i class="fas fa-copy"></i> نسخ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة التعديل مع السجل -->
+    <div id="editHistoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-history"></i> سجل التعديلات</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="editHistoryContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- رسائل التنبيه -->
+    <div id="alertToast" class="toast">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+    
+    <!-- شاشة التحميل -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري تحميل البيانات...</div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    
+    <!-- ملفات النظام -->
+    <script src="app.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="service-worker.js"></script>
+    
+    <script>
+        // تسجيل Service Worker لتطبيق PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js');
+            });
+        }
+    </script>
+</body>
+</html>
