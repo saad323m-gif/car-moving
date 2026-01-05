@@ -1,0 +1,70 @@
+// firebase.js
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+// إعدادات Firebase الخاصة بك (كما أرسلتها)
+const firebaseConfig = {
+  apiKey: "AIzaSyBpSLNh78z4FvOIFC7I0DzCa_De-2yuWwo",
+  authDomain: "car-moving-8b59e.firebaseapp.com",
+  projectId: "car-moving-8b59e",
+  storageBucket: "car-moving-8b59e.firebasestorage.app",
+  messagingSenderId: "332747318494",
+  appId: "1:332747318494:web:4f2ef98c365b6bf62f0e4f"
+};
+
+// تهيئة التطبيق
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// تصدير ما نحتاجه في بقية الملفات
+export {
+  app,
+  auth,
+  db,
+  // Auth
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  updateProfile,
+  // Firestore
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp
+};
