@@ -1,0 +1,355 @@
+// fleet.js
+import {
+  db,
+  collection,
+  doc,
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  serverTimestamp
+} from "./firebase.js";
+
+import { currentUserProfile } from "./auth.js";
+import { canManageFleet } from "./roles.js";
+
+const fleetList = document.getElementById("fleetList");
+const fleetFormContainer = document.getElementById("fleetFormContainer");
+const addFleetBtn = document.getElementById("addFleetBtn");
+
+function daysUntil(dateIso) {
+  if (!dateIso) return null;
+  const target = new Date(dateIso);
+  const now = new Date();
+  const diffMs = target.getTime() - now.getTime();
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function renderFleetForm(existing) {
+  fleetFormContainer.innerHTML = "";
+  const isEdit = !!existing;
+  const card = document.createElement("div");
+  card.className = "card";
+
+  const title = document.createElement("h3");
+  title.textContent = isEdit ? "تعديل سيارة" : "إضافة سيارة للأسطول";
+  card.appendChild(title);
+
+  const form = document.createElement("form");
+  form.className = "form";
+
+  form.innerHTML = `
+    <div class="form-group">
+      <label>رقم السيارة</label>
+      <input type="text" name="carNumber" required value="${existing?.carNumber || ""}" />
+    </div>
+    <div class="form-group">
+      <label>كود اللوحة</label>
+      <input type="text" name="plateCode" required value="${existing?.plateCode || ""}" />
+    </div>
+    <div class="form-group">
+      <label>المالك</label>
+      <input type="text" name="owner" required value="${existing?.owner || ""}" />
+    </div>
+    <div class="form-group">
+      <label>نوع السيارة</label>
+      <input type="text" name="carType" required value="${existing?.carType || ""}" />
+    </div>
+    <div class="form-group">
+      <label>اسم المتعهد (اختياري)</label>
+      <input type="text" name="custodianName" value="${existing?.custodianName || ""}" />
+    </div>
+    <div class="form-group">
+      <label>تاريخ نهاية الترخيص</label>
+      <input type="date" name="licenseEndDate" value="${existing?.licenseEndDate || ""}" />
+    </div>
+    <div class="form-group">
+      <label>تاريخ نهاية التأمين</label>
+      <input type="date" name="insuranceEndDate" value="${existing?.insuranceEndDate || ""}" />
+    </div>
+    <div class="form-group">
+      <label>ملاحظات</label>
+      <textarea name="notes">${existing?.notes || ""}</textarea>
+    </div>
+    <p class="hint-text">
+      يتم تنبيه المسؤولين قبل انتهاء الترخيص أو التأمين بـ 15 يومًا.
+    </p>
+    <div class="form-inline" style="margin-top:0.5rem;">
+      <button type="submit" class="btn btn-primary">${isEdit ? "حفظ التعديلات" : "حفظ"}</button>
+      <button type="button" class="btn btn-secondary" id="cancelFleetForm">إلغاء</button>
+    </div>
+  `;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form).entries());
+    const payload = {
+      carNumber: data.carNumber.trim(),
+      plateCode: data.plateCode.trim(),
+      owner: data.owner.trim(),
+      carType: data.carType.trim(),
+      custodianName: data.custodianName.trim() || null,
+      custodianUid: existing?.custodianUid || null,
+      licenseEndDate: data.licenseEndDate || null,
+      insuranceEndDate: data.insuranceEndDate || null,
+      notes: data.notes.trim()
+    };
+
+    try {
+      if (isEdit) {
+        await updateDoc(doc(db, "fleet", existing.id), payload);
+      } else {
+        await addDoc(collection(db, "fleet"), {
+          ...payload,
+          createdAt: serverTimestamp()
+        });
+      }
+      fleetFormContainer.classList.add("hidden");
+      await loadFleet();
+    } catch (err) {
+      console.error(err);
+      alert("حدث خطأ أثناء حفظ بيانات السيارة.");
+    }
+  });
+
+  card.appendChild(form);
+  fleetFormContainer.appendChild(card);
+  fleetFormContainer.classList.remove("hidden");
+
+  document
+    .getElementById("cancelFleetForm")
+    .addEventListener("click", () => {
+      fleetFormContainer.classList.add("hidden");
+    });
+}
+
+if (addFleetBtn) {
+  addFleetBtn.addEventListener("click", () => {
+    const user = currentUserProfile;
+    if (!canManageFleet(user.role)) {
+      alert("لا تملك صلاحية إضافة سيارة للأسطول.");
+      return;
+    }
+    renderFleetForm(null);
+  });
+}
+
+function renderFleetItem(docId, data) {
+  const user = currentUserProfile;
+  if (!canManageFleet(user.role)) {
+    return null; // العضو العادي لا يرى الأسطول
+  }
+
+  const item = document.createElement("div");
+  item.className = "accordion-item";
+
+  const header = document.createElement("div");
+  header.className = "accordion-header";
+
+  const headerMain = document.createElement("div");
+  headerMain.className = "accordion-header-main";
+
+  const title = document.createElement("div");
+  title.className = "accordion-title";
+  title.textContent = `${data.carNumber} - ${data.carType}`;
+
+  const subtitle = document.createElement("div");
+  subtitle.className = "accordion-subtitle";
+  subtitle.textContent = `كود اللوحة: ${data.plateCode} | المالك: ${data.owner}`;
+
+  headerMain.appendChild(title);
+  headerMain.appendChild(subtitle);
+
+  const toggle = document.createElement("div");
+  toggle.className = "accordion-toggle";
+  toggle.textContent = "▼";
+
+  header.appendChild(headerMain);
+  header.appendChild(toggle);
+
+  const body = document.createElement("div");
+  body.className = "accordion-body hidden";
+
+  const licenseDays = daysUntil(data.licenseEndDate);
+  const insuranceDays = daysUntil(data.insuranceEndDate);
+
+  const warningParts = [];
+  if (licenseDays !== null && licenseDays <= 15 && licenseDays >= 0) {
+    warningParts.push(`الترخيص ينتهي خلال ${licenseDays} يوم`);
+  }
+  if (insuranceDays !== null && insuranceDays <= 15 && insuranceDays >= 0) {
+    warningParts.push(`التأمين ينتهي خلال ${insuranceDays} يوم`);
+  }
+
+  body.innerHTML = `
+    <div class="accordion-body-row">
+      <span class="label">رقم السيارة:</span>
+      <span class="value">${data.carNumber}</span>
+    </div>
+    <div class="accordion-body-row">
+      <span class="label">كود اللوحة:</span>
+      <span class="value">${data.plateCode}</span>
+    </div>
+    <div class="accordion-body-row">
+      <span class="label">المالك:</span>
+      <span class="value">${data.owner}</span>
+    </div>
+    <div class="accordion-body-row">
+      <span class="label">نوع السيارة:</span>
+      <span class="value">${data.carType}</span>
+    </div>
+    <div class="accordion-body-row">
+      <span class="label">من المتعهد:</span>
+      <span class="value">${data.custodianName || "-"}</span>
+    </div>
+    <div class="accordion-body-row">
+      <span class="label">تاريخ نهاية الترخيص:</span>
+      <span class="value">${data.licenseEndDate || "-"}</span>
+    </div>
+    <div class="accordion-body-row">
+      <span class="label">تاريخ نهاية التأمين:</span>
+      <span class="value">${data.insuranceEndDate || "-"}</span>
+    </div>
+    <div class="accordion-body-row">
+      <span class="label">ملاحظات:</span>
+      <span class="value">${data.notes || "-"}</span>
+    </div>
+    ${
+      warningParts.length
+        ? `<div class="badge-warning" style="display:inline-block;margin-top:0.4rem;">
+             ${warningParts.join(" - ")}
+           </div>`
+        : ""
+    }
+  `;
+
+  const actions = document.createElement("div");
+  actions.className = "accordion-actions";
+
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "btn btn-secondary";
+  shareBtn.textContent = "📤 مشاركة";
+  shareBtn.addEventListener("click", () => {
+    const text = `
+بيان سيارة من الأسطول
+رقم السيارة: ${data.carNumber}
+كود اللوحة: ${data.plateCode}
+المالك: ${data.owner}
+نوع السيارة: ${data.carType}
+المتعهد: ${data.custodianName || "-"}
+نهاية الترخيص: ${data.licenseEndDate || "-"}
+نهاية التأمين: ${data.insuranceEndDate || "-"}
+ملاحظات: ${data.notes || "-"}
+    `.trim();
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(text);
+      alert("تم نسخ بيانات السيارة.");
+    }
+  });
+
+  const printBtn = document.createElement("button");
+  printBtn.className = "btn btn-secondary";
+  printBtn.textContent = "🖨 طباعة";
+  printBtn.addEventListener("click", () => {
+    const w = window.open("", "_blank");
+    w.document.write(`
+      <html dir="rtl" lang="ar"><head><title>طباعة بيانات سيارة</title></head><body>
+      <h2>بيان سيارة من الأسطول</h2>
+      <p>رقم السيارة: ${data.carNumber}</p>
+      <p>كود اللوحة: ${data.plateCode}</p>
+      <p>المالك: ${data.owner}</p>
+      <p>نوع السيارة: ${data.carType}</p>
+      <p>المتعهد: ${data.custodianName || "-"}</p>
+      <p>نهاية الترخيص: ${data.licenseEndDate || "-"}</p>
+      <p>نهاية التأمين: ${data.insuranceEndDate || "-"}</p>
+      <p>ملاحظات: ${data.notes || "-"}</p>
+      </body></html>
+    `);
+    w.document.close();
+    w.print();
+  });
+
+  actions.appendChild(shareBtn);
+  actions.appendChild(printBtn);
+
+  if (canManageFleet(user.role)) {
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn btn-primary";
+    editBtn.textContent = "✏ تعديل";
+    editBtn.addEventListener("click", () => {
+      renderFleetForm({ id: docId, ...data });
+    });
+    actions.appendChild(editBtn);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn btn-danger";
+    deleteBtn.textContent = "🗑 حذف";
+    deleteBtn.addEventListener("click", async () => {
+      if (!confirm("هل أنت متأكد من حذف هذه السيارة من الأسطول؟")) return;
+      try {
+        await deleteDoc(doc(db, "fleet", docId));
+        await loadFleet();
+      } catch (err) {
+        console.error(err);
+        alert("حدث خطأ أثناء الحذف.");
+      }
+    });
+    actions.appendChild(deleteBtn);
+  }
+
+  body.appendChild(actions);
+
+  header.addEventListener("click", () => {
+    const isHidden = body.classList.contains("hidden");
+    body.classList.toggle("hidden", !isHidden);
+    toggle.textContent = isHidden ? "▲" : "▼";
+  });
+
+  item.appendChild(header);
+  item.appendChild(body);
+
+  return item;
+}
+
+export async function loadFleet() {
+  if (!fleetList) return;
+  fleetList.innerHTML = "";
+
+  try {
+    const colRef = collection(db, "fleet");
+    const q = query(colRef, orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+      const item = renderFleetItem(docSnap.id, data);
+      if (item) fleetList.appendChild(item);
+    });
+
+    if (!fleetList.children.length) {
+      fleetList.innerHTML = "<p>لا توجد بيانات أسطول.</p>";
+    }
+
+    document.dispatchEvent(new CustomEvent("fleet-loaded"));
+  } catch (err) {
+    console.error(err);
+    fleetList.innerHTML = "<p>تعذر تحميل بيانات الأسطول.</p>";
+  }
+}
+
+document.addEventListener("user-ready", () => {
+  const user = currentUserProfile;
+  if (!canManageFleet(user.role)) {
+    // إخفاء التبويب عن الأعضاء
+    const fleetTabBtn = document.querySelector('[data-main-tab="fleet"]');
+    const fleetTab = document.getElementById("fleetTab");
+    if (fleetTabBtn) fleetTabBtn.style.display = "none";
+    if (fleetTab) fleetTab.style.display = "none";
+    return;
+  }
+  loadFleet();
+});
