@@ -1,142 +1,50 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <title>نظام تسجيل وإدارة السيارات - AL MASAOOD</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Manifest -->
-  <link rel="manifest" href="manifest.json" />
-
-  <!-- Icon -->
-  <link rel="icon" type="image/png" href="logo.png" />
-
-  <!-- Apple PWA -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="apple-touch-icon" href="logo.png" />
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام تسجيل وإدارة السيارات - مجموعة المسعود</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#001f3f">
+  <link rel="icon" href="logo.png">
 </head>
-
 <body>
-
-  <!-- ====================== شاشة تسجيل الدخول ====================== -->
-  <main id="authView" class="auth-view">
-    <div class="auth-card">
-
-      <div class="auth-logo">
-        <img src="logo.png" alt="AL MASAOOD" />
-      </div>
-
-      <h1 class="auth-title">نظام تسجيل وإدارة السيارات</h1>
-      <p class="auth-subtitle">مجموعة المسعود</p>
-
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="login">دخول</button>
-        <button class="auth-tab" data-tab="register">تسجيل جديد</button>
-      </div>
-
-      <!-- نموذج الدخول -->
-      <form id="loginForm" class="auth-form" data-form="login">
-        <label>اسم المستخدم</label>
-        <input type="text" id="loginUsername" required minlength="4" />
-
-        <label>كلمة المرور</label>
-        <input type="password" id="loginPassword" required minlength="6" />
-
-        <button type="submit" class="btn-primary">دخول</button>
-      </form>
-
-      <!-- نموذج التسجيل -->
-      <form id="registerForm" class="auth-form hidden" data-form="register">
-        <label>اسم العضو</label>
-        <input type="text" id="registerFullName" required />
-
-        <label>اسم المستخدم (4 أحرف على الأقل)</label>
-        <input type="text" id="registerUsername" required minlength="4" />
-
-        <label>كلمة المرور (6 خانات على الأقل)</label>
-        <input type="password" id="registerPassword" required minlength="6" />
-
-        <label>وسيلة الاتصال (10 أرقام)</label>
-        <input type="tel" id="registerPhone" pattern="[0-9]{10}" required />
-
-        <p class="note">
-          أول عضو يتم تسجيله سيصبح <strong>مطور النظام</strong> تلقائيًا.
-        </p>
-
-        <button type="submit" class="btn-primary">تسجيل</button>
-      </form>
-
-      <p id="authMessage" class="auth-message"></p>
-    </div>
-  </main>
-
-  <!-- ====================== واجهة التطبيق ====================== -->
-  <header id="appHeader" class="app-header hidden">
-    <div class="header-left">
-      <img src="logo.png" class="header-logo" />
-      <div>
-        <h2 class="header-title">نظام تسجيل وإدارة السيارات</h2>
-        <p class="header-subtitle">مجموعة المسعود</p>
-      </div>
-    </div>
-
-    <div class="header-right">
-      <button id="refreshAppBtn" class="btn-secondary">🔄 تحديث</button>
-      <button id="logoutBtn" class="btn-danger">خروج</button>
-    </div>
+  <header>
+    <img src="logo.png" alt="Al Masaood Logo" class="logo">
+    <h1>نظام تسجيل وإدارة السيارات المتكامل</h1>
+    <button id="refresh-btn" title="تحديث يدوي">🔄</button>
+    <div id="user-info"></div>
+    <button id="logout-btn" style="display:none;">تسجيل خروج</button>
   </header>
 
-  <main id="appView" class="app-view hidden">
+  <div id="auth-screen">
+    <h2>تسجيل الدخول</h2>
+    <input type="text" id="username" placeholder="اسم المستخدم (4 أحرف على الأقل)" minlength="4">
+    <input type="password" id="password" placeholder="كلمة المرور (6 أحرف/أرقام على الأقل)" minlength="6">
+    <button id="login-btn">دخول</button>
+    <button id="register-btn">تسجيل عضوية جديدة (مطور فقط في البداية)</button>
+    <p id="auth-msg"></p>
+  </div>
 
-    <!-- شريط المستخدم -->
-    <section class="user-bar">
-      <span id="currentUserName"></span>
-      <span id="currentUserRole" class="role-badge"></span>
-    </section>
+  <div id="app-screen" style="display:none;">
+    <input type="text" id="global-search" placeholder="بحث قوي في كل البيانات...">
+    <div class="tabs">
+      <button data-tab="movements">تحركات السيارات</button>
+      <button data-tab="custody">العهدة</button>
+      <button data-tab="fleet" id="fleet-tab" style="display:none;">الأسطول</button>
+      <button data-tab="members">الأعضاء</button>
+      <button data-tab="stats" id="stats-tab" style="display:none;">الإحصائيات</button>
+    </div>
 
-    <!-- البحث -->
-    <section class="search-bar">
-      <input type="search" id="globalSearchInput" placeholder="ابحث في الحركات، العهد، أو الأسطول..." />
-    </section>
+    <div id="content"></div>
+  </div>
 
-    <!-- التبويبات -->
-    <nav class="main-tabs">
-      <button class="tab-btn active" data-tab="movements">الحركات</button>
-      <button class="tab-btn" data-tab="custody">العهد</button>
-      <button class="tab-btn" data-tab="fleet">الأسطول</button>
-      <button class="tab-btn" data-tab="members">الأعضاء</button>
-      <button class="tab-btn" data-tab="stats">الإحصائيات</button>
-    </nav>
-
-    <!-- محتوى التبويبات -->
-    <section id="movementsTab" class="tab-content"></section>
-    <section id="custodyTab" class="tab-content hidden"></section>
-    <section id="fleetTab" class="tab-content hidden"></section>
-    <section id="membersTab" class="tab-content hidden"></section>
-    <section id="statsTab" class="tab-content hidden"></section>
-
-  </main>
-
-  <!-- فوتر -->
-  <footer class="footer">
-    جميع الحقوق محفوظة © <span id="currentYear"></span> - تم التطوير بواسطة MOHAMED SAAD
+  <footer>
+    <p>جميع الحقوق محفوظة © <span id="year"></span></p>
+    <p>تم التطوير والبرمجة بواسطة MOHAMED SAAD</p>
   </footer>
 
-  <!-- Scripts -->
-  <script type="module" src="firebase.js"></script>
-  <script type="module" src="roles.js"></script>
-  <script type="module" src="auth.js"></script>
   <script type="module" src="app.js"></script>
-  <script type="module" src="movements.js"></script>
-  <script type="module" src="custody.js"></script>
-  <script type="module" src="fleet.js"></script>
-  <script type="module" src="members.js"></script>
-  <script type="module" src="stats.js"></script>
-  <script type="module" src="search.js"></script>
-
 </body>
 </html>
