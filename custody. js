@@ -1,0 +1,354 @@
+// custody.js
+import {
+  db,
+  collection,
+  doc,
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp
+} from "./firebase.js";
+
+import { currentUserProfile } from "./auth.js";
+import {
+  canSeeAllCustody
+} from "./roles.js";
+
+const custodyList = document.getElementById("custodyList");
+const custodyFormContainer = document.getElementById("custodyFormContainer");
+const addCustodyBtn = document.getElementById("addCustodyBtn");
+
+function getNowGmt4Iso() {
+  const nowUtc = new Date();
+  const utcMs = nowUtc.getTime() + nowUtc.getTimezoneOffset() * 60000;
+  const gmt4Ms = utcMs + 4 * 60 * 60 * 1000;
+  return new Date(gmt4Ms).toISOString();
+}
+
+// صلاحيات العهدة
+function canEditCustody(user) {
+  if (!user) return false;
+  return canSeeAllCustody(user.role); // مطور + مدير + مشرف
+}
+
+function canDeleteCustody(user) {
+  if (!user) return false;
+  return canSeeAllCustody(user.role);
+}
+
+// نموذج إضافة / تعديل عهدة
+function renderCustodyForm(existing) {
+  custodyFormContainer.innerHTML = "";
+  const isEdit = !!existing;
+  const card = document.createElement("div");
+  card.className = "card";
+
+  const title = document.createElement("h3");
+  title.textContent = isEdit ? "تعديل عهدة" : "إضافة عهدة جديدة";
+  card.appendChild(title);
+
+  const form = document.createElement("form");
+  form.className = "form";
+
+  form.innerHTML = `
+    <div class="form-group">
+      <label>اسم المتعهد (عضو)</label>
+      <input type="text" name="custodianName" required value="${existing?.custodianName || ""}" />
+    </div>
+    <div class="form-group">
+      <label>رقم السيارة</label>
+      <input type="text" name="carNumber" required value="${existing?.carNumber || ""}" />
+    </div>
+    <div class="form-group">
+      <label>كود اللوحة</label>
+      <input type="text" name="plateCode" required value="${existing?.plateCode || ""}" />
+    </div>
+    <div class="form-group">
+      <label>المالك</label>
+      <input type="text" name="owner" required value="${existing?.owner || ""}" />
+    </div>
+    <div class="form-group">
+      <label>نوع السيارة</label>
+      <input type="text" name="carType" required value="${existing?.carType || ""}" />
+    </div>
+    <div class="form-group">
+      <label>ملاحظات</label>
+      <textarea name="notes">${existing?.notes || ""}</textarea>
+    </div>
+    <p class="hint-text">
+      العضو (المتعهد) يرى عهدته فقط، والمسؤولون يرون كل العهد.
+    </p>
+    <div class="form-inline" style="margin-top:0.5rem;">
+      <button type="submit" class="btn btn-primary">${isEdit ? "حفظ التعديلات" : "حفظ"}</button>
+      <button type="button" class="btn btn-secondary" id="cancelCustodyForm">إلغاء</button>
+    </div>
+  `;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form).entries());
+    const user = currentUserProfile;
+
+    const payload = {
+      custodianName: data.custodianName.trim(),
+      custodianUid: existing?.custodianUid || user.uid, // يمكن تعديل لاحقًا لربطه بقائمة الأعضاء
+      carNumber: data.carNumber.trim(),
+      plateCode: data.plateCode.trim(),
+      owner: data.owner.trim(),
+      carType: data.carType.trim(),
+      notes: data.notes.trim(),
+    };
+
+    try {
+      if (isEdit) {
+        await updateDoc(doc(db, "custody", existing.id), {
+          ...payload,
+          lastEditedByUid: user.uid,
+          lastEditedByName: user.fullName,
+          lastEditedAt: getNowGmt4Iso()
+        });
+      } else {
+        await addDoc(collection(db, "custody"), {
+          ...payload,
+          createdAt: serverTimestamp(),
+          createdAtGmt4Iso: getNowGmt4Iso()
+        });
+      }
+      custodyFormContainer.classList.add("hidden");
+      await loadCustody();
+    } catch (err) {
+      console.error(err);
+      alert("حدث خطأ أثناء حفظ العهدة.");
+    }
+  });
+
+  card.appendChild(form);
+  custodyFormContainer.appendChild(card);
+  custodyFormContainer.classList.remove("hidden");
+
+  document
+    .getElementById("cancelCustodyForm")
+    .addEventListener("click", () => {
+      custodyFormContainer.classList.add("hidden");
+    });
+}
+
+if (addCustodyBtn) {
+  addCustodyBtn.addEventListener("click", () => {
+    const user = currentUserProfile;
+    if (!canEditCustody(user)) {
+      alert("ليست لديك صلاحية إضافة عهدة جديدة.");
+      return;
+    }
+    renderCustodyForm(null);
+  });
+}
+
+// الأكورديون: تجميع بالعُهدة حسب المتعهد
+function renderCustodyGrouped(records) {
+  custodyList.innerHTML = "";
+
+  const user = currentUserProfile;
+  const canSeeAll = canSeeAllCustody(user.role);
+
+  // تصفية حسب الصلاحيات
+  const filtered = records.filter((r) =>
+    canSeeAll ? true : r.custodianUid === user.uid
+  );
+
+  // تجميع حسب المتعهد
+  const groups = {};
+  filtered.forEach((r) => {
+    const key = `${r.custodianUid}::${r.custodianName}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(r);
+  });
+
+  Object.keys(groups).forEach((key) => {
+    const [uid, name] = key.split("::");
+    const cars = groups[key];
+
+    const item = document.createElement("div");
+    item.className = "accordion-item";
+
+    const header = document.createElement("div");
+    header.className = "accordion-header";
+
+    const headerMain = document.createElement("div");
+    headerMain.className = "accordion-header-main";
+
+    const title = document.createElement("div");
+    title.className = "accordion-title";
+    title.textContent = name || "مجهول";
+
+    const subtitle = document.createElement("div");
+    subtitle.className = "accordion-subtitle";
+    subtitle.textContent = `عدد السيارات في العهدة: ${cars.length}`;
+
+    headerMain.appendChild(title);
+    headerMain.appendChild(subtitle);
+
+    const toggle = document.createElement("div");
+    toggle.className = "accordion-toggle";
+    toggle.textContent = "▼";
+
+    header.appendChild(headerMain);
+    header.appendChild(toggle);
+
+    const body = document.createElement("div");
+    body.className = "accordion-body hidden";
+
+    cars.forEach((c) => {
+      const block = document.createElement("div");
+      block.style.borderBottom = "1px solid #e2e8f0";
+      block.style.paddingBottom = "0.4rem";
+      block.style.marginBottom = "0.4rem";
+
+      block.innerHTML = `
+        <div class="accordion-body-row">
+          <span class="label">رقم السيارة:</span>
+          <span class="value">${c.carNumber}</span>
+        </div>
+        <div class="accordion-body-row">
+          <span class="label">كود اللوحة:</span>
+          <span class="value">${c.plateCode}</span>
+        </div>
+        <div class="accordion-body-row">
+          <span class="label">المالك:</span>
+          <span class="value">${c.owner}</span>
+        </div>
+        <div class="accordion-body-row">
+          <span class="label">نوع السيارة:</span>
+          <span class="value">${c.carType}</span>
+        </div>
+        <div class="accordion-body-row">
+          <span class="label">ملاحظات:</span>
+          <span class="value">${c.notes || "-"}</span>
+        </div>
+      `;
+
+      const actions = document.createElement("div");
+      actions.className = "accordion-actions";
+
+      const shareBtn = document.createElement("button");
+      shareBtn.className = "btn btn-secondary";
+      shareBtn.textContent = "📤 مشاركة";
+      shareBtn.addEventListener("click", () => {
+        const text = `
+عهدة سيارة
+المتعهد: ${c.custodianName}
+رقم السيارة: ${c.carNumber}
+كود اللوحة: ${c.plateCode}
+المالك: ${c.owner}
+نوع السيارة: ${c.carType}
+ملاحظات: ${c.notes || "-"}
+        `.trim();
+        if (navigator.share) {
+          navigator.share({ text }).catch(() => {});
+        } else {
+          navigator.clipboard?.writeText(text);
+          alert("تم نسخ بيانات العهدة.");
+        }
+      });
+
+      const printBtn = document.createElement("button");
+      printBtn.className = "btn btn-secondary";
+      printBtn.textContent = "🖨 طباعة";
+      printBtn.addEventListener("click", () => {
+        const w = window.open("", "_blank");
+        w.document.write(`
+          <html dir="rtl" lang="ar"><head><title>طباعة عهدة</title></head><body>
+          <h2>بيان عهدة</h2>
+          <p>المتعهد: ${c.custodianName}</p>
+          <p>رقم السيارة: ${c.carNumber}</p>
+          <p>كود اللوحة: ${c.plateCode}</p>
+          <p>المالك: ${c.owner}</p>
+          <p>نوع السيارة: ${c.carType}</p>
+          <p>ملاحظات: ${c.notes || "-"}</p>
+          </body></html>
+        `);
+        w.document.close();
+        w.print();
+      });
+
+      actions.appendChild(shareBtn);
+      actions.appendChild(printBtn);
+
+      if (canEditCustody(currentUserProfile)) {
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn btn-primary";
+        editBtn.textContent = "✏ تعديل";
+        editBtn.addEventListener("click", () => {
+          renderCustodyForm({ id: c.id, ...c });
+        });
+        actions.appendChild(editBtn);
+      }
+
+      if (canDeleteCustody(currentUserProfile)) {
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn btn-danger";
+        deleteBtn.textContent = "🗑 حذف";
+        deleteBtn.addEventListener("click", async () => {
+          if (!confirm("هل أنت متأكد من حذف هذه العهدة؟")) return;
+          try {
+            await deleteDoc(doc(db, "custody", c.id));
+            await loadCustody();
+          } catch (err) {
+            console.error(err);
+            alert("حدث خطأ أثناء الحذف.");
+          }
+        });
+        actions.appendChild(deleteBtn);
+      }
+
+      block.appendChild(actions);
+      body.appendChild(block);
+    });
+
+    header.addEventListener("click", () => {
+      const isHidden = body.classList.contains("hidden");
+      body.classList.toggle("hidden", !isHidden);
+      toggle.textContent = isHidden ? "▲" : "▼";
+    });
+
+    item.appendChild(header);
+    item.appendChild(body);
+
+    custodyList.appendChild(item);
+  });
+
+  if (!filtered.length) {
+    custodyList.innerHTML = "<p>لا توجد بيانات عهدة.</p>";
+  }
+}
+
+// تحميل العهدة من Firestore
+export async function loadCustody() {
+  if (!custodyList) return;
+  custodyList.innerHTML = "";
+
+  try {
+    const colRef = collection(db, "custody");
+    const q = query(colRef, orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+
+    const records = [];
+    snap.forEach((d) => {
+      records.push({ id: d.id, ...d.data() });
+    });
+
+    renderCustodyGrouped(records);
+    document.dispatchEvent(new CustomEvent("custody-loaded", { detail: records }));
+  } catch (err) {
+    console.error(err);
+    custodyList.innerHTML = "<p>تعذر تحميل بيانات العهدة.</p>";
+  }
+}
+
+document.addEventListener("user-ready", () => {
+  loadCustody();
+});
