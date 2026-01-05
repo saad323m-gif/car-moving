@@ -1,360 +1,87 @@
-// members.js
-// ===============================
-// إدارة الأعضاء (إضافة – تعديل – حذف – تغيير صلاحيات)
-// ===============================
+import { db, ref, push, onValue, update, remove } from "./firebase.js";
 
-import {
-  db,
-  collection,
-  doc,
-  getDocs,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  serverTimestamp
-} from "./firebase.js";
+export function loadMembers(role, uid) {
+  if (role !== 'مطور' && role !== 'مدير') return;
 
-import { currentUserProfile } from "./auth.js";
-import {
-  ROLE_DEVELOPER,
-  ROLE_ADMIN,
-  ROLE_SUPERVISOR,
-  ROLE_MEMBER,
-  ROLE_LABELS,
-  ROLE_CLASS,
-  canManageUsers
-} from "./roles.js";
-
-// عناصر الواجهة
-const membersTab = document.getElementById("membersTab");
-
-// ===============================
-// بناء واجهة التبويب
-// ===============================
-
-function renderMembersUI() {
-  const canManage = canManageUsers(currentUserProfile.role);
-
-  membersTab.innerHTML = `
-    <div class="tab-inner-header">
-      <h3>الأعضاء</h3>
-      ${
-        canManage
-          ? `<button id="addMemberBtn" class="btn-primary">+ إضافة عضو</button>`
-          : ""
-      }
-    </div>
-
-    <div id="membersList" class="accordion-list"></div>
-
-    <div id="memberFormContainer" class="hidden"></div>
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <h2>إدارة الأعضاء</h2>
+    <button class="action-btn" id="add-member">+ إضافة عضو</button>
+    <div id="members-list"></div>
   `;
 
-  if (canManage) {
-    document.getElementById("addMemberBtn").addEventListener("click", () => {
-      renderMemberForm(null);
+  const membersRef = ref(db, 'members');
+  onValue(membersRef, (snapshot) => {
+    const list = document.getElementById('members-list');
+    list.innerHTML = '';
+    snapshot.forEach(child => {
+      const m = child.val();
+      const roleColor = m.role === 'مطور' ? 'red' : m.role === 'مدير' ? 'orange' : m.role === 'مشرف' ? 'darkblue' : 'green';
+
+      const div = document.createElement('div');
+      div.className = 'accordion';
+      div.innerHTML = `<strong style="color:${roleColor};">${m.username} - ${m.role}</strong>`;
+
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.innerHTML = `
+        <p><strong>رقم الجوال:</strong> ${m.phone || '-'}</p>
+        <button class="action-btn" onclick="editMember('${child.key}')">✏ تعديل</button>
+        ${m.role !== 'مطور' ? `<button class="action-btn" style="background:red;" onclick="deleteMember('${child.key}')">🗑 حذف</button>` : ''}
+      `;
+
+      div.onclick = () => panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+      list.appendChild(div);
+      list.appendChild(panel);
     });
-  }
-}
-
-// ===============================
-// نموذج إضافة / تعديل عضو
-// ===============================
-
-function renderMemberForm(existing) {
-  const container = document.getElementById("memberFormContainer");
-  container.innerHTML = "";
-  container.classList.remove("hidden");
-
-  const isEdit = !!existing;
-  const canManage = canManageUsers(currentUserProfile.role);
-
-  const card = document.createElement("div");
-  card.className = "tab-content";
-
-  card.innerHTML = `
-    <h3>${isEdit ? "تعديل عضو" : "إضافة عضو جديد"}</h3>
-
-    <form id="memberForm" class="auth-form">
-
-      <label>الاسم الكامل</label>
-      <input type="text" name="fullName" required value="${existing?.fullName || ""}" />
-
-      <label>اسم المستخدم</label>
-      <input type="text" name="username" required minlength="4" value="${existing?.username || ""}" />
-
-      <label>رقم الهاتف</label>
-      <input type="tel" name="phone" required pattern="[0-9]{10}" value="${existing?.phone || ""}" />
-
-      ${
-        isEdit
-          ? `
-      <label>الصلاحية</label>
-      <select name="role" ${existing.role === ROLE_DEVELOPER ? "disabled" : ""}>
-        <option value="${ROLE_MEMBER}" ${existing.role === ROLE_MEMBER ? "selected" : ""}>عضو</option>
-        <option value="${ROLE_SUPERVISOR}" ${existing.role === ROLE_SUPERVISOR ? "selected" : ""}>مشرف</option>
-        <option value="${ROLE_ADMIN}" ${existing.role === ROLE_ADMIN ? "selected" : ""}>مدير</option>
-      </select>
-      `
-          : `
-      <label>الصلاحية</label>
-      <select name="role">
-        <option value="${ROLE_MEMBER}">عضو</option>
-        <option value="${ROLE_SUPERVISOR}">مشرف</option>
-        <option value="${ROLE_ADMIN}">مدير</option>
-      </select>
-      `
-      }
-
-      <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
-        <button type="submit" class="btn-primary">${isEdit ? "حفظ التعديلات" : "حفظ"}</button>
-        <button type="button" id="cancelMemberForm" class="btn-secondary">إلغاء</button>
-      </div>
-    </form>
-  `;
-
-  container.appendChild(card);
-
-  document.getElementById("cancelMemberForm").addEventListener("click", () => {
-    container.classList.add("hidden");
   });
 
-  document.getElementById("memberForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+  document.getElementById('add-member').onclick = () => openMemberForm();
+}
 
-    const data = Object.fromEntries(new FormData(e.target).entries());
+function openMemberForm(editKey = null) {
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <h2>${editKey ? 'تعديل' : 'إضافة'} عضو</h2>
+    <label>اسم المستخدم:</label><input type="text" id="username" minlength="4">
+    <label>كلمة المرور (إذا جديد):</label><input type="password" id="password" ${editKey ? '' : 'required'} minlength="6">
+    <label>رقم الجوال (10 أرقام):</label><input type="tel" id="phone" pattern="[0-9]{10}">
+    <label>الصلاحية:</label>
+    <select id="role">
+      <option value="عضو">عضو</option>
+      <option value="مشرف">مشرف</option>
+      <option value="مدير">مدير</option>
+      ${editKey ? '' : '<option value="مطور">مطور</option>'}
+    </select>
+    <button class="action-btn" id="save-member">حفظ</button>
+    <button class="action-btn" onclick="loadMembers()">إلغاء</button>
+  `;
 
-    if (!canManage) {
-      alert("لا تملك صلاحية إدارة الأعضاء.");
-      return;
-    }
+  if (editKey) {
+    onValue(ref(db, 'members/' + editKey), (snap) => {
+      const m = snap.val();
+      document.getElementById('username').value = m.username;
+      document.getElementById('phone').value = m.phone || '';
+      document.getElementById('role').value = m.role;
+    }, { onlyOnce: true });
+  }
 
-    if (isEdit && existing.role === ROLE_DEVELOPER) {
-      alert("لا يمكن تعديل صلاحية مطور النظام.");
-      return;
-    }
-
-    const payload = {
-      fullName: data.fullName.trim(),
-      username: data.username.trim(),
-      phone: data.phone.trim(),
-      role: isEdit ? (existing.role === ROLE_DEVELOPER ? ROLE_DEVELOPER : data.role) : data.role
+  document.getElementById('save-member').onclick = async () => {
+    // سيتم التعامل مع كلمة المرور في auth.js لاحقاً (هنا فقط بيانات الملف الشخصي)
+    const memberData = {
+      username: document.getElementById('username').value,
+      phone: document.getElementById('phone').value,
+      role: document.getElementById('role').value
     };
-
-    try {
-      if (isEdit) {
-        await updateDoc(doc(db, "members", existing.uid), payload);
-      } else {
-        const uid = "manual-" + Date.now();
-        await setDoc(doc(db, "members", uid), {
-          uid,
-          ...payload,
-          createdAt: new Date().toISOString()
-        });
-      }
-
-      container.classList.add("hidden");
-      await loadMembers();
-
-    } catch (err) {
-      console.error(err);
-      alert("حدث خطأ أثناء حفظ بيانات العضو.");
-    }
-  });
-}
-
-// ===============================
-// عرض عضو داخل أكورديون
-// ===============================
-
-function renderMemberItem(data) {
-  const user = currentUserProfile;
-  const canManage = canManageUsers(user.role);
-
-  if (!canManage && data.uid !== user.uid) return null;
-
-  const item = document.createElement("div");
-  item.className = "accordion-item";
-
-  const header = document.createElement("div");
-  header.className = "accordion-header";
-
-  const headerMain = document.createElement("div");
-  headerMain.className = "accordion-header-main";
-
-  const title = document.createElement("div");
-  title.className = "accordion-title";
-  title.textContent = `${data.fullName}`;
-
-  const subtitle = document.createElement("div");
-  subtitle.className = "accordion-subtitle";
-  subtitle.textContent = `${data.username}`;
-
-  const meta = document.createElement("div");
-  meta.className = "accordion-meta";
-  meta.textContent = ROLE_LABELS[data.role];
-
-  headerMain.appendChild(title);
-  headerMain.appendChild(subtitle);
-  headerMain.appendChild(meta);
-
-  const toggle = document.createElement("div");
-  toggle.className = "accordion-toggle";
-  toggle.textContent = "▼";
-
-  header.appendChild(headerMain);
-  header.appendChild(toggle);
-
-  const body = document.createElement("div");
-  body.className = "accordion-body hidden";
-
-  body.innerHTML = `
-    <div class="accordion-row">
-      <span class="label">الاسم الكامل:</span>
-      <span class="value">${data.fullName}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">اسم المستخدم:</span>
-      <span class="value">${data.username}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">الهاتف:</span>
-      <span class="value">${data.phone}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">الصلاحية:</span>
-      <span class="value ${ROLE_CLASS[data.role]}">${ROLE_LABELS[data.role]}</span>
-    </div>
-  `;
-
-  // أزرار
-  const actions = document.createElement("div");
-  actions.className = "accordion-actions";
-
-  // مشاركة
-  const shareBtn = document.createElement("button");
-  shareBtn.className = "btn-secondary";
-  shareBtn.textContent = "📤 مشاركة";
-  shareBtn.addEventListener("click", () => {
-    const text = `
-بيانات عضو
-الاسم: ${data.fullName}
-اسم المستخدم: ${data.username}
-الهاتف: ${data.phone}
-الصلاحية: ${ROLE_LABELS[data.role]}
-    `.trim();
-
-    if (navigator.share) {
-      navigator.share({ text }).catch(() => {});
+    if (editKey) {
+      update(ref(db, 'members/' + editKey), memberData);
     } else {
-      navigator.clipboard.writeText(text);
-      alert("تم نسخ بيانات العضو.");
+      // للجديد يحتاج تسجيل auth أولاً (يمكن للمطور فقط)
+      alert('لإضافة عضو جديد، استخدم تسجيل الدخول أول مرة ثم قم بتعديل الصلاحية');
     }
-  });
-
-  // طباعة
-  const printBtn = document.createElement("button");
-  printBtn.className = "btn-secondary";
-  printBtn.textContent = "🖨 طباعة";
-  printBtn.addEventListener("click", () => {
-    const w = window.open("", "_blank");
-    w.document.write(`
-      <html dir="rtl"><body>
-      <h2>بيانات عضو</h2>
-      <p>الاسم: ${data.fullName}</p>
-      <p>اسم المستخدم: ${data.username}</p>
-      <p>الهاتف: ${data.phone}</p>
-      <p>الصلاحية: ${ROLE_LABELS[data.role]}</p>
-      </body></html>
-    `);
-    w.document.close();
-    w.print();
-  });
-
-  actions.appendChild(shareBtn);
-  actions.appendChild(printBtn);
-
-  // تعديل
-  if (canManage) {
-    const editBtn = document.createElement("button");
-    editBtn.className = "btn-primary";
-    editBtn.textContent = "✏ تعديل";
-    editBtn.addEventListener("click", () => {
-      renderMemberForm(data);
-    });
-    actions.appendChild(editBtn);
-  }
-
-  // حذف
-  if (canManage && data.role !== ROLE_DEVELOPER) {
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn-danger";
-    deleteBtn.textContent = "🗑 حذف";
-    deleteBtn.addEventListener("click", async () => {
-      if (!confirm("هل أنت متأكد من حذف العضو؟")) return;
-      await deleteDoc(doc(db, "members", data.uid));
-      await loadMembers();
-    });
-    actions.appendChild(deleteBtn);
-  }
-
-  body.appendChild(actions);
-
-  // فتح/إغلاق
-  header.addEventListener("click", () => {
-    const isHidden = body.classList.contains("hidden");
-    body.classList.toggle("hidden", !isHidden);
-    toggle.textContent = isHidden ? "▲" : "▼";
-  });
-
-  item.appendChild(header);
-  item.appendChild(body);
-
-  return item;
+    loadMembers();
+  };
 }
 
-// ===============================
-// تحميل الأعضاء
-// ===============================
-
-export async function loadMembers() {
-  const list = document.getElementById("membersList");
-  if (!list) return;
-
-  list.innerHTML = "";
-
-  try {
-    const q = query(collection(db, "members"), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
-
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      const item = renderMemberItem(data);
-      if (item) list.appendChild(item);
-    });
-
-    if (!list.children.length) {
-      list.innerHTML = "<p>لا توجد بيانات أعضاء.</p>";
-    }
-
-    document.dispatchEvent(new CustomEvent("members-loaded"));
-
-  } catch (err) {
-    console.error(err);
-    list.innerHTML = "<p>تعذر تحميل بيانات الأعضاء.</p>";
-  }
-}
-
-// ===============================
-// عند جاهزية المستخدم
-// ===============================
-
-document.addEventListener("user-ready", () => {
-  renderMembersUI();
-  loadMembers();
-});
+window.editMember = (key) => openMemberForm(key);
+window.deleteMember = (key) => { if (confirm('حذف العضو؟')) remove(ref(db, 'members/' + key)); };
