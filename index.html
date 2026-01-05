@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>نظام إدارة حركة وعهدة السيارات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- أيقونة الموقع -->
+  <link rel="icon" type="image/png" href="logo.png" />
+
+  <!-- نمط CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- ميتا PWA لأيفون -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="logo.png" />
+
+</head>
+<body>
+
+  <!-- زر تحديث يدوي في الهيدر -->
+  <header class="app-header">
+    <div class="header-left">
+      <img src="logo.png" alt="Logo" class="logo" />
+      <div>
+        <h1 class="app-title">نظام إدارة حركة وعهدة السيارات</h1>
+        <p class="app-subtitle">صلاحيات (مطور النظام، مدير، مشرف، عضو)</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <button id="refreshAppBtn" class="btn btn-secondary">
+        🔄 تحديث
+      </button>
+      <button id="logoutBtn" class="btn btn-danger" style="display:none;">
+        تسجيل خروج
+      </button>
+    </div>
+  </header>
+
+  <!-- شاشة التحميل السريع -->
+  <div id="loadingOverlay" class="overlay overlay-visible">
+    <div class="overlay-content">
+      <div class="loader"></div>
+      <p>جاري تحميل النظام...</p>
+    </div>
+  </div>
+
+  <!-- شاشة الدخول / التسجيل -->
+  <main id="authView" class="auth-view">
+    <div class="card auth-card">
+      <h2 class="card-title">تسجيل الدخول</h2>
+      <div class="tabs">
+        <button class="tab-button tab-active" data-auth-tab="login">دخول</button>
+        <button class="tab-button" data-auth-tab="register">تسجيل جديد</button>
+      </div>
+
+      <!-- نموذج الدخول -->
+      <form id="loginForm" class="form" data-tab="login">
+        <div class="form-group">
+          <label for="loginUsername">اسم المستخدم</label>
+          <input type="text" id="loginUsername" required minlength="4" />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">كلمة المرور</label>
+          <input type="password" id="loginPassword" required minlength="6" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">دخول</button>
+      </form>
+
+      <!-- نموذج التسجيل -->
+      <form id="registerForm" class="form hidden" data-tab="register">
+        <div class="form-group">
+          <label for="registerFullName">اسم العضو</label>
+          <input type="text" id="registerFullName" required />
+        </div>
+        <div class="form-group">
+          <label for="registerUsername">اسم المستخدم (4 أحرف على الأقل)</label>
+          <input type="text" id="registerUsername" required minlength="4" />
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">كلمة المرور (6 خانات على الأقل)</label>
+          <input type="password" id="registerPassword" required minlength="6" />
+        </div>
+        <div class="form-group">
+          <label for="registerPhone">وسيلة الاتصال (10 أرقام)</label>
+          <input type="tel" id="registerPhone" pattern="[0-9]{10}" required />
+        </div>
+        <p class="hint-text">
+          أول عضو يتم تسجيله في النظام سيُمنح صلاحية <strong>مطور النظام</strong> تلقائيًا (بدون أي تنويه على الواجهة).
+        </p>
+        <button type="submit" class="btn btn-primary btn-full">تسجيل</button>
+      </form>
+
+      <p id="authMessage" class="message"></p>
+    </div>
+  </main>
+
+  <!-- واجهة النظام بعد تسجيل الدخول -->
+  <main id="appView" class="app-view hidden">
+
+    <!-- شريط معلومات المستخدم -->
+    <section class="user-bar">
+      <div>
+        <span id="currentUserName"></span> -
+        <span id="currentUserRoleBadge" class="role-badge"></span>
+      </div>
+      <div>
+        <input type="search" id="globalSearchInput" placeholder="بحث في جميع الأقسام..." />
+      </div>
+    </section>
+
+    <!-- تبويبات الأقسام -->
+    <nav class="tabs main-tabs">
+      <button class="tab-button main-tab-button tab-active" data-main-tab="movements">الحركة</button>
+      <button class="tab-button main-tab-button" data-main-tab="custody">العهدة</button>
+      <button class="tab-button main-tab-button" data-main-tab="fleet">الأسطول</button>
+      <button class="tab-button main-tab-button" data-main-tab="members">الأعضاء</button>
+      <button class="tab-button main-tab-button" data-main-tab="stats">الإحصائيات</button>
+    </nav>
+
+    <!-- قسم حركة السيارات -->
+    <section id="movementsTab" class="tab-content">
+      <div class="tab-header">
+        <h2>حركة السيارات</h2>
+        <button id="addMovementBtn" class="btn btn-primary">➕ إضافة حركة</button>
+      </div>
+
+      <div id="movementFormContainer" class="card collapsible hidden"></div>
+
+      <div id="movementsList" class="accordion-list"></div>
+    </section>
+
+    <!-- قسم العهدة -->
+    <section id="custodyTab" class="tab-content hidden">
+      <div class="tab-header">
+        <h2>العهدة</h2>
+        <button id="addCustodyBtn" class="btn btn-primary">➕ إضافة عهدة</button>
+      </div>
+
+      <div id="custodyFormContainer" class="card collapsible hidden"></div>
+
+      <div id="custodyList" class="accordion-list"></div>
+    </section>
+
+    <!-- قسم الأسطول -->
+    <section id="fleetTab" class="tab-content hidden">
+      <div class="tab-header">
+        <h2>الأسطول</h2>
+        <button id="addFleetBtn" class="btn btn-primary">➕ إضافة سيارة</button>
+      </div>
+
+      <div id="fleetFormContainer" class="card collapsible hidden"></div>
+
+      <div id="fleetList" class="accordion-list"></div>
+    </section>
+
+    <!-- قسم الأعضاء -->
+    <section id="membersTab" class="tab-content hidden">
+      <div class="tab-header">
+        <h2>الأعضاء</h2>
+        <button id="addMemberBtn" class="btn btn-primary">➕ إضافة عضو</button>
+      </div>
+
+      <div id="memberFormContainer" class="card collapsible hidden"></div>
+
+      <div id="membersList" class="accordion-list"></div>
+    </section>
+
+    <!-- قسم الإحصائيات -->
+    <section id="statsTab" class="tab-content hidden">
+      <div class="tab-header">
+        <h2>الإحصائيات</h2>
+      </div>
+
+      <div class="card">
+        <div class="form-inline">
+          <label for="statsPeriod">الفترة:</label>
+          <select id="statsPeriod">
+            <option value="day">اليوم</option>
+            <option value="week">الأسبوع</option>
+            <option value="month">الشهر</option>
+            <option value="year">السنة</option>
+            <option value="all">كل المدة</option>
+          </select>
+          <button id="loadStatsBtn" class="btn btn-secondary">عرض</button>
+          <button id="printStatsBtn" class="btn btn-secondary">🖨 طباعة</button>
+        </div>
+        <div id="statsContent"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- فوتر -->
+  <footer class="app-footer">
+    <p>
+      جميع الحقوق محفوظة &copy;
+      <span id="currentYear"></span> -
+      تم التطوير والبرمجة بواسطة MOHAMED SAAD
+    </p>
+  </footer>
+
+  <!-- مكتبات Firebase CDN (Modular SDK) -->
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="roles.js"></script>
+  <script type="module" src="movements.js"></script>
+  <script type="module" src="custody.js"></script>
+  <script type="module" src="fleet.js"></script>
+  <script type="module" src="members.js"></script>
+  <script type="module" src="stats.js"></script>
+  <script type="module" src="search.js"></script>
+  <script type="module" src="app.js"></script>
+
+</body>
+</html>
