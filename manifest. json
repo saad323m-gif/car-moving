@@ -1,12 +1,13 @@
 {
-  "name": "نظام إدارة حركة وعهدة السيارات",
-  "short_name": "حركة السيارات",
+  "name": "AL MASAOOD - Car Management",
+  "short_name": "Car System",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#0f172a",
-  "theme_color": "#1e3c72",
+  "theme_color": "#1e3a8a",
+  "description": "نظام تسجيل وإدارة السيارات - مجموعة المسعود",
   "icons": [
     {
       "src": "logo.png",
