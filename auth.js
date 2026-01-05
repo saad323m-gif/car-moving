@@ -1,17 +1,21 @@
 // auth.js
+// ===============================
+// نظام الدخول والتسجيل + تحميل بروفايل المستخدم
+// ===============================
+
 import {
   auth,
   db,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
   collection,
   doc,
   getDoc,
   getDocs,
-  setDoc,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-  updateProfile
+  setDoc
 } from "./firebase.js";
 
 import {
@@ -23,54 +27,68 @@ import {
 
 // عناصر الواجهة
 const authView = document.getElementById("authView");
+const appHeader = document.getElementById("appHeader");
 const appView = document.getElementById("appView");
-const loadingOverlay = document.getElementById("loadingOverlay");
 const logoutBtn = document.getElementById("logoutBtn");
 const authMessage = document.getElementById("authMessage");
-const currentUserNameSpan = document.getElementById("currentUserName");
-const currentUserRoleBadge = document.getElementById("currentUserRoleBadge");
 
-const authTabs = document.querySelectorAll(".auth-card .tab-button");
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 
-// حالة المستخدم الحالي
+const authTabs = document.querySelectorAll(".auth-tab");
+
+const currentUserName = document.getElementById("currentUserName");
+const currentUserRole = document.getElementById("currentUserRole");
+
+// حالة المستخدم الحالية
 export let currentUserProfile = null;
 
-// تبديل تبويبات الدخول/التسجيل
+// ===============================
+// تبديل تبويبات الدخول / التسجيل
+// ===============================
+
 authTabs.forEach(btn => {
   btn.addEventListener("click", () => {
-    authTabs.forEach(b => b.classList.remove("tab-active"));
-    btn.classList.add("tab-active");
+    authTabs.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
 
-    const tab = btn.dataset.authTab;
+    const tab = btn.dataset.tab;
+
     if (tab === "login") {
       loginForm.classList.remove("hidden");
       registerForm.classList.add("hidden");
-      authMessage.textContent = "";
     } else {
       loginForm.classList.add("hidden");
       registerForm.classList.remove("hidden");
-      authMessage.textContent = "";
     }
+
+    authMessage.textContent = "";
   });
 });
 
-// توليد إيميل وهمي من اسم المستخدم لاستخدام Auth
+// ===============================
+// تحويل اسم المستخدم إلى إيميل وهمي
+// ===============================
+
 function usernameToEmail(username) {
-  return `${username.toLowerCase()}@local.car-app`;
+  return `${username.toLowerCase()}@local.app`;
 }
 
-// فحص إن كان هناك أي مستخدمين في النظام
+// ===============================
+// هل هذا أول مستخدم في النظام؟
+// ===============================
+
 async function isFirstUser() {
   const snap = await getDocs(collection(db, "members"));
   return snap.empty;
 }
 
-// إنشاء بروفايل عضو في مجموعة members
+// ===============================
+// إنشاء بروفايل عضو في Firestore
+// ===============================
+
 async function createMemberProfile(uid, fullName, username, phone, role) {
-  const ref = doc(db, "members", uid);
-  await setDoc(ref, {
+  await setDoc(doc(db, "members", uid), {
     uid,
     fullName,
     username,
@@ -80,15 +98,20 @@ async function createMemberProfile(uid, fullName, username, phone, role) {
   });
 }
 
+// ===============================
 // تحميل بروفايل عضو
+// ===============================
+
 async function loadMemberProfile(uid) {
   const ref = doc(db, "members", uid);
   const snap = await getDoc(ref);
-  if (!snap.exists()) return null;
-  return snap.data();
+  return snap.exists() ? snap.data() : null;
 }
 
+// ===============================
 // تسجيل جديد
+// ===============================
+
 registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   authMessage.textContent = "";
@@ -104,8 +127,6 @@ registerForm.addEventListener("submit", async (e) => {
   }
 
   try {
-    loadingOverlay.classList.add("overlay-visible");
-
     const email = usernameToEmail(username);
     const first = await isFirstUser();
     const role = first ? ROLE_DEVELOPER : ROLE_MEMBER;
@@ -119,14 +140,15 @@ registerForm.addEventListener("submit", async (e) => {
     authMessage.textContent = "تم التسجيل بنجاح، جاري تسجيل الدخول...";
   } catch (err) {
     console.error(err);
-    authMessage.style.color = "#d9534f";
+    authMessage.style.color = "#dc2626";
     authMessage.textContent = "حدث خطأ أثناء التسجيل.";
-  } finally {
-    loadingOverlay.classList.remove("overlay-visible");
   }
 });
 
+// ===============================
 // تسجيل الدخول
+// ===============================
+
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   authMessage.textContent = "";
@@ -140,57 +162,55 @@ loginForm.addEventListener("submit", async (e) => {
   }
 
   try {
-    loadingOverlay.classList.add("overlay-visible");
     const email = usernameToEmail(username);
     await signInWithEmailAndPassword(auth, email, password);
   } catch (err) {
     console.error(err);
     authMessage.textContent = "بيانات الدخول غير صحيحة.";
-  } finally {
-    loadingOverlay.classList.remove("overlay-visible");
   }
 });
 
+// ===============================
 // تسجيل خروج
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", async () => {
-    await signOut(auth);
-  });
-}
+// ===============================
 
+logoutBtn.addEventListener("click", async () => {
+  await signOut(auth);
+});
+
+// ===============================
 // مراقبة حالة تسجيل الدخول
+// ===============================
+
 onAuthStateChanged(auth, async (user) => {
-  loadingOverlay.classList.remove("overlay-visible");
   if (user) {
     // تحميل بروفايل العضو
     currentUserProfile = await loadMemberProfile(user.uid);
 
     if (!currentUserProfile) {
-      // إن لم يوجد بروفايل، نغلق الجلسة احتياطاً
       await signOut(auth);
-      authMessage.textContent = "حدث خلل في بيانات الحساب، يرجى المحاولة مجدداً.";
+      authMessage.textContent = "حدث خلل في بيانات الحساب.";
       return;
     }
 
+    // إظهار واجهة التطبيق
     authView.classList.add("hidden");
+    appHeader.classList.remove("hidden");
     appView.classList.remove("hidden");
-    logoutBtn.style.display = "inline-flex";
 
     // عرض الاسم والصلاحية
-    currentUserNameSpan.textContent = currentUserProfile.fullName;
-    const role = currentUserProfile.role;
-    currentUserRoleBadge.textContent = ROLE_LABELS[role] || "";
-    currentUserRoleBadge.className = `role-badge ${ROLE_CLASS[role] || ""}`;
+    currentUserName.textContent = currentUserProfile.fullName;
+    currentUserRole.textContent = ROLE_LABELS[currentUserProfile.role];
+    currentUserRole.className = `role-badge ${ROLE_CLASS[currentUserProfile.role]}`;
 
+    // إعلام بقية الملفات أن المستخدم جاهز
     document.dispatchEvent(new CustomEvent("user-ready", { detail: currentUserProfile }));
 
   } else {
+    // العودة لشاشة الدخول
     currentUserProfile = null;
     authView.classList.remove("hidden");
+    appHeader.classList.add("hidden");
     appView.classList.add("hidden");
-    logoutBtn.style.display = "none";
-    currentUserNameSpan.textContent = "";
-    currentUserRoleBadge.textContent = "";
-    currentUserRoleBadge.className = "role-badge";
   }
 });
