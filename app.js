@@ -1,14 +1,20 @@
 // app.js
+// ===============================
+// إدارة التبويبات + الهيدر + التحديث + PWA
+// ===============================
 
-// سنة الفوتر
+// ضبط سنة الفوتر
 const yearSpan = document.getElementById("currentYear");
 if (yearSpan) {
   yearSpan.textContent = new Date().getFullYear().toString();
 }
 
-// تبويبات رئيسية
-const mainTabButtons = document.querySelectorAll(".main-tab-button");
-const mainTabs = {
+// ===============================
+// التبويبات الرئيسية
+// ===============================
+
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabContents = {
   movements: document.getElementById("movementsTab"),
   custody: document.getElementById("custodyTab"),
   fleet: document.getElementById("fleetTab"),
@@ -16,20 +22,28 @@ const mainTabs = {
   stats: document.getElementById("statsTab")
 };
 
-mainTabButtons.forEach((btn) => {
+tabButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    mainTabButtons.forEach((b) => b.classList.remove("tab-active"));
-    btn.classList.add("tab-active");
+    // إزالة التفعيل من كل الأزرار
+    tabButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
 
-    const tabKey = btn.dataset.mainTab;
-    Object.keys(mainTabs).forEach((k) => {
-      if (!mainTabs[k]) return;
-      mainTabs[k].classList.toggle("hidden", k !== tabKey);
+    const tab = btn.dataset.tab;
+
+    // إخفاء كل التبويبات
+    Object.keys(tabContents).forEach(key => {
+      tabContents[key].classList.add("hidden");
     });
+
+    // إظهار التبويب المطلوب
+    tabContents[tab].classList.remove("hidden");
   });
 });
 
+// ===============================
 // زر التحديث اليدوي
+// ===============================
+
 const refreshAppBtn = document.getElementById("refreshAppBtn");
 if (refreshAppBtn) {
   refreshAppBtn.addEventListener("click", () => {
@@ -37,24 +51,33 @@ if (refreshAppBtn) {
   });
 }
 
-// إعادة تحميل قوية عند فتح الصفحة لأول مرة (مرة واحدة فقط لكل متصفح)
+// ===============================
+// إعادة تحميل قوية مرة واحدة فقط
+// ===============================
+
 window.addEventListener("load", () => {
   const key = "car-moving-force-reload-v1";
   const hasReloaded = localStorage.getItem(key);
+
   if (!hasReloaded) {
     localStorage.setItem(key, "1");
     location.reload();
   }
 });
 
-// تسجيل Service Worker لـ PWA
+// ===============================
+// تسجيل Service Worker لتفعيل PWA
+// ===============================
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("./sw.js")
       .then(() => {
-        // لا نعرض رسائل، فقط هدوء
+        // تم التسجيل بنجاح (بدون رسائل)
       })
-      .catch(() => {});
+      .catch(() => {
+        // فشل التسجيل (نتجاهله)
+      });
   });
 }
