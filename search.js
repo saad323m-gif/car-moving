@@ -1,42 +1,34 @@
-// search.js
-// ===============================
-// البحث الشامل في كل التبويبات
-// ===============================
+import { db, ref, onValue } from "./firebase.js";
 
-// عنصر البحث
-const searchInput = document.getElementById("globalSearchInput");
+export function initGlobalSearch(role, uid) {
+  document.getElementById('global-search').oninput = (e) => {
+    const query = e.target.value.trim().toLowerCase();
+    if (query.length < 2) {
+      document.getElementById('content').innerHTML = '';
+      return;
+    }
 
-// ===============================
-// دالة البحث العامة
-// ===============================
+    const results = [];
+    const content = document.getElementById('content');
 
-function applySearch() {
-  const term = searchInput.value.trim().toLowerCase();
+    // بحث في الحركات
+    onValue(ref(db, 'movements'), (snap) => {
+      snap.forEach(child => {
+        const m = child.val();
+        if (role === 'عضو' && m.driverUid !== uid) return;
+        const text = `${m.driverName} ${m.carNumber} ${m.plateCode} ${m.carType} ${m.notes}`.toLowerCase();
+        if (text.includes(query)) {
+          results.push(`<p>حركة: ${m.driverName} - ${m.carNumber} (${m.type === 'receive' ? 'استلام' : 'تسليم'})</p>`);
+        }
+      });
+      displayResults();
+    }, { onlyOnce: true });
 
-  // كل عناصر الأكورديون في كل التبويبات
-  const allItems = document.querySelectorAll(".accordion-item");
+    // بحث في العهدة والأسطول والأعضاء بنفس الطريقة...
+    // (يمكن توسيعها لاحقاً)
 
-  allItems.forEach((item) => {
-    const text = item.textContent.toLowerCase();
-    const match = text.includes(term);
-
-    item.style.display = match ? "" : "none";
-  });
+    function displayResults() {
+      content.innerHTML = `<h3>نتائج البحث عن "${query}"</h3>` + results.join('');
+    }
+  };
 }
-
-// ===============================
-// تشغيل البحث أثناء الكتابة
-// ===============================
-
-if (searchInput) {
-  searchInput.addEventListener("input", applySearch);
-}
-
-// ===============================
-// إعادة تطبيق البحث بعد تحميل أي تبويب
-// ===============================
-
-document.addEventListener("movements-loaded", applySearch);
-document.addEventListener("custody-loaded", applySearch);
-document.addEventListener("fleet-loaded", applySearch);
-document.addEventListener("members-loaded", applySearch);
