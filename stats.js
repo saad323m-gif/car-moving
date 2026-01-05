@@ -1,227 +1,63 @@
-// stats.js
-// ===============================
-// الإحصائيات (اليوم – الأسبوع – الشهر)
-// ===============================
+import { db, ref, onValue } from "./firebase.js";
 
-import {
-  db,
-  collection,
-  getDocs,
-  query,
-  orderBy
-} from "./firebase.js";
+export function loadStats(role) {
+  if (!['مطور','مدير','مشرف'].includes(role)) return;
 
-import { currentUserProfile } from "./auth.js";
-import { canSeeStats } from "./roles.js";
-
-// عناصر الواجهة
-const statsTab = document.getElementById("statsTab");
-
-// ===============================
-// حساب بداية اليوم / الأسبوع / الشهر
-// ===============================
-
-function getStartOfDay() {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function getStartOfWeek() {
-  const d = new Date();
-  const day = d.getDay(); // 0 = الأحد
-  const diff = d.getDate() - day;
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function getStartOfMonth() {
-  const d = new Date();
-  d.setDate(1);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-// ===============================
-// بناء واجهة الإحصائيات
-// ===============================
-
-function renderStatsUI() {
-  const canSeeAll = canSeeStats(currentUserProfile.role);
-
-  statsTab.innerHTML = `
-    <div class="tab-inner-header">
-      <h3>الإحصائيات</h3>
-    </div>
-
-    <div class="tab-content">
-
-      <label>الفترة</label>
-      <select id="statsPeriod">
-        <option value="day">اليوم</option>
-        <option value="week">هذا الأسبوع</option>
-        <option value="month">هذا الشهر</option>
-      </select>
-
-      ${
-        canSeeAll
-          ? `
-      <label style="margin-top:0.6rem;">تصفية حسب المستخدم</label>
-      <input type="text" id="statsUserFilter" placeholder="اكتب اسم المستخدم..." />
-      `
-          : ""
-      }
-
-      <button id="loadStatsBtn" class="btn-primary" style="margin-top:0.8rem;">عرض الإحصائيات</button>
-
-      <div id="statsResults" style="margin-top:1rem;"></div>
-
-    </div>
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <h2>الإحصائيات</h2>
+    <select id="period">
+      <option value="day">اليوم</option>
+      <option value="week">أسبوع</option>
+      <option value="month">شهر</option>
+      <option value="year">سنة</option>
+    </select>
+    <button class="action-btn" id="print-stats">🖨 طباعة الإحصائيات</button>
+    <div id="stats-content"></div>
   `;
 
-  document.getElementById("loadStatsBtn").addEventListener("click", loadStats);
-}
+  document.getElementById('period').onchange = () => calculateStats();
+  document.getElementById('print-stats').onclick = () => window.print();
+  calculateStats();
 
-// ===============================
-// تحميل الإحصائيات
-// ===============================
+  function calculateStats() {
+    const period = document.getElementById('period').value;
+    const now = Date.now();
+    const start = {
+      day: now - 24*60*60*1000,
+      week: now - 7*24*60*60*1000,
+      month: now - 30*24*60*60*1000,
+      year: now - 365*24*60*60*1000
+    }[period];
 
-async function loadStats() {
-  const period = document.getElementById("statsPeriod").value;
-  const userFilter = document.getElementById("statsUserFilter")?.value.trim().toLowerCase();
+    let movementsCount = 0, receiveCount = 0, deliverCount = 0;
+    let membersCount = 0, carsInCustody = 0, fleetCount = 0;
 
-  const results = document.getElementById("statsResults");
-  results.innerHTML = "جاري التحميل...";
-
-  let startDate;
-
-  if (period === "day") startDate = getStartOfDay();
-  if (period === "week") startDate = getStartOfWeek();
-  if (period === "month") startDate = getStartOfMonth();
-
-  try {
-    // تحميل كل البيانات
-    const movementsSnap = await getDocs(query(collection(db, "movements"), orderBy("createdAt", "desc")));
-    const custodySnap = await getDocs(query(collection(db, "custody"), orderBy("createdAt", "desc")));
-    const fleetSnap = await getDocs(query(collection(db, "fleet"), orderBy("createdAt", "desc")));
-    const membersSnap = await getDocs(query(collection(db, "members"), orderBy("createdAt", "desc")));
-
-    // ===============================
-    // تصفية حسب الفترة
-    // ===============================
-
-    const filterByDate = (snap) =>
-      snap.docs.filter((d) => {
-        const data = d.data();
-        if (!data.createdAt) return false;
-        const created = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
-        return created >= startDate;
+    onValue(ref(db, 'movements'), (snap) => {
+      movementsCount = 0; receiveCount = 0; deliverCount = 0;
+      snap.forEach(child => {
+        if (child.val().timestamp >= start) {
+          movementsCount++;
+          if (child.val().type === 'receive') receiveCount++;
+          else deliverCount++;
+        }
       });
+      display();
+    }, { onlyOnce: true });
 
-    let movements = filterByDate(movementsSnap);
-    let custody = filterByDate(custodySnap);
-    let fleet = filterByDate(fleetSnap);
-    let members = filterByDate(membersSnap);
+    onValue(ref(db, 'members'), (snap) => { membersCount = snap.numChildren(); display(); }, { onlyOnce: true });
+    onValue(ref(db, 'custody'), (snap) => { carsInCustody = snap.numChildren(); display(); }, { onlyOnce: true });
+    onValue(ref(db, 'fleet'), (snap) => { fleetCount = snap.numChildren(); display(); }, { onlyOnce: true });
 
-    // ===============================
-    // تصفية حسب المستخدم (للمدير/المشرف/المطور فقط)
-    // ===============================
-
-    if (userFilter) {
-      movements = movements.filter((d) =>
-        d.data().createdByName.toLowerCase().includes(userFilter)
-      );
-
-      custody = custody.filter((d) =>
-        d.data().custodianName.toLowerCase().includes(userFilter)
-      );
+    function display() {
+      document.getElementById('stats-content').innerHTML = `
+        <h3>إحصائيات ${period === 'day' ? 'اليوم' : period === 'week' ? 'الأسبوع' : period === 'month' ? 'الشهر' : 'السنة'}</h3>
+        <p>عدد الحركات: ${movementsCount}</p>
+        <p>استلام: ${receiveCount} | تسليم: ${deliverCount}</p>
+        <p>عدد الأعضاء: ${membersCount}</p>
+        <p>سيارات في العهدة: ${carsInCustody}</p>
+        <p>إجمالي الأسطول: ${fleetCount}</p>
+      `;
     }
-
-    // ===============================
-    // عرض النتائج
-    // ===============================
-
-    results.innerHTML = `
-      <div class="accordion-list">
-
-        <div class="accordion-item">
-          <div class="accordion-header">
-            <div class="accordion-header-main">
-              <div class="accordion-title">عدد الحركات</div>
-              <div class="accordion-subtitle">${movements.length}</div>
-            </div>
-            <div class="accordion-toggle">▼</div>
-          </div>
-          <div class="accordion-body hidden">
-            <p>عدد الحركات المسجلة خلال الفترة المختارة: ${movements.length}</p>
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <div class="accordion-header">
-            <div class="accordion-header-main">
-              <div class="accordion-title">عدد العهد</div>
-              <div class="accordion-subtitle">${custody.length}</div>
-            </div>
-            <div class="accordion-toggle">▼</div>
-          </div>
-          <div class="accordion-body hidden">
-            <p>عدد العهد المسجلة خلال الفترة المختارة: ${custody.length}</p>
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <div class="accordion-header">
-            <div class="accordion-header-main">
-              <div class="accordion-title">عدد السيارات</div>
-              <div class="accordion-subtitle">${fleet.length}</div>
-            </div>
-            <div class="accordion-toggle">▼</div>
-          </div>
-          <div class="accordion-body hidden">
-            <p>عدد السيارات المضافة خلال الفترة المختارة: ${fleet.length}</p>
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <div class="accordion-header">
-            <div class="accordion-header-main">
-              <div class="accordion-title">عدد الأعضاء</div>
-              <div class="accordion-subtitle">${members.length}</div>
-            </div>
-            <div class="accordion-toggle">▼</div>
-          </div>
-          <div class="accordion-body hidden">
-            <p>عدد الأعضاء المسجلين خلال الفترة المختارة: ${members.length}</p>
-          </div>
-        </div>
-
-      </div>
-    `;
-
-    // تفعيل الأكورديون
-    results.querySelectorAll(".accordion-header").forEach((header) => {
-      const body = header.nextElementSibling;
-      const toggle = header.querySelector(".accordion-toggle");
-
-      header.addEventListener("click", () => {
-        const isHidden = body.classList.contains("hidden");
-        body.classList.toggle("hidden", !isHidden);
-        toggle.textContent = isHidden ? "▲" : "▼";
-      });
-    });
-
-  } catch (err) {
-    console.error(err);
-    results.innerHTML = "<p>تعذر تحميل الإحصائيات.</p>";
   }
 }
-
-// ===============================
-// عند جاهزية المستخدم
-// ===============================
-
-document.addEventListener("user-ready", () => {
-  renderStatsUI();
-});
