@@ -1,216 +1,65 @@
-// auth.js
-// ===============================
-// نظام الدخول والتسجيل + تحميل بروفايل المستخدم
-// ===============================
+import { auth, db, ref, onValue, set, push, createUser, signIn, onAuthStateChanged, signOut } from "./firebase.js";
 
-import {
-  auth,
-  db,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc
-} from "./firebase.js";
+let currentUser = null;
+let userRole = 'عضو'; // افتراضي
 
-import {
-  ROLE_DEVELOPER,
-  ROLE_MEMBER,
-  ROLE_LABELS,
-  ROLE_CLASS
-} from "./roles.js";
-
-// عناصر الواجهة
-const authView = document.getElementById("authView");
-const appHeader = document.getElementById("appHeader");
-const appView = document.getElementById("appView");
-const logoutBtn = document.getElementById("logoutBtn");
-const authMessage = document.getElementById("authMessage");
-
-const loginForm = document.getElementById("loginForm");
-const registerForm = document.getElementById("registerForm");
-
-const authTabs = document.querySelectorAll(".auth-tab");
-
-const currentUserName = document.getElementById("currentUserName");
-const currentUserRole = document.getElementById("currentUserRole");
-
-// حالة المستخدم الحالية
-export let currentUserProfile = null;
-
-// ===============================
-// تبديل تبويبات الدخول / التسجيل
-// ===============================
-
-authTabs.forEach(btn => {
-  btn.addEventListener("click", () => {
-    authTabs.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    const tab = btn.dataset.tab;
-
-    if (tab === "login") {
-      loginForm.classList.remove("hidden");
-      registerForm.classList.add("hidden");
+export function initAuth() {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+      const userRef = ref(db, 'members/' + user.uid);
+      onValue(userRef, (snap) => {
+        const data = snap.val();
+        if (data) {
+          userRole = data.role || 'عضو';
+          showApp();
+          loadRoleFeatures();
+        }
+      });
     } else {
-      loginForm.classList.add("hidden");
-      registerForm.classList.remove("hidden");
+      showLogin();
     }
-
-    authMessage.textContent = "";
-  });
-});
-
-// ===============================
-// تحويل اسم المستخدم إلى إيميل وهمي
-// ===============================
-
-function usernameToEmail(username) {
-  return `${username.toLowerCase()}@local.app`;
-}
-
-// ===============================
-// هل هذا أول مستخدم في النظام؟
-// ===============================
-
-async function isFirstUser() {
-  const snap = await getDocs(collection(db, "members"));
-  return snap.empty;
-}
-
-// ===============================
-// إنشاء بروفايل عضو في Firestore
-// ===============================
-
-async function createMemberProfile(uid, fullName, username, phone, role) {
-  await setDoc(doc(db, "members", uid), {
-    uid,
-    fullName,
-    username,
-    phone,
-    role,
-    createdAt: new Date().toISOString()
   });
 }
 
-// ===============================
-// تحميل بروفايل عضو
-// ===============================
-
-async function loadMemberProfile(uid) {
-  const ref = doc(db, "members", uid);
-  const snap = await getDoc(ref);
-  return snap.exists() ? snap.data() : null;
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('logout-btn').style.display = 'block';
+  document.getElementById('user-info').innerText = `مرحباً: ${currentUser.email} - ${userRole}`;
+  document.getElementById('year').innerText = new Date().getFullYear();
 }
 
-// ===============================
-// تسجيل جديد
-// ===============================
+function showLogin() {
+  document.getElementById('auth-screen').style.display = 'block';
+  document.getElementById('app-screen').style.display = 'none';
+}
 
-registerForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  authMessage.textContent = "";
-
-  const fullName = document.getElementById("registerFullName").value.trim();
-  const username = document.getElementById("registerUsername").value.trim();
-  const password = document.getElementById("registerPassword").value.trim();
-  const phone = document.getElementById("registerPhone").value.trim();
-
-  if (username.length < 4 || password.length < 6 || phone.length !== 10) {
-    authMessage.textContent = "تحقق من صحة البيانات المدخلة.";
-    return;
-  }
-
+// تسجيل (مطور فقط في البداية)
+document.getElementById('register-btn').onclick = async () => {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  if (!username || !password) return;
   try {
-    const email = usernameToEmail(username);
-    const first = await isFirstUser();
-    const role = first ? ROLE_DEVELOPER : ROLE_MEMBER;
+    const userCred = await createUser(auth, username + '@system.com', password);
+    await set(ref(db, 'members/' + userCred.user.uid), {
+      username, role: 'مطور', phone: '', createdAt: Date.now()
+    });
+    alert('تم التسجيل كمطور');
+  } catch (e) { document.getElementById('auth-msg').innerText = e.message; }
+};
 
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(cred.user, { displayName: fullName });
-
-    await createMemberProfile(cred.user.uid, fullName, username, phone, role);
-
-    authMessage.style.color = "#16a34a";
-    authMessage.textContent = "تم التسجيل بنجاح، جاري تسجيل الدخول...";
-  } catch (err) {
-    console.error(err);
-    authMessage.style.color = "#dc2626";
-    authMessage.textContent = "حدث خطأ أثناء التسجيل.";
-  }
-});
-
-// ===============================
-// تسجيل الدخول
-// ===============================
-
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  authMessage.textContent = "";
-
-  const username = document.getElementById("loginUsername").value.trim();
-  const password = document.getElementById("loginPassword").value.trim();
-
-  if (!username || !password) {
-    authMessage.textContent = "يرجى إدخال اسم المستخدم وكلمة المرور.";
-    return;
-  }
-
+// دخول
+document.getElementById('login-btn').onclick = async () => {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
   try {
-    const email = usernameToEmail(username);
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (err) {
-    console.error(err);
-    authMessage.textContent = "بيانات الدخول غير صحيحة.";
-  }
-});
+    await signIn(auth, username + '@system.com', password);
+  } catch (e) { document.getElementById('auth-msg').innerText = e.message; }
+};
 
-// ===============================
-// تسجيل خروج
-// ===============================
+// خروج
+document.getElementById('logout-btn').onclick = () => signOut(auth);
 
-logoutBtn.addEventListener("click", async () => {
-  await signOut(auth);
-});
-
-// ===============================
-// مراقبة حالة تسجيل الدخول
-// ===============================
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    // تحميل بروفايل العضو
-    currentUserProfile = await loadMemberProfile(user.uid);
-
-    if (!currentUserProfile) {
-      await signOut(auth);
-      authMessage.textContent = "حدث خلل في بيانات الحساب.";
-      return;
-    }
-
-    // إظهار واجهة التطبيق
-    authView.classList.add("hidden");
-    appHeader.classList.remove("hidden");
-    appView.classList.remove("hidden");
-
-    // عرض الاسم والصلاحية
-    currentUserName.textContent = currentUserProfile.fullName;
-    currentUserRole.textContent = ROLE_LABELS[currentUserProfile.role];
-    currentUserRole.className = `role-badge ${ROLE_CLASS[currentUserProfile.role]}`;
-
-    // إعلام بقية الملفات أن المستخدم جاهز
-    document.dispatchEvent(new CustomEvent("user-ready", { detail: currentUserProfile }));
-
-  } else {
-    // العودة لشاشة الدخول
-    currentUserProfile = null;
-    authView.classList.remove("hidden");
-    appHeader.classList.add("hidden");
-    appView.classList.add("hidden");
-  }
-});
+// تحديث يدوي
+document.getElementById('refresh-btn').onclick = () => location.reload();
