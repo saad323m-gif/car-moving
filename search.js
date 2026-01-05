@@ -1,50 +1,42 @@
 // search.js
-const globalSearchInput = document.getElementById("globalSearchInput");
-const sections = [
-  document.getElementById("movementsList"),
-  document.getElementById("custodyList"),
-  document.getElementById("fleetList"),
-  document.getElementById("membersList")
-];
+// ===============================
+// البحث الشامل في كل التبويبات
+// ===============================
 
-function indexAccordionItems() {
-  sections.forEach((sec) => {
-    if (!sec) return;
-    const items = sec.querySelectorAll(".accordion-item");
-    items.forEach((item) => {
-      const text = item.textContent || "";
-      item.dataset.search = text.toLowerCase();
-    });
+// عنصر البحث
+const searchInput = document.getElementById("globalSearchInput");
+
+// ===============================
+// دالة البحث العامة
+// ===============================
+
+function applySearch() {
+  const term = searchInput.value.trim().toLowerCase();
+
+  // كل عناصر الأكورديون في كل التبويبات
+  const allItems = document.querySelectorAll(".accordion-item");
+
+  allItems.forEach((item) => {
+    const text = item.textContent.toLowerCase();
+    const match = text.includes(term);
+
+    item.style.display = match ? "" : "none";
   });
 }
 
-function applySearchFilter(term) {
-  const q = term.trim().toLowerCase();
-  sections.forEach((sec) => {
-    if (!sec) return;
-    const items = sec.querySelectorAll(".accordion-item");
-    items.forEach((item) => {
-      if (!q) {
-        item.style.display = "";
-        return;
-      }
-      const haystack = item.dataset.search || "";
-      item.style.display = haystack.includes(q) ? "" : "none";
-    });
-  });
+// ===============================
+// تشغيل البحث أثناء الكتابة
+// ===============================
+
+if (searchInput) {
+  searchInput.addEventListener("input", applySearch);
 }
 
-if (globalSearchInput) {
-  globalSearchInput.addEventListener("input", () => {
-    applySearchFilter(globalSearchInput.value);
-  });
-}
+// ===============================
+// إعادة تطبيق البحث بعد تحميل أي تبويب
+// ===============================
 
-["movements-loaded", "custody-loaded", "fleet-loaded", "members-loaded"].forEach(
-  (evt) => {
-    document.addEventListener(evt, () => {
-      indexAccordionItems();
-      applySearchFilter(globalSearchInput?.value || "");
-    });
-  }
-);
+document.addEventListener("movements-loaded", applySearch);
+document.addEventListener("custody-loaded", applySearch);
+document.addEventListener("fleet-loaded", applySearch);
+document.addEventListener("members-loaded", applySearch);
