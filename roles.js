@@ -1,10 +1,15 @@
 // roles.js
+// ===============================
+// تعريف الصلاحيات الأساسية للنظام
+// ===============================
 
-export const ROLE_DEVELOPER = "developer";
-export const ROLE_ADMIN = "admin";
-export const ROLE_SUPERVISOR = "supervisor";
-export const ROLE_MEMBER = "member";
+// أسماء الأدوار
+export const ROLE_DEVELOPER = "developer";   // مطور النظام
+export const ROLE_ADMIN = "admin";           // مدير
+export const ROLE_SUPERVISOR = "supervisor"; // مشرف
+export const ROLE_MEMBER = "member";         // عضو
 
+// أسماء العرض
 export const ROLE_LABELS = {
   [ROLE_DEVELOPER]: "مطور النظام",
   [ROLE_ADMIN]: "مدير",
@@ -12,6 +17,7 @@ export const ROLE_LABELS = {
   [ROLE_MEMBER]: "عضو"
 };
 
+// ألوان الشارات (CSS classes)
 export const ROLE_CLASS = {
   [ROLE_DEVELOPER]: "role-dev",
   [ROLE_ADMIN]: "role-admin",
@@ -19,27 +25,56 @@ export const ROLE_CLASS = {
   [ROLE_MEMBER]: "role-member"
 };
 
-// ترتيب القوة
+// ===============================
+// صلاحيات النظام
+// ===============================
+
+// من يستطيع إدارة الأعضاء
 export function canManageUsers(role) {
-  return [ROLE_DEVELOPER, ROLE_ADMIN].includes(role);
+  return role === ROLE_DEVELOPER || role === ROLE_ADMIN;
 }
 
-export function canManageFleet(role) {
-  return [ROLE_DEVELOPER, ROLE_ADMIN, ROLE_SUPERVISOR].includes(role);
-}
-
-export function canSeeStats(role) {
-  return [ROLE_DEVELOPER, ROLE_ADMIN, ROLE_SUPERVISOR].includes(role);
-}
-
+// من يستطيع رؤية كل الحركات
 export function canSeeAllMovements(role) {
-  return [ROLE_DEVELOPER, ROLE_ADMIN, ROLE_SUPERVISOR].includes(role);
+  return (
+    role === ROLE_DEVELOPER ||
+    role === ROLE_ADMIN ||
+    role === ROLE_SUPERVISOR
+  );
 }
 
-export function canSeeAllCustody(role) {
-  return [ROLE_DEVELOPER, ROLE_ADMIN, ROLE_SUPERVISOR].includes(role);
-}
-
+// من يستطيع إضافة حركة لغيره
 export function canAddMovementForOthers(role) {
-  return [ROLE_DEVELOPER, ROLE_ADMIN, ROLE_SUPERVISOR].includes(role);
+  return (
+    role === ROLE_DEVELOPER ||
+    role === ROLE_ADMIN ||
+    role === ROLE_SUPERVISOR
+  );
+}
+
+// من يستطيع رؤية كل العهد
+export function canSeeAllCustody(role) {
+  return (
+    role === ROLE_DEVELOPER ||
+    role === ROLE_ADMIN ||
+    role === ROLE_SUPERVISOR
+  );
+}
+
+// من يستطيع إدارة الأسطول
+export function canManageFleet(role) {
+  return (
+    role === ROLE_DEVELOPER ||
+    role === ROLE_ADMIN ||
+    role === ROLE_SUPERVISOR
+  );
+}
+
+// من يستطيع رؤية الإحصائيات
+export function canSeeStats(role) {
+  return (
+    role === ROLE_DEVELOPER ||
+    role === ROLE_ADMIN ||
+    role === ROLE_SUPERVISOR
+  );
 }
