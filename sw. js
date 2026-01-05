@@ -1,5 +1,10 @@
 // sw.js
-const CACHE_NAME = "car-moving-cache-v1";
+// ===============================
+// Service Worker للتخزين المؤقت + العمل بدون إنترنت
+// ===============================
+
+const CACHE_NAME = "car-system-cache-v1";
+
 const ASSETS = [
   "./",
   "./index.html",
@@ -7,31 +12,41 @@ const ASSETS = [
   "./firebase.js",
   "./roles.js",
   "./auth.js",
+  "./app.js",
   "./movements.js",
   "./custody.js",
   "./fleet.js",
   "./members.js",
   "./stats.js",
   "./search.js",
-  "./app.js",
   "./manifest.json",
   "./logo.png"
 ];
 
+// ===============================
+// تثبيت Service Worker
+// ===============================
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS);
+    })
   );
   self.skipWaiting();
 });
+
+// ===============================
+// تفعيل Service Worker
+// ===============================
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
-        keys.map((k) => {
-          if (k !== CACHE_NAME) {
-            return caches.delete(k);
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
           }
         })
       )
@@ -40,15 +55,20 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// ===============================
+// جلب الملفات (Cache First)
+// ===============================
+
 self.addEventListener("fetch", (event) => {
-  const req = event.request;
   event.respondWith(
-    caches.match(req).then((cached) => {
+    caches.match(event.request).then((cached) => {
       return (
         cached ||
-        fetch(req).catch(() => {
-          // في حال عدم توفر الاتصال ولا يوجد كاش
-          return cached;
+        fetch(event.request).catch(() => {
+          // في حال عدم توفر الإنترنت
+          if (event.request.mode === "navigate") {
+            return caches.match("./index.html");
+          }
         })
       );
     })
