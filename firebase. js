@@ -1,14 +1,18 @@
 // firebase.js
+// ===============================
+// تهيئة Firebase للمشروع بالكامل
+// ===============================
+
 import {
   initializeApp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 
 import {
   getAuth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
+  signInWithEmailAndPassword,
   signOut,
+  onAuthStateChanged,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
@@ -28,7 +32,10 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// إعدادات Firebase الخاصة بك (كما أرسلتها)
+// ===============================
+// إعدادات Firebase الخاصة بمشروعك
+// ===============================
+
 const firebaseConfig = {
   apiKey: "AIzaSyBpSLNh78z4FvOIFC7I0DzCa_De-2yuWwo",
   authDomain: "car-moving-8b59e.firebaseapp.com",
@@ -38,21 +45,27 @@ const firebaseConfig = {
   appId: "1:332747318494:web:4f2ef98c365b6bf62f0e4f"
 };
 
-// تهيئة التطبيق
+// ===============================
+// تشغيل Firebase
+// ===============================
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// تصدير ما نحتاجه في بقية الملفات
+// ===============================
+// تصدير كل شيء لبقية الملفات
+// ===============================
+
 export {
   app,
   auth,
   db,
   // Auth
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
+  signInWithEmailAndPassword,
   signOut,
+  onAuthStateChanged,
   updateProfile,
   // Firestore
   collection,
