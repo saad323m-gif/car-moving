@@ -1,357 +1,120 @@
-// fleet.js
-// ===============================
-// إدارة الأسطول (إضافة – تعديل – حذف – تنبيه انتهاء)
-// ===============================
+import { db, ref, push, onValue, update, remove } from "./firebase.js";
 
-import {
-  db,
-  collection,
-  doc,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  serverTimestamp
-} from "./firebase.js";
+export function loadFleet(role, uid) {
+  if (!['مطور','مدير','مشرف'].includes(role)) return;
 
-import { currentUserProfile } from "./auth.js";
-import { canManageFleet } from "./roles.js";
-
-// عناصر الواجهة
-const fleetTab = document.getElementById("fleetTab");
-
-// ===============================
-// حساب الأيام المتبقية
-// ===============================
-
-function daysLeft(dateIso) {
-  if (!dateIso) return null;
-  const now = new Date();
-  const target = new Date(dateIso);
-  const diff = target - now;
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
-
-// ===============================
-// بناء واجهة التبويب
-// ===============================
-
-function renderFleetUI() {
-  const canManage = canManageFleet(currentUserProfile.role);
-
-  fleetTab.innerHTML = `
-    <div class="tab-inner-header">
-      <h3>الأسطول</h3>
-      ${
-        canManage
-          ? `<button id="addFleetBtn" class="btn-primary">+ إضافة سيارة</button>`
-          : ""
-      }
-    </div>
-
-    <div id="fleetList" class="accordion-list"></div>
-
-    <div id="fleetFormContainer" class="hidden"></div>
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <h2>الأسطول</h2>
+    <button class="action-btn" id="add-fleet">+ إضافة سيارة</button>
+    <div id="fleet-list"></div>
   `;
 
-  if (canManage) {
-    document.getElementById("addFleetBtn").addEventListener("click", () => {
-      renderFleetForm(null);
+  const fleetRef = ref(db, 'fleet');
+  onValue(fleetRef, (snapshot) => {
+    const list = document.getElementById('fleet-list');
+    list.innerHTML = '';
+    const data = snapshot.val() || {};
+
+    Object.keys(data).reverse().forEach(key => {
+      const f = data[key];
+      const licenseDays = daysLeft(f.licenseEnd);
+      const insuranceDays = daysLeft(f.insuranceEnd);
+
+      const accordion = document.createElement('div');
+      accordion.className = 'accordion';
+      accordion.innerHTML = `
+        <strong>${f.carNumber} | ${f.carType}</strong>
+        ${licenseDays <= 15 ? '<span style="color:red;"> ⚠ تنبيه ترخيص</span>' : ''}
+        ${insuranceDays <= 15 ? '<span style="color:red;"> ⚠ تنبيه تأمين</span>' : ''}
+      `;
+
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.innerHTML = `
+        <p><strong>كود اللوحة:</strong> ${f.plateCode}</p>
+        <p><strong>المالك:</strong> ${f.owner}</p>
+        <p><strong>المتعهد:</strong> ${f.assignedTo || 'غير محدد'}</p>
+        <p><strong>ملاحظات:</strong> ${f.notes || '-'}</p>
+        <p><strong>نهاية الترخيص:</strong> ${f.licenseEnd} (${licenseDays} يوم)</p>
+        <p><strong>نهاية التأمين:</strong> ${f.insuranceEnd} (${insuranceDays} يوم)</p>
+        <button class="action-btn" onclick="editFleet('${key}')">✏ تعديل</button>
+        <button class="action-btn" style="background:red;" onclick="deleteFleet('${key}')">🗑 حذف</button>
+      `;
+
+      accordion.onclick = () => panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+      list.appendChild(accordion);
+      list.appendChild(panel);
     });
-  }
-}
-
-// ===============================
-// نموذج إضافة / تعديل سيارة
-// ===============================
-
-function renderFleetForm(existing) {
-  const container = document.getElementById("fleetFormContainer");
-  container.innerHTML = "";
-  container.classList.remove("hidden");
-
-  const isEdit = !!existing;
-
-  const card = document.createElement("div");
-  card.className = "tab-content";
-
-  card.innerHTML = `
-    <h3>${isEdit ? "تعديل سيارة" : "إضافة سيارة جديدة"}</h3>
-
-    <form id="fleetForm" class="auth-form">
-
-      <label>رقم السيارة</label>
-      <input type="text" name="carNumber" required value="${existing?.carNumber || ""}" />
-
-      <label>نوع السيارة</label>
-      <input type="text" name="carType" required value="${existing?.carType || ""}" />
-
-      <label>تاريخ انتهاء التأمين (YYYY-MM-DD)</label>
-      <input type="date" name="insuranceExpiry" required value="${existing?.insuranceExpiry || ""}" />
-
-      <label>تاريخ انتهاء الترخيص (YYYY-MM-DD)</label>
-      <input type="date" name="licenseExpiry" required value="${existing?.licenseExpiry || ""}" />
-
-      <label>ملاحظات</label>
-      <textarea name="notes">${existing?.notes || ""}</textarea>
-
-      <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
-        <button type="submit" class="btn-primary">${isEdit ? "حفظ التعديلات" : "حفظ"}</button>
-        <button type="button" id="cancelFleetForm" class="btn-secondary">إلغاء</button>
-      </div>
-    </form>
-  `;
-
-  container.appendChild(card);
-
-  document.getElementById("cancelFleetForm").addEventListener("click", () => {
-    container.classList.add("hidden");
   });
 
-  document.getElementById("fleetForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+  document.getElementById('add-fleet').onclick = () => openFleetForm();
+}
 
-    const data = Object.fromEntries(new FormData(e.target).entries());
+function daysLeft(dateStr) {
+  if (!dateStr) return Infinity;
+  const days = (new Date(dateStr) - new Date()) / (1000 * 60 * 60 * 24);
+  return Math.ceil(days);
+}
 
-    const payload = {
-      carNumber: data.carNumber.trim(),
-      carType: data.carType.trim(),
-      insuranceExpiry: data.insuranceExpiry,
-      licenseExpiry: data.licenseExpiry,
-      notes: data.notes.trim()
-    };
+function openFleetForm(editKey = null) {
+  const membersRef = ref(db, 'members');
+  onValue(membersRef, (snap) => {
+    let options = '<option value="">غير محدد</option>';
+    snap.forEach(child => {
+      options += `<option value="${child.val().username}">${child.val().username}</option>`;
+    });
 
-    try {
-      if (isEdit) {
-        await updateDoc(doc(db, "fleet", existing.id), payload);
+    const content = document.getElementById('content');
+    content.innerHTML = `
+      <h2>${editKey ? 'تعديل' : 'إضافة'} سيارة للأسطول</h2>
+      <label>رقم السيارة:</label><input type="text" id="carNumber">
+      <label>كود اللوحة:</label><input type="text" id="plateCode">
+      <label>المالك:</label><input type="text" id="owner">
+      <label>نوع السيارة:</label><input type="text" id="carType">
+      <label>المتعهد (اختياري):</label><select id="assignedTo">${options}</select>
+      <label>ملاحظات:</label><textarea id="notes"></textarea>
+      <label>نهاية الترخيص:</label><input type="date" id="licenseEnd">
+      <label>نهاية التأمين:</label><input type="date" id="insuranceEnd">
+      <button class="action-btn" id="save-fleet">حفظ</button>
+      <button class="action-btn" onclick="loadFleet()">إلغاء</button>
+    `;
+
+    if (editKey) {
+      onValue(ref(db, 'fleet/' + editKey), (snap) => {
+        const f = snap.val();
+        document.getElementById('carNumber').value = f.carNumber;
+        document.getElementById('plateCode').value = f.plateCode;
+        document.getElementById('owner').value = f.owner;
+        document.getElementById('carType').value = f.carType;
+        document.getElementById('assignedTo').value = f.assignedTo || '';
+        document.getElementById('notes').value = f.notes || '';
+        document.getElementById('licenseEnd').value = f.licenseEnd;
+        document.getElementById('insuranceEnd').value = f.insuranceEnd;
+      }, { onlyOnce: true });
+    }
+
+    document.getElementById('save-fleet').onclick = () => {
+      const fleetData = {
+        carNumber: document.getElementById('carNumber').value,
+        plateCode: document.getElementById('plateCode').value,
+        owner: document.getElementById('owner').value,
+        carType: document.getElementById('carType').value,
+        assignedTo: document.getElementById('assignedTo').value,
+        notes: document.getElementById('notes').value,
+        licenseEnd: document.getElementById('licenseEnd').value,
+        insuranceEnd: document.getElementById('insuranceEnd').value
+      };
+
+      if (editKey) {
+        update(ref(db, 'fleet/' + editKey), fleetData);
       } else {
-        await addDoc(collection(db, "fleet"), {
-          ...payload,
-          createdAt: serverTimestamp()
-        });
+        push(ref(db, 'fleet'), fleetData);
       }
-
-      container.classList.add("hidden");
-      await loadFleet();
-
-    } catch (err) {
-      console.error(err);
-      alert("حدث خطأ أثناء حفظ بيانات السيارة.");
-    }
-  });
+      loadFleet();
+    };
+  }, { onlyOnce: true });
 }
 
-// ===============================
-// عرض سيارة داخل أكورديون
-// ===============================
-
-function renderFleetItem(docId, data) {
-  const canManage = canManageFleet(currentUserProfile.role);
-
-  const item = document.createElement("div");
-  item.className = "accordion-item";
-
-  const header = document.createElement("div");
-  header.className = "accordion-header";
-
-  const headerMain = document.createElement("div");
-  headerMain.className = "accordion-header-main";
-
-  const title = document.createElement("div");
-  title.className = "accordion-title";
-  title.textContent = `${data.carNumber} 🚗`;
-
-  const subtitle = document.createElement("div");
-  subtitle.className = "accordion-subtitle";
-  subtitle.textContent = `${data.carType}`;
-
-  const insuranceDays = daysLeft(data.insuranceExpiry);
-  const licenseDays = daysLeft(data.licenseExpiry);
-
-  const meta = document.createElement("div");
-  meta.className = "accordion-meta";
-  meta.textContent = `التأمين: ${data.insuranceExpiry} | الترخيص: ${data.licenseExpiry}`;
-
-  headerMain.appendChild(title);
-  headerMain.appendChild(subtitle);
-  headerMain.appendChild(meta);
-
-  const toggle = document.createElement("div");
-  toggle.className = "accordion-toggle";
-  toggle.textContent = "▼";
-
-  header.appendChild(headerMain);
-  header.appendChild(toggle);
-
-  const body = document.createElement("div");
-  body.className = "accordion-body hidden";
-
-  body.innerHTML = `
-    <div class="accordion-row">
-      <span class="label">رقم السيارة:</span>
-      <span class="value">${data.carNumber}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">نوع السيارة:</span>
-      <span class="value">${data.carType}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">انتهاء التأمين:</span>
-      <span class="value">${data.insuranceExpiry}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">انتهاء الترخيص:</span>
-      <span class="value">${data.licenseExpiry}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">ملاحظات:</span>
-      <span class="value">${data.notes || "-"}</span>
-    </div>
-
-    ${
-      insuranceDays !== null && insuranceDays <= 15
-        ? `<span class="badge-warning">⚠ التأمين سينتهي خلال ${insuranceDays} يوم</span>`
-        : ""
-    }
-
-    ${
-      licenseDays !== null && licenseDays <= 15
-        ? `<span class="badge-warning">⚠ الترخيص سينتهي خلال ${licenseDays} يوم</span>`
-        : ""
-    }
-  `;
-
-  // أزرار
-  const actions = document.createElement("div");
-  actions.className = "accordion-actions";
-
-  // مشاركة
-  const shareBtn = document.createElement("button");
-  shareBtn.className = "btn-secondary";
-  shareBtn.textContent = "📤 مشاركة";
-  shareBtn.addEventListener("click", () => {
-    const text = `
-بيانات سيارة
-رقم السيارة: ${data.carNumber}
-نوع السيارة: ${data.carType}
-انتهاء التأمين: ${data.insuranceExpiry}
-انتهاء الترخيص: ${data.licenseExpiry}
-ملاحظات: ${data.notes || "-"}
-    `.trim();
-
-    if (navigator.share) {
-      navigator.share({ text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text);
-      alert("تم نسخ بيانات السيارة.");
-    }
-  });
-
-  // طباعة
-  const printBtn = document.createElement("button");
-  printBtn.className = "btn-secondary";
-  printBtn.textContent = "🖨 طباعة";
-  printBtn.addEventListener("click", () => {
-    const w = window.open("", "_blank");
-    w.document.write(`
-      <html dir="rtl"><body>
-      <h2>بيان سيارة</h2>
-      <p>رقم السيارة: ${data.carNumber}</p>
-      <p>نوع السيارة: ${data.carType}</p>
-      <p>انتهاء التأمين: ${data.insuranceExpiry}</p>
-      <p>انتهاء الترخيص: ${data.licenseExpiry}</p>
-      <p>ملاحظات: ${data.notes || "-"}</p>
-      </body></html>
-    `);
-    w.document.close();
-    w.print();
-  });
-
-  actions.appendChild(shareBtn);
-  actions.appendChild(printBtn);
-
-  // تعديل
-  if (canManage) {
-    const editBtn = document.createElement("button");
-    editBtn.className = "btn-primary";
-    editBtn.textContent = "✏ تعديل";
-    editBtn.addEventListener("click", () => {
-      renderFleetForm({ id: docId, ...data });
-    });
-    actions.appendChild(editBtn);
-  }
-
-  // حذف
-  if (canManage) {
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn-danger";
-    deleteBtn.textContent = "🗑 حذف";
-    deleteBtn.addEventListener("click", async () => {
-      if (!confirm("هل أنت متأكد من حذف السيارة؟")) return;
-      await deleteDoc(doc(db, "fleet", docId));
-      await loadFleet();
-    });
-    actions.appendChild(deleteBtn);
-  }
-
-  body.appendChild(actions);
-
-  // فتح/إغلاق
-  header.addEventListener("click", () => {
-    const isHidden = body.classList.contains("hidden");
-    body.classList.toggle("hidden", !isHidden);
-    toggle.textContent = isHidden ? "▲" : "▼";
-  });
-
-  item.appendChild(header);
-  item.appendChild(body);
-
-  return item;
-}
-
-// ===============================
-// تحميل الأسطول
-// ===============================
-
-export async function loadFleet() {
-  const list = document.getElementById("fleetList");
-  if (!list) return;
-
-  list.innerHTML = "";
-
-  try {
-    const q = query(collection(db, "fleet"), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
-
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      const item = renderFleetItem(docSnap.id, data);
-      if (item) list.appendChild(item);
-    });
-
-    if (!list.children.length) {
-      list.innerHTML = "<p>لا توجد سيارات في الأسطول.</p>";
-    }
-
-    document.dispatchEvent(new CustomEvent("fleet-loaded"));
-
-  } catch (err) {
-    console.error(err);
-    list.innerHTML = "<p>تعذر تحميل بيانات الأسطول.</p>";
-  }
-}
-
-// ===============================
-// عند جاهزية المستخدم
-// ===============================
-
-document.addEventListener("user-ready", () => {
-  renderFleetUI();
-  loadFleet();
-});
+window.editFleet = (key) => openFleetForm(key);
+window.deleteFleet = (key) => { if (confirm('حذف؟')) remove(ref(db, 'fleet/' + key)); };
