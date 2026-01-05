@@ -1,368 +1,191 @@
-// movements.js
-// ===============================
-// إدارة حركة السيارات (استلام / تسليم)
-// ===============================
+import { db, ref, push, onValue, update, remove } from "./firebase.js";
 
-import {
-  db,
-  collection,
-  doc,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  serverTimestamp
-} from "./firebase.js";
+let currentUserRole = '';
+let currentUserUid = '';
 
-import { currentUserProfile } from "./auth.js";
-import {
-  canSeeAllMovements,
-  canAddMovementForOthers
-} from "./roles.js";
+export function loadMovements(role, uid) {
+  currentUserRole = role;
+  currentUserUid = uid;
 
-// عناصر الواجهة
-const movementsTab = document.getElementById("movementsTab");
-
-// ===============================
-// دالة الوقت GMT+4
-// ===============================
-
-function getNowGmt4Iso() {
-  const nowUtc = new Date();
-  const utcMs = nowUtc.getTime() + nowUtc.getTimezoneOffset() * 60000;
-  const gmt4Ms = utcMs + 4 * 60 * 60 * 1000;
-  return new Date(gmt4Ms).toISOString();
-}
-
-// ===============================
-// بناء واجهة التبويب
-// ===============================
-
-function renderMovementsUI() {
-  movementsTab.innerHTML = `
-    <div class="tab-inner-header">
-      <h3>حركة السيارات</h3>
-      <button id="addMovementBtn" class="btn-primary">+ إضافة حركة</button>
-    </div>
-
-    <div id="movementsList" class="accordion-list"></div>
-
-    <div id="movementFormContainer" class="hidden"></div>
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <h2>تحركات السيارات</h2>
+    ${['مطور','مدير','مشرف'].includes(role) ? `<button class="action-btn" id="add-movement">+ إضافة حركة جديدة</button>` : ''}
+    <div id="movements-list"></div>
   `;
 
-  document.getElementById("addMovementBtn").addEventListener("click", () => {
-    renderMovementForm(null);
+  // عرض القائمة
+  const movementsRef = ref(db, 'movements');
+  onValue(movementsRef, (snapshot) => {
+    const list = document.getElementById('movements-list');
+    list.innerHTML = '';
+    const data = snapshot.val();
+    if (!data) return;
+
+    Object.keys(data).reverse().forEach(key => {
+      const m = data[key];
+      if (role === 'عضو' && m.driverUid !== uid) return; // العضو يرى حركاته فقط
+
+      const date = new Date(m.timestamp);
+      const formattedDate = date.toLocaleString('en-GB', {
+        timeZone: 'Asia/Dubai',
+        hour12: true,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      }).replace(',', '');
+
+      const accordion = document.createElement('div');
+      accordion.className = 'accordion';
+      accordion.innerHTML = `
+        <strong>${m.driverName} | ${m.carNumber} | ${m.type === 'receive' ? 'استلام' : 'تسليم'}</strong>
+        <span>${formattedDate}</span>
+        ${m.edited ? '<span style="color:red; font-weight:bold;"> (تم التعديل)</span>' : ''}
+      `;
+
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.innerHTML = `
+        <p><strong>كود اللوحة:</strong> ${m.plateCode}</p>
+        <p><strong>نوع السيارة:</strong> ${m.carType}</p>
+        <p><strong>نوع الحركة:</strong> ${m.type === 'receive' ? 'استلام' : 'تسليم'}</p>
+        <p><strong>ملاحظات:</strong> ${m.notes || '-'}</p>
+        ${m.edited ? `<p style="color:red;"><strong>تم التعديل بواسطة:</strong> ${m.editedBy} | <strong>النص الأصلي:</strong> ${m.originalNotes || m.notes}</p>` : ''}
+        <div>
+          <button class="action-btn" onclick="printMovement('${key}')">🖨 طباعة</button>
+          <button class="action-btn" onclick="shareMovement('${key}')">📤 مشاركة</button>
+          ${canEditDelete(m, role, uid, m.timestamp) ? `<button class="action-btn" onclick="editMovement('${key}')">✏ تعديل</button>` : ''}
+          ${['مطور','مدير','مشرف'].includes(role) ? `<button class="action-btn" style="background:red;" onclick="deleteMovement('${key}')">🗑 حذف</button>` : ''}
+        </div>
+      `;
+
+      accordion.onclick = () => panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+      list.appendChild(accordion);
+      list.appendChild(panel);
+    });
   });
+
+  // إضافة حركة جديدة
+  if (document.getElementById('add-movement')) {
+    document.getElementById('add-movement').onclick = () => openMovementForm();
+  }
 }
 
-// ===============================
-// نموذج إضافة / تعديل حركة
-// ===============================
-
-function renderMovementForm(existing) {
-  const container = document.getElementById("movementFormContainer");
-  container.innerHTML = "";
-  container.classList.remove("hidden");
-
-  const isEdit = !!existing;
-  const user = currentUserProfile;
-
-  const card = document.createElement("div");
-  card.className = "tab-content";
-
-  card.innerHTML = `
-    <h3>${isEdit ? "تعديل حركة" : "إضافة حركة جديدة"}</h3>
-
-    <form id="movementForm" class="auth-form">
-
-      <label>نوع الحركة</label>
-      <select name="movementType" required>
-        <option value="استلام" ${existing?.movementType === "استلام" ? "selected" : ""}>استلام</option>
-        <option value="تسليم" ${existing?.movementType === "تسليم" ? "selected" : ""}>تسليم</option>
-      </select>
-
-      <label>رقم السيارة</label>
-      <input type="text" name="carNumber" required value="${existing?.carNumber || ""}" />
-
-      <label>اسم المتعهد</label>
-      <input type="text" name="custodianName" required value="${existing?.custodianName || user.fullName}" />
-
-      <label>ملاحظات</label>
-      <textarea name="notes">${existing?.notes || ""}</textarea>
-
-      <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
-        <button type="submit" class="btn-primary">${isEdit ? "حفظ التعديلات" : "حفظ"}</button>
-        <button type="button" id="cancelMovementForm" class="btn-secondary">إلغاء</button>
-      </div>
-
-      ${
-        isEdit && existing.originalText
-          ? `<p class="edited-original">النص الأصلي: ${existing.originalText}</p>`
-          : ""
-      }
-    </form>
-  `;
-
-  container.appendChild(card);
-
-  document.getElementById("cancelMovementForm").addEventListener("click", () => {
-    container.classList.add("hidden");
-  });
-
-  document.getElementById("movementForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = Object.fromEntries(new FormData(e.target).entries());
-
-    const payload = {
-      movementType: data.movementType,
-      carNumber: data.carNumber.trim(),
-      custodianName: data.custodianName.trim(),
-      notes: data.notes.trim(),
-      createdByUid: existing?.createdByUid || user.uid,
-      createdByName: existing?.createdByName || user.fullName
-    };
-
-    try {
-      if (isEdit) {
-        // تحقق من 24 ساعة
-        const createdAt = new Date(existing.createdAtGmt4Iso);
-        const now = new Date(getNowGmt4Iso());
-        const diffHours = (now - createdAt) / (1000 * 60 * 60);
-
-        if (existing.createdByUid === user.uid && diffHours > 24) {
-          alert("لا يمكنك تعديل الحركة بعد مرور 24 ساعة.");
-          return;
-        }
-
-        await updateDoc(doc(db, "movements", existing.id), {
-          ...payload,
-          editedAt: getNowGmt4Iso(),
-          originalText: existing.originalText || existing.notes
-        });
-      } else {
-        await addDoc(collection(db, "movements"), {
-          ...payload,
-          createdAt: serverTimestamp(),
-          createdAtGmt4Iso: getNowGmt4Iso()
-        });
-      }
-
-      container.classList.add("hidden");
-      await loadMovements();
-
-    } catch (err) {
-      console.error(err);
-      alert("حدث خطأ أثناء حفظ الحركة.");
-    }
-  });
+function canEditDelete(m, role, uid, timestamp) {
+  if (['مطور','مدير','مشرف'].includes(role)) return true;
+  if (role === 'عضو' && m.driverUid === uid) {
+    const hours = (Date.now() - timestamp) / (1000 * 60 * 60);
+    return hours <= 24;
+  }
+  return false;
 }
 
-// ===============================
-// عرض الحركة داخل أكورديون
-// ===============================
+function openMovementForm(editKey = null) {
+  const membersRef = ref(db, 'members');
+  onValue(membersRef, (snap) => {
+    let options = '';
+    snap.forEach(child => {
+      const m = child.val();
+      options += `<option value="${child.key}">${m.username}</option>`;
+    });
 
-function renderMovementItem(docId, data) {
-  const user = currentUserProfile;
-  const canSeeAll = canSeeAllMovements(user.role);
+    const content = document.getElementById('content');
+    const oldContent = content.innerHTML;
+    content.innerHTML = `
+      <h2>${editKey ? 'تعديل' : 'إضافة'} حركة</h2>
+      <label>اسم السائق:</label>
+      <select id="driverUid">${options}</select>
+      <label>رقم السيارة:</label>
+      <input type="text" id="carNumber">
+      <label>كود اللوحة:</label>
+      <input type="text" id="plateCode">
+      <label>نوع السيارة:</label>
+      <input type="text" id="carType">
+      <label>نوع الحركة:</label>
+      <select id="type"><option value="receive">استلام</option><option value="deliver">تسليم</option></select>
+      <label>ملاحظات:</label>
+      <textarea id="notes"></textarea>
+      <button class="action-btn" id="save-movement">حفظ</button>
+      <button class="action-btn" onclick="loadMovements('${currentUserRole}', '${currentUserUid}')">إلغاء</button>
+    `;
 
-  if (!canSeeAll && data.createdByUid !== user.uid) return null;
-
-  const item = document.createElement("div");
-  item.className = "accordion-item";
-
-  const header = document.createElement("div");
-  header.className = "accordion-header";
-
-  const headerMain = document.createElement("div");
-  headerMain.className = "accordion-header-main";
-
-  const title = document.createElement("div");
-  title.className = "accordion-title";
-  title.textContent = `${data.movementType} - ${data.carNumber}`;
-
-  const subtitle = document.createElement("div");
-  subtitle.className = "accordion-subtitle";
-  subtitle.textContent = `بواسطة: ${data.createdByName}`;
-
-  const meta = document.createElement("div");
-  meta.className = "accordion-meta";
-  meta.textContent = data.createdAtGmt4Iso || "-";
-
-  headerMain.appendChild(title);
-  headerMain.appendChild(subtitle);
-  headerMain.appendChild(meta);
-
-  const toggle = document.createElement("div");
-  toggle.className = "accordion-toggle";
-  toggle.textContent = "▼";
-
-  header.appendChild(headerMain);
-  header.appendChild(toggle);
-
-  const body = document.createElement("div");
-  body.className = "accordion-body hidden";
-
-  body.innerHTML = `
-    <div class="accordion-row">
-      <span class="label">نوع الحركة:</span>
-      <span class="value">${data.movementType}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">رقم السيارة:</span>
-      <span class="value">${data.carNumber}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">المتعهد:</span>
-      <span class="value">${data.custodianName}</span>
-    </div>
-
-    <div class="accordion-row">
-      <span class="label">ملاحظات:</span>
-      <span class="value">${data.notes || "-"}</span>
-    </div>
-
-    ${
-      data.originalText
-        ? `<span class="badge-edited">تم التعديل</span>`
-        : ""
-    }
-  `;
-
-  // أزرار
-  const actions = document.createElement("div");
-  actions.className = "accordion-actions";
-
-  // مشاركة
-  const shareBtn = document.createElement("button");
-  shareBtn.className = "btn-secondary";
-  shareBtn.textContent = "📤 مشاركة";
-  shareBtn.addEventListener("click", () => {
-    const text = `
-${data.movementType}
-رقم السيارة: ${data.carNumber}
-المتعهد: ${data.custodianName}
-ملاحظات: ${data.notes || "-"}
-بواسطة: ${data.createdByName}
-${data.createdAtGmt4Iso}
-    `.trim();
-
-    if (navigator.share) {
-      navigator.share({ text }).catch(() => {});
+    if (editKey) {
+      const mRef = ref(db, 'movements/' + editKey);
+      onValue(mRef, (snap) => {
+        const m = snap.val();
+        document.getElementById('driverUid').value = m.driverUid;
+        document.getElementById('carNumber').value = m.carNumber;
+        document.getElementById('plateCode').value = m.plateCode;
+        document.getElementById('carType').value = m.carType;
+        document.getElementById('type').value = m.type;
+        document.getElementById('notes').value = m.notes;
+      }, { onlyOnce: true });
     } else {
-      navigator.clipboard.writeText(text);
-      alert("تم نسخ بيانات الحركة.");
+      document.getElementById('driverUid').value = currentUserUid;
+      if (currentUserRole === 'عضو') document.getElementById('driverUid').disabled = true;
     }
-  });
 
-  // طباعة
-  const printBtn = document.createElement("button");
-  printBtn.className = "btn-secondary";
-  printBtn.textContent = "🖨 طباعة";
-  printBtn.addEventListener("click", () => {
-    const w = window.open("", "_blank");
-    w.document.write(`
-      <html dir="rtl"><body>
-      <h2>بيان حركة سيارة</h2>
-      <p>نوع الحركة: ${data.movementType}</p>
-      <p>رقم السيارة: ${data.carNumber}</p>
-      <p>المتعهد: ${data.custodianName}</p>
-      <p>ملاحظات: ${data.notes || "-"}</p>
-      <p>بواسطة: ${data.createdByName}</p>
-      <p>${data.createdAtGmt4Iso}</p>
+    document.getElementById('save-movement').onclick = () => {
+      const driverUid = document.getElementById('driverUid').value;
+      const driverName = document.querySelector(`#driverUid option[value="${driverUid}"]`).textContent;
+
+      const movement = {
+        driverUid,
+        driverName,
+        carNumber: document.getElementById('carNumber').value,
+        plateCode: document.getElementById('plateCode').value,
+        carType: document.getElementById('carType').value,
+        type: document.getElementById('type').value,
+        notes: document.getElementById('notes').value,
+        timestamp: Date.now()  // ثابت UTC+4 من السيرفر
+      };
+
+      if (editKey) {
+        const updates = {
+          ...movement,
+          edited: true,
+          editedBy: currentUserRole,
+          originalNotes: movement.notes !== snap.val().notes ? snap.val().notes : undefined
+        };
+        update(ref(db, 'movements/' + editKey), updates);
+      } else {
+        push(ref(db, 'movements'), movement);
+      }
+      loadMovements(currentUserRole, currentUserUid);
+    };
+  }, { onlyOnce: true });
+}
+
+// دوال الطباعة والمشاركة
+window.printMovement = (key) => {
+  const mRef = ref(db, 'movements/' + key);
+  onValue(mRef, (snap) => {
+    const m = snap.val();
+    const printWin = window.open('', '_blank');
+    printWin.document.write(`
+      <html dir="rtl"><head><title>حركة سيارة</title></head><body>
+        <h1>تحركات السيارات - المسعود</h1>
+        <p><strong>السائق:</strong> ${m.driverName}</p>
+        <p><strong>رقم السيارة:</strong> ${m.carNumber}</p>
+        <p><strong>كود اللوحة:</strong> ${m.plateCode}</p>
+        <p><strong>نوع السيارة:</strong> ${m.carType}</p>
+        <p><strong>النوع:</strong> ${m.type === 'receive' ? 'استلام' : 'تسليم'}</p>
+        <p><strong>التاريخ والوقت:</strong> ${new Date(m.timestamp).toLocaleString('en-GB', {timeZone: 'Asia/Dubai', hour12: true})}</p>
+        <p><strong>ملاحظات:</strong> ${m.notes || '-'}</p>
       </body></html>
     `);
-    w.document.close();
-    w.print();
-  });
+    printWin.document.close();
+    printWin.print();
+  }, { onlyOnce: true });
+};
 
-  actions.appendChild(shareBtn);
-  actions.appendChild(printBtn);
-
-  // تعديل
-  const canEdit =
-    data.createdByUid === user.uid ||
-    canAddMovementForOthers(user.role);
-
-  if (canEdit) {
-    const editBtn = document.createElement("button");
-    editBtn.className = "btn-primary";
-    editBtn.textContent = "✏ تعديل";
-    editBtn.addEventListener("click", () => {
-      renderMovementForm({ id: docId, ...data });
-    });
-    actions.appendChild(editBtn);
+window.shareMovement = async (key) => {
+  const url = location.href;
+  if (navigator.share) {
+    navigator.share({ title: 'حركة سيارة', url });
+  } else {
+    prompt('انسخ الرابط:', url + '?movement=' + key);
   }
+};
 
-  // حذف
-  if (canAddMovementForOthers(user.role)) {
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn-danger";
-    deleteBtn.textContent = "🗑 حذف";
-    deleteBtn.addEventListener("click", async () => {
-      if (!confirm("هل أنت متأكد من حذف الحركة؟")) return;
-      await deleteDoc(doc(db, "movements", docId));
-      await loadMovements();
-    });
-    actions.appendChild(deleteBtn);
-  }
-
-  body.appendChild(actions);
-
-  // فتح/إغلاق
-  header.addEventListener("click", () => {
-    const isHidden = body.classList.contains("hidden");
-    body.classList.toggle("hidden", !isHidden);
-    toggle.textContent = isHidden ? "▲" : "▼";
-  });
-
-  item.appendChild(header);
-  item.appendChild(body);
-
-  return item;
-}
-
-// ===============================
-// تحميل الحركات
-// ===============================
-
-export async function loadMovements() {
-  const list = document.getElementById("movementsList");
-  if (!list) return;
-
-  list.innerHTML = "";
-
-  try {
-    const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
-
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      const item = renderMovementItem(docSnap.id, data);
-      if (item) list.appendChild(item);
-    });
-
-    if (!list.children.length) {
-      list.innerHTML = "<p>لا توجد حركات مسجلة.</p>";
-    }
-
-    document.dispatchEvent(new CustomEvent("movements-loaded"));
-
-  } catch (err) {
-    console.error(err);
-    list.innerHTML = "<p>تعذر تحميل الحركات.</p>";
-  }
-}
-
-// ===============================
-// عند جاهزية المستخدم
-// ===============================
-
-document.addEventListener("user-ready", () => {
-  renderMovementsUI();
-  loadMovements();
-});
+window.editMovement = (key) => openMovementForm(key);
+window.deleteMovement = (key) => { if (confirm('حذف نهائي؟')) remove(ref(db, 'movements/' + key)); };
