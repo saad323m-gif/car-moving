@@ -1,0 +1,463 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: #f3f6fa;
+  color: #111;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* الهيدر */
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.app-subtitle {
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* الفوتر */
+
+.app-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+}
+
+/* أزرار عامة */
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #007bff, #0056d6);
+  color: #fff;
+}
+
+.btn-secondary {
+  background-color: #f1f3f5;
+  color: #333;
+}
+
+.btn-danger {
+  background-color: #d9534f;
+  color: #fff;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* كروت */
+
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  margin: 0 0 0.75rem;
+}
+
+/* نماذج */
+
+.form-group {
+  margin-bottom: 0.6rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.85rem;
+}
+
+.form-group textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* رسائل */
+
+.message {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #d9534f;
+}
+
+.hint-text {
+  font-size: 0.75rem;
+  color: #555;
+}
+
+/* تبويبات */
+
+.tabs {
+  display: flex;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 0.4rem;
+  font-size: 0.8rem;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  color: #555;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button.tab-active {
+  color: #1d4ed8;
+  border-bottom-color: #1d4ed8;
+  font-weight: 600;
+}
+
+/* واجهة الدخول */
+
+.auth-view {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+}
+
+/* واجهة التطبيق */
+
+.app-view {
+  flex: 1;
+  padding: 0.75rem;
+}
+
+.user-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.user-bar input[type="search"] {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.8rem;
+  min-width: 160px;
+}
+
+/* تبويبات رئيسية */
+
+.main-tabs {
+  margin-bottom: 0.75rem;
+}
+
+.main-tab-button {
+  font-size: 0.8rem;
+}
+
+/* محتوى التبويب */
+
+.tab-content {
+  animation: fadeIn 0.25s ease-in;
+}
+
+.tab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+/* أكورديون */
+
+.accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.accordion-item {
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.accordion-header {
+  padding: 0.55rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: linear-gradient(135deg, #e0f2fe, #eff6ff);
+}
+
+.accordion-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.accordion-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.accordion-subtitle {
+  font-size: 0.75rem;
+  color: #334155;
+}
+
+.accordion-meta {
+  font-size: 0.7rem;
+  color: #475569;
+}
+
+.accordion-toggle {
+  font-size: 1rem;
+}
+
+.accordion-body {
+  padding: 0.6rem 0.75rem 0.75rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.8rem;
+}
+
+.accordion-body-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.accordion-body-row span.label {
+  color: #64748b;
+}
+
+.accordion-body-row span.value {
+  font-weight: 500;
+}
+
+.accordion-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* شارات الصلاحيات */
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  color: #fff;
+}
+
+.role-dev {
+  background-color: #b91c1c; /* مطور النظام - أحمر */
+}
+
+.role-admin {
+  background-color: #ea580c; /* مدير - برتقالي */
+}
+
+.role-supervisor {
+  background-color: #1e3a8a; /* مشرف - أزرق غامق */
+}
+
+.role-member {
+  background-color: #16a34a; /* عضو - أخضر */
+}
+
+/* تمييز التعديلات */
+
+.badge-edited {
+  background-color: #facc15;
+  color: #111827;
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.7rem;
+  margin-inline-start: 0.3rem;
+}
+
+.edited-original {
+  color: #b91c1c;
+  font-size: 0.75rem;
+}
+
+/* تمييز تنبيه انتهاء الرخصة / التأمين */
+
+.badge-warning {
+  background-color: #f97316;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.7rem;
+}
+
+/* أوفرلاي التحميل */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.overlay-visible {
+  display: flex;
+}
+
+.overlay-content {
+  background-color: #0f172a;
+  color: #e5e7eb;
+  padding: 1rem 1.4rem;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 200px;
+}
+
+.loader {
+  border: 3px solid rgba(148, 163, 184, 0.3);
+  border-top: 3px solid #38bdf8;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 0.5rem;
+}
+
+/* مساعدات */
+
+.hidden {
+  display: none !important;
+}
+
+.collapsible {
+  animation: slideDown 0.2s ease-out;
+}
+
+/* أنيميشن */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* استجابة للموبايل */
+
+@media (max-width: 600px) {
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .header-right {
+    align-self: stretch;
+    justify-content: flex-end;
+  }
+  .tab-header h2 {
+    font-size: 1rem;
+  }
+}
